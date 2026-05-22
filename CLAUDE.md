@@ -233,15 +233,31 @@ bt_bl  Blocks array
 
 **MVP: Complete — v1.0.0**
 
-**Phase 1: Usability and Trust — NEXT**
-- Multi-device sync via Supabase free tier
-- Monthly income summary screen
-- GCash and Maya payment log per booking
+**v1.1.0: Complete**
+- Password removed from source, SHA-256 hash constant
+- Silent save failure now shows visible error banner
+- Export and Import JSON backup with validation and confirm modal
+- What's New modal
+
+**v1.2.0: Guest Masterlist — NEXT**
+- Guest profile modal, full screen, opened from header button
+- Search by name, mobile, email
+- Filter chips: All, Repeat, VIP, Flagged
+- Guest card showing name, total stays, last stay date, platform badges, tag color dot
+- Tap card opens full profile: all stays, total revenue, payment methods, notes, host rating
+
+**v1.3.0: Navigation — PENDING**
+- Bottom navigation bar: Home, Guests, Reports, Settings
+- Settings tab absorbs: Export, Import, Clear Demo, What's New, Password
+- Header cleaned up
+
+**Phase 1 remaining — PENDING**
+- Monthly income summary (becomes Reports tab in v1.3.0)
 - Next check-in banner on home screen
 - PWA installable on phone home screen
+- Multi-device sync via Supabase free tier
 
 **Phase 2: Guest Intelligence — PENDING**
-- Persistent guest profiles
 - Quick reply message templates
 - Expense tracking per booking
 - Partial cancel gap support
@@ -252,13 +268,13 @@ bt_bl  Blocks array
 - iCal auto-pull from Airbnb, Booking.com, Agoda
 - Subscription billing and landing page
 
-**Phase 4: AI Features (Claude API) — PENDING**
+**Phase 4: AI Assistant — PENDING**
 - Monthly host report in plain language
 - Guest message drafts based on booking details
-- Pricing suggestions based on occupancy patterns
+- Pricing suggestions based on occupancy and local market data
 - Anomaly alerts for unusual booking patterns
-- Formal monthly PDF report for record keeping
-- Goal: present to Connectt.io as portfolio piece
+- Formal monthly PDF report
+- Present to Connectt.io as portfolio piece
 
 ---
 
