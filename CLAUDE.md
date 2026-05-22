@@ -91,20 +91,23 @@ Single file architecture is intentional. Do not propose splitting unless the own
 ```
 index.html
 │
-├── style               Lines 9 to 152      All CSS
-├── LOGIN               Lines 153 to 163    Login screen HTML
-├── APP                 Lines 164 to 222    App shell, header, occupancy bar, calendar, detail panel
-├── ADD                 Lines 223 to 252    Add booking modal
-├── TURNAROUND          Lines 253 to 259    Same-day turnaround warning modal
-├── EDIT                Lines 260 to 291    Edit booking modal
-├── EXTEND              Lines 292 to 295    Extend stay modal
-├── CANCEL              Lines 296 to 299    Cancel booking modal
-├── CANCEL CONFIRM      Lines 300 to 307    Full cancel double-confirm modal
-├── MAINTENANCE         Lines 308 to 321    Block dates modal
-├── CLEAR DEMO          Lines 322 to 329    Clear demo data confirm modal
-├── ALL BOOKINGS        Lines 330 to 348    All bookings list modal
+├── style               Lines 11 to 137     All CSS
+├── LOGIN               Lines 139 to 148    Login screen HTML
+├── APP                 Lines 150 to 197    App shell, header, occupancy bar, calendar, detail panel
+├── ADD                 Lines 198 to 224    Add booking modal
+├── TURNAROUND          Lines 225 to 231    Same-day turnaround warning modal
+├── EDIT                Lines 232 to 258    Edit booking modal
+├── EXTEND              Lines 259 to 261    Extend stay modal
+├── CANCEL              Lines 262 to 264    Cancel booking modal
+├── CANCEL CONFIRM      Lines 265 to 271    Full cancel double-confirm modal
+├── MAINTENANCE         Lines 272 to 282    Block dates modal
+├── CLEAR DEMO          Lines 283 to 289    Clear demo data confirm modal
+├── ALL BOOKINGS        Lines 290 to 306    All bookings list modal
+├── IMPORT FILE         Lines 307 to 309    Hidden file input for import
+├── IMPORT CONFIRM      Lines 310 to 323    Import confirm modal with validation
+├── WHAT'S NEW          Lines 324 to 334    v1.1.0 release notes modal
 │
-└── script              Lines 349 to 734    All application logic
+└── script              Lines 335 to 820    All application logic
     ├── AUTH            SHA-256 login, logout
     ├── DATA            Demo data, localStorage save/load, clearDemo
     ├── HELPERS         fmt12, dRange, addDays, getters, class mappers
@@ -119,7 +122,9 @@ index.html
     ├── EXTEND          openExt, confExt
     ├── CANCEL          openCan, tgP, reqCan, execFull, confPart
     ├── MAINTENANCE     openMaint, openEditBlk, saveMaint, delBlk
-    └── ALL BOOKINGS    openList, renderList, pickBk
+    ├── ALL BOOKINGS    openList, renderList, pickBk
+    ├── EXPORT/IMPORT   doExport, triggerImport, readImport, confirmImport
+    └── WHAT'S NEW      openWN
 ```
 
 ### 3.3 localStorage Schema
@@ -261,9 +266,10 @@ bt_bl  Blocks array
 
 | Version | Date | Summary |
 |---|---|---|
+| v1.1.0 | May 2026 | Password removed from source, replaced with pre-computed SHA-256 hash. Silent save failure now shows visible error banner. Export and import JSON backup added with file validation and confirm modal. What's New modal added. |
 | v1.0.0 | May 2026 | MVP complete. Login, calendar, full booking lifecycle, cleaner flow, payment tracking, turnaround detection, localStorage persistence, all bookings list, maintenance blocks, occupancy tracker. 23 checks passing. |
 
-Next release: v1.1.0
+Next release: v1.2.0
 
 ---
 
