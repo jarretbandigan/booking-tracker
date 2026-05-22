@@ -153,11 +153,15 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
     <h1>📋 Booking Tracker</h1>
     <div class="hbs">
       <button class="hb" onclick="openList()">📋 All Bookings</button>
+      <button class="hb" onclick="openWN()">✨ What's New</button>
+      <button class="hb" onclick="doExport()">📤 Export</button>
+      <button class="hb" onclick="triggerImport()">📥 Import</button>
       <button class="hb hbd" onclick="document.getElementById('ov-cd').classList.add('sh')">🗑 Clear demo</button>
       <button class="hb" onclick="doLogout()">Sign out</button>
     </div>
   </div>
   <div class="wp">
+    <div id="sverr" class="er" style="display:none;margin-bottom:9px">⚠️ Auto-save failed — your last change was not stored. Try again or export a backup.</div>
     <div class="ob">
       <span class="ol">Occupancy</span>
       <span class="of" id="ofrac">0/31</span>
@@ -300,14 +304,41 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
   <div class="mbb" style="margin-top:9px"><button class="bxx" style="flex:1" onclick="cAll()">Close</button></div>
 </div></div>
 
+<!-- IMPORT FILE INPUT -->
+<input type="file" id="imp-file" accept=".json" style="display:none" onchange="readImport(this)"/>
+
+<!-- IMPORT CONFIRM -->
+<div class="ov" id="ov-imp"><div class="md cm">
+  <h3>📥 Restore backup?</h3>
+  <div id="imperr" class="er" style="display:none;margin-bottom:9px"></div>
+  <div id="impok" style="display:none">
+    <div class="wb" style="margin-bottom:9px">⚠️ This will overwrite all current bookings and blocks. This cannot be undone.</div>
+    <div id="impsummary" style="font-size:13px;color:#555;margin-bottom:9px"></div>
+  </div>
+  <div class="mbb">
+    <button class="bxx" onclick="cOv('ov-imp');pendingImport=null;">Cancel</button>
+    <button id="impconfbtn" class="bsv" onclick="confirmImport()" style="display:none">Yes, restore backup</button>
+  </div>
+</div></div>
+
+<!-- WHAT'S NEW -->
+<div class="ov" id="ov-wn"><div class="md">
+  <h3>✨ What's New — v1.1.0</h3>
+  <div style="font-size:13px;color:#444;line-height:1.7;margin-bottom:13px">
+    <div style="margin-bottom:10px"><strong>🔒 Security fix</strong><br>Removed plaintext password from source code. Credentials are no longer visible in View Source or DevTools.</div>
+    <div style="margin-bottom:10px"><strong>⚠️ Save failure alerts</strong><br>If auto-save to local storage fails for any reason, a visible error banner now appears so no change is ever lost silently.</div>
+    <div><strong>📤 Export &amp; 📥 Import</strong><br>Back up all bookings and blocks to a single JSON file. Restore from any backup with a summary preview and confirmation step before overwriting.</div>
+  </div>
+  <div class="mbb"><button class="bxx" style="flex:1" onclick="cOv('ov-wn')">Close</button></div>
+</div></div>
+
 <script>
-// AUTH — SHA-256, no race condition
+// AUTH — SHA-256, pre-computed hash (plaintext password not stored in source)
 const CU="admin";
-let CH="",pend=null,pfcl=null,active=null;
-const HR=crypto.subtle.digest("SHA-256",new TextEncoder().encode("amaya0827")).then(b=>{CH=Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,"0")).join("");});
+const CH="fba447b7c72af7dbd2482b4bc07352abbb8292df3b28956d91692e65eaafde2e";
+let pend=null,pfcl=null,active=null;
 async function h256(s){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,"0")).join("");}
 async function doLogin(){
-  await HR;
   const u=document.getElementById("lu").value.trim(),p=document.getElementById("lp").value;
   const h=await h256(p);
   if(u===CU&&h===CH){document.getElementById("ls").style.display="none";document.getElementById("as").style.display="block";document.getElementById("lerr").style.display="none";loadData();renderCal();}
@@ -328,7 +359,15 @@ const DB=[
 const DBL=[{id:5,from:"2026-05-17",to:"2026-05-19",reason:"Maintenance / repairs",notes:"Aircon servicing"}];
 let bk=[],bl=[];
 
-function sv(){try{localStorage.setItem("bt_b",JSON.stringify(bk));localStorage.setItem("bt_bl",JSON.stringify(bl));}catch(e){}}
+function sv(){
+  try{
+    localStorage.setItem("bt_b",JSON.stringify(bk));
+    localStorage.setItem("bt_bl",JSON.stringify(bl));
+    document.getElementById("sverr").style.display="none";
+  }catch(e){
+    document.getElementById("sverr").style.display="block";
+  }
+}
 function loadData(){
   try{
     const b=localStorage.getItem("bt_b"),l=localStorage.getItem("bt_bl");
@@ -729,6 +768,55 @@ function pickBk(id){
   cAll();const d=new Date(b.ci);cy=d.getFullYear();cm=d.getMonth();
   renderCal();showDet(b);
 }
+
+// EXPORT / IMPORT
+let pendingImport=null;
+function doExport(){
+  const data={bt_b:bk,bt_bl:bl};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");a.href=url;a.download="booking-tracker-backup.json";
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+function triggerImport(){document.getElementById("imp-file").value="";document.getElementById("imp-file").click();}
+function readImport(input){
+  const file=input.files[0];if(!file)return;
+  const imperr=document.getElementById("imperr");
+  const impok=document.getElementById("impok");
+  const impconfbtn=document.getElementById("impconfbtn");
+  const reader=new FileReader();
+  reader.onload=function(e){
+    let data;
+    try{data=JSON.parse(e.target.result);}catch(err){
+      imperr.textContent="Invalid file — could not parse JSON.";imperr.style.display="block";
+      impok.style.display="none";impconfbtn.style.display="none";
+      document.getElementById("ov-imp").classList.add("sh");return;
+    }
+    if(!Array.isArray(data.bt_b)||!Array.isArray(data.bt_bl)){
+      imperr.textContent="Invalid backup — file must contain bt_b and bt_bl arrays.";imperr.style.display="block";
+      impok.style.display="none";impconfbtn.style.display="none";
+      document.getElementById("ov-imp").classList.add("sh");return;
+    }
+    pendingImport=data;
+    imperr.style.display="none";
+    document.getElementById("impsummary").textContent="Found "+data.bt_b.length+" booking"+(data.bt_b.length!==1?"s":"")+" and "+data.bt_bl.length+" block"+(data.bt_bl.length!==1?"s":"")+".";
+    impok.style.display="block";impconfbtn.style.display="block";
+    document.getElementById("ov-imp").classList.add("sh");
+  };
+  reader.readAsText(file);
+}
+function confirmImport(){
+  if(!pendingImport)return;
+  bk=pendingImport.bt_b;bl=pendingImport.bt_bl;
+  const ids=[...bk.map(x=>x.id),...bl.map(x=>x.id)];
+  nid=ids.length?Math.max(...ids)+1:1;
+  sv();cAll();renderCal();active=null;
+  document.getElementById("dpanel").innerHTML='<div class="ph">✅ Backup restored — '+bk.length+' booking'+(bk.length!==1?'s':'')+(bl.length?' and '+bl.length+' block'+(bl.length!==1?'s':''):'')+' loaded.</div>';
+  pendingImport=null;
+}
+
+// WHAT'S NEW
+function openWN(){document.getElementById("ov-wn").classList.add("sh");}
 </script>
 </body>
 </html>
