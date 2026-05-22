@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Booking Tracker — Property management made simple"/>
+  <title>Booking Tracker</title>
+</head>
+<body>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f7f8fa}
+#ls{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#1a3a0a,#2D5F0F,#4a8a20);padding:20px}
+.lb{background:#fff;border-radius:16px;padding:30px 26px;width:310px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,.18)}
+.ll{text-align:center;margin-bottom:22px}
+.ll h1{font-size:21px;font-weight:700;color:#2D5F0F}
+.ll p{font-size:12px;color:#888;margin-top:3px}
+.lr{margin-bottom:13px}
+.lr label{display:block;font-size:12px;font-weight:600;color:#444;margin-bottom:4px}
+.lr input{width:100%;border:1.5px solid #ddd;border-radius:8px;padding:9px 11px;font-size:14px;outline:none;transition:border .15s}
+.lr input:focus{border-color:#2D5F0F}
+.lbtn{width:100%;background:#2D5F0F;color:#fff;border:none;border-radius:8px;padding:10px;font-size:14px;font-weight:700;cursor:pointer;margin-top:3px}
+.lbtn:hover{opacity:.9}
+.lerr{background:#fff0f0;border:1px solid #f09595;border-radius:6px;padding:8px 11px;font-size:12px;color:#a32d2d;margin-bottom:11px;display:none}
+#as{display:none;min-height:100vh;background:#f7f8fa}
+.ah{background:#2D5F0F;color:#fff;padding:11px 14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:7px}
+.ah h1{font-size:15px;font-weight:700}
+.hbs{display:flex;gap:5px;flex-wrap:wrap}
+.hb{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.28);border-radius:5px;padding:5px 9px;font-size:12px;font-weight:600;cursor:pointer}
+.hb:hover{background:rgba(255,255,255,.28)}
+.hbd{background:rgba(255,80,80,.22);border-color:rgba(255,150,150,.35)}
+.wp{padding:11px;max-width:700px;margin:0 auto}
+.ob{background:#fff;border-radius:9px;padding:10px 13px;margin-bottom:9px;border:1px solid #e0e0e0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ol{font-size:12px;color:#666;font-weight:500;flex-shrink:0}
+.of{font-size:17px;font-weight:700;color:#2D5F0F;flex-shrink:0}
+.ot{flex:1;min-width:55px;height:7px;background:#e8f5e0;border-radius:4px;overflow:hidden}
+.of2{height:100%;background:#2D5F0F;border-radius:4px;transition:width .4s}
+.op{font-size:12px;font-weight:700;color:#fff;background:#2D5F0F;border-radius:5px;padding:2px 7px;flex-shrink:0}
+.om{font-size:11px;color:#aaa;margin-left:auto}
+.tp{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;gap:7px;flex-wrap:wrap}
+.mn{display:flex;align-items:center;gap:6px}
+.nb{background:#fff;border:1px solid #ddd;border-radius:5px;padding:4px 10px;cursor:pointer;font-size:13px;font-weight:700}
+.nb:hover{background:#f0f0f0}
+.ml{font-size:14px;font-weight:700;min-width:128px;text-align:center}
+.ta{display:flex;gap:5px;flex-wrap:wrap}
+.ab{background:#2D5F0F;color:#fff;border:none;border-radius:5px;padding:6px 11px;cursor:pointer;font-size:12px;font-weight:700}
+.mb{background:#555;color:#fff;border:none;border-radius:5px;padding:6px 10px;cursor:pointer;font-size:12px;font-weight:700}
+.leg{display:flex;gap:7px;margin-bottom:7px;font-size:11px;color:#555;flex-wrap:wrap;align-items:center;background:#fff;border-radius:7px;padding:7px 9px;border:1px solid #e8e8e8}
+.lgi{display:flex;align-items:center;gap:3px;white-space:nowrap}
+.ld{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:9px}
+.dn{text-align:center;font-size:10px;color:#999;padding:3px 0;font-weight:700}
+.dy{min-height:50px;border-radius:5px;padding:4px;font-size:11px;border:2px solid transparent;position:relative;transition:border-color .1s,background .1s}
+.dy.em{background:transparent;cursor:default}
+.dy.av{background:#EAF3DE;cursor:pointer}.dy.av:hover{background:#d4ecbf;border-color:#4A8A20}
+.dy.bk{background:#FBEAF0;cursor:pointer}.dy.bk:hover{border-color:#D4537E}
+.dy.co{background:#FEF3E2;cursor:pointer}.dy.co:hover{border-color:#C17D1A}
+.dy.mn2{background:#EBEBEB;cursor:pointer}.dy.mn2:hover{border-color:#888}
+.dy.tr{background:linear-gradient(180deg,#FEF3E2 50%,#EAF3DE 50%);cursor:pointer;border-color:#E8A020;animation:pb 2s infinite}
+@keyframes pb{0%,100%{border-color:#E8A020}50%{border-color:#C17D1A}}
+.dy.td{box-shadow:0 0 0 2px #1A56DB;border-color:#1A56DB!important}
+.dn2{font-weight:700;font-size:12px;line-height:1;margin-bottom:2px}
+.dy.av .dn2{color:#1E4D08}.dy.bk .dn2{color:#7E1D3F}.dy.co .dn2{color:#7A4A00}.dy.mn2 .dn2{color:#444}.dy.tr .dn2{color:#7A4A00}.dy.td .dn2{color:#1A56DB}
+.tp2{position:absolute;top:2px;right:2px;background:#1A56DB;color:#fff;font-size:8px;font-weight:700;border-radius:2px;padding:0 3px;line-height:13px;z-index:2}
+.ch{font-size:10px;border-radius:2px;padding:1px 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;margin-top:1px;line-height:1.4}
+.chin{background:#C8E6C9;color:#1B5E20}
+.chout{background:#FAD9A0;color:#7A4A00}
+.chb{background:#F4C0D1;color:#7E1D3F}
+.chm{background:#D5D5D5;color:#444}
+.rdot{display:inline-block;width:4px;height:4px;background:#D4537E;border-radius:50%;margin-right:2px;vertical-align:middle}
+.trbdg{position:absolute;top:2px;right:2px;background:#E8A020;color:#fff;font-size:8px;font-weight:700;border-radius:2px;padding:0 3px;line-height:13px}
+.ah2{font-size:9px;color:#4A8A20;opacity:.6;margin-top:1px}
+.pn{background:#fff;border-radius:9px;padding:12px;border:1px solid #e0e0e0}
+.pt{font-size:14px;font-weight:700;margin-bottom:9px}
+.dr{display:flex;justify-content:space-between;align-items:flex-start;padding:5px 0;border-bottom:1px solid #f0f0f0;font-size:12px;gap:7px}
+.dr:last-child{border-bottom:none}
+.dl{color:#888;flex-shrink:0}
+.dv{text-align:right}
+.bdg{font-size:11px;padding:2px 7px;border-radius:10px;font-weight:600;display:inline-block}
+.rp{background:#F4C0D1;color:#7E1D3F}.nw{background:#EAF3DE;color:#1E4D08}
+.ba{background:#FAECE7;color:#8B2110}.bg{background:#E6F1FB;color:#0C3C7A}.bb{background:#EEEDFE;color:#322A8A}.bf{background:#E7F0FB;color:#0F3D7A}.bd{background:#EAF3DE;color:#1E4D08}
+.pf{background:#EAF3DE;color:#1E4D08}.pp{background:#FEF3E2;color:#7A4A00}.pn2{background:#FBEAF0;color:#7E1D3F}
+.gc{background:#E7F0FB;color:#0F3D7A}.my{background:#EDE7FB;color:#3A1A8A}.bk2{background:#F0F4F0;color:#2A4A2A}.ap{background:#FAECE7;color:#8B2110}.cs{background:#F5F0E8;color:#5A4520}
+.cb{display:flex;align-items:flex-start;gap:7px;background:#FEF3E2;border:1px solid #E8A020;border-radius:6px;padding:8px 9px;font-size:12px;color:#7A4A00;margin:7px 0 3px}
+.cu{display:flex;align-items:flex-start;gap:7px;background:#FFF0E0;border:2px solid #E8A020;border-radius:6px;padding:8px 9px;font-size:12px;color:#7A4A00;margin:7px 0 3px;animation:pb 2s infinite}
+.rb{display:flex;align-items:flex-start;gap:7px;background:#EAF3DE;border:1px solid #4A8A20;border-radius:6px;padding:8px 9px;font-size:12px;color:#1E4D08;margin:3px 0}
+.tt{display:flex;gap:6px;margin:7px 0 3px;flex-wrap:wrap}
+.tbtn{flex:1;min-width:105px;padding:8px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid;text-align:center}
+.tcl{background:#FEF3E2;border-color:#E8A020;color:#7A4A00}.tcl.dn3{background:#E8A020;border-color:#C17D1A;color:#fff}
+.trd{background:#EAF3DE;border-color:#4A8A20;color:#1E4D08}.trd.dn3{background:#4A8A20;border-color:#2D5F0F;color:#fff}
+.acb{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+.btn{padding:6px 10px;border-radius:5px;font-size:12px;cursor:pointer;font-weight:600;border:1px solid #ddd;background:#fff;color:#333}
+.btn:hover{background:#f5f5f5}
+.be{border-color:#E8A020;color:#7A4A00}.bx{border-color:#85B7EB;color:#0C3C7A}.bc{border-color:#F09595;color:#8B2110}
+.ph{color:#aaa;font-size:13px;text-align:center;padding:18px;line-height:1.8}
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:flex-start;justify-content:center;padding-top:18px;overflow-y:auto}
+.ov.sh{display:flex}
+.md{background:#fff;border-radius:11px;padding:15px;width:330px;max-width:96vw;border:1px solid #ddd;margin-bottom:38px}
+.md h3{font-size:14px;font-weight:700;margin-bottom:11px}
+.fr{margin-bottom:8px}
+.fr label{display:block;font-size:11px;color:#666;margin-bottom:2px;font-weight:600}
+.fr input,.fr select{width:100%;border:1px solid #ddd;border-radius:5px;padding:6px 8px;font-size:13px;background:#fafafa;color:#1a1a1a}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+.f2 label{display:block;font-size:11px;color:#666;margin-bottom:2px;font-weight:600}
+.f2 input,.f2 select{width:100%;border:1px solid #ddd;border-radius:5px;padding:6px 7px;font-size:13px;background:#fafafa;color:#1a1a1a}
+.tg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+.ti label{display:block;font-size:11px;color:#666;margin-bottom:2px;font-weight:600}
+.ti input{width:100%;border:1px solid #ddd;border-radius:5px;padding:5px 7px;font-size:13px;background:#fafafa;color:#1a1a1a}
+.sl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#999;margin:9px 0 4px}
+.mbb{display:flex;gap:6px;margin-top:11px}
+.bxx{flex:1;background:#fff;border:1px solid #ddd;border-radius:5px;padding:7px;cursor:pointer;font-size:13px;color:#333}
+.bsv{flex:1;background:#2D5F0F;color:#fff;border:none;border-radius:5px;padding:7px;cursor:pointer;font-size:13px;font-weight:700}
+.bsv:hover{opacity:.88}
+.bdl{flex:1;background:#8B2110;color:#fff;border:none;border-radius:5px;padding:7px;cursor:pointer;font-size:13px;font-weight:700}
+.er{padding:7px;border-radius:5px;font-size:12px;margin-bottom:7px;background:#fff0f0;border:1px solid #f09595;color:#8B2110}
+.wb{padding:7px 9px;border-radius:5px;font-size:12px;margin-bottom:7px;background:#FEF3E2;border:1px solid #E8A020;color:#7A4A00}
+.ib{padding:7px;border-radius:5px;font-size:12px;margin-bottom:7px;background:#e6f1fb;border:1px solid #85b7eb;color:#0C3C7A}
+.lk{background:#f5f5f5;border:1px solid #e0e0e0;border-radius:5px;padding:6px 8px;font-size:12px;color:#888;margin-bottom:7px}
+.ds{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.ds label{display:flex;align-items:center;gap:3px;font-size:11px;padding:3px 6px;border:1px solid #ddd;border-radius:4px;cursor:pointer;color:#333}
+.ds label:has(input:checked){background:#fff0f0;border-color:#f09595;color:#8B2110}
+.pn3{background:#EAF3DE;border:1px solid #4A8A20;border-radius:5px;padding:5px 8px;font-size:11px;color:#1E4D08;margin-bottom:7px}
+.lm{width:560px;max-width:97vw}
+.ls2{display:flex;gap:6px;margin-bottom:9px;flex-wrap:wrap}
+.ls2 input{flex:1;min-width:120px;border:1px solid #ddd;border-radius:5px;padding:6px 8px;font-size:13px;background:#fafafa}
+.ls2 select{border:1px solid #ddd;border-radius:5px;padding:6px 8px;font-size:13px;background:#fafafa;color:#333}
+.bl{display:flex;flex-direction:column;gap:5px;max-height:320px;overflow-y:auto}
+.bc2{background:#fafafa;border:1px solid #e8e8e8;border-radius:7px;padding:9px 11px;cursor:pointer;transition:border-color .12s}
+.bc2:hover{border-color:#2D5F0F}
+.bc2t{display:flex;justify-content:space-between;align-items:flex-start;gap:7px;margin-bottom:4px}
+.bc2n{font-weight:700;font-size:13px}
+.bc2d{font-size:11px;color:#888;margin-top:1px}
+.bc2b{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.el{text-align:center;color:#aaa;font-size:13px;padding:18px}
+.cm{width:290px}
+</style>
+
+<!-- LOGIN -->
+<div id="ls">
+  <div class="lb">
+    <div class="ll"><h1>📋 Booking Tracker</h1><p>Property management made simple</p></div>
+    <div id="lerr" class="lerr">Incorrect username or password.</div>
+    <div class="lr"><label>Username</label><input id="lu" placeholder="Enter username" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+    <div class="lr"><label>Password</label><input id="lp" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+    <button class="lbtn" onclick="doLogin()">Sign in</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="as">
+  <div class="ah">
+    <h1>📋 Booking Tracker</h1>
+    <div class="hbs">
+      <button class="hb" onclick="openList()">📋 All Bookings</button>
+      <button class="hb hbd" onclick="document.getElementById('ov-cd').classList.add('sh')">🗑 Clear demo</button>
+      <button class="hb" onclick="doLogout()">Sign out</button>
+    </div>
+  </div>
+  <div class="wp">
+    <div class="ob">
+      <span class="ol">Occupancy</span>
+      <span class="of" id="ofrac">0/31</span>
+      <div class="ot"><div class="of2" id="ofill" style="width:0%"></div></div>
+      <span class="op" id="opct">0%</span>
+      <span class="om" id="omonth"></span>
+    </div>
+    <div class="tp">
+      <div class="mn">
+        <button class="nb" onclick="chgM(-1)">&#8592;</button>
+        <div class="ml" id="mlbl"></div>
+        <button class="nb" onclick="chgM(1)">&#8594;</button>
+      </div>
+      <div class="ta">
+        <button class="mb" onclick="openMaint(null)">🔧 Block</button>
+        <button class="ab" onclick="openAdd(null)">+ Add booking</button>
+      </div>
+    </div>
+    <div class="leg">
+      <div class="lgi"><div class="ld" style="background:#EAF3DE;border:1px solid #4A8A20"></div>Free</div>
+      <div class="lgi"><div class="ld" style="background:#FBEAF0;border:1px solid #D4537E"></div>Booked</div>
+      <div class="lgi"><div class="ld" style="background:#FEF3E2;border:1px solid #C17D1A"></div>Checkout</div>
+      <div class="lgi"><div class="ld" style="background:#EBEBEB;border:1px solid #888"></div>Blocked</div>
+      <div class="lgi"><div class="ld" style="border:2px solid #1A56DB;background:transparent"></div>Today</div>
+      <div class="lgi"><span style="color:#1B5E20;font-weight:700">↑</span>Check-in</div>
+      <div class="lgi"><span style="color:#7A4A00;font-weight:700">↓</span>Check-out</div>
+      <div class="lgi"><span style="color:#E8A020;font-weight:700">↑↓</span>Turnaround</div>
+    </div>
+    <div class="cg" id="cal"></div>
+    <div class="pn" id="dpanel"><div class="ph">📅 Tap any date to get started<br><span style="font-size:11px">Free dates open booking form · Booked dates show details</span></div></div>
+  </div>
+</div>
+
+<!-- ADD -->
+<div class="ov" id="ov-add"><div class="md">
+  <h3>Add booking</h3>
+  <div id="apre" class="pn3" style="display:none"></div>
+  <div class="fr"><label>Guest name</label><input id="an" placeholder="e.g. Maria Santos"/></div>
+  <div class="f2"><div><label>Mobile</label><input id="am" placeholder="+63 9XX XXX XXXX"/></div><div><label>Email (optional)</label><input id="ae" placeholder="guest@email.com"/></div></div>
+  <div class="f2"><div><label>Check-in</label><input type="date" id="aci"/></div><div><label>Check-out</label><input type="date" id="aco"/></div></div>
+  <div class="sl">Timing</div>
+  <div class="tg">
+    <div class="ti"><label>Std check-in</label><input type="time" id="acis" value="14:00"/></div>
+    <div class="ti"><label>Std check-out</label><input type="time" id="acos" value="12:00"/></div>
+    <div class="ti"><label>Early check-in</label><input type="time" id="acie"/></div>
+    <div class="ti"><label>Late check-out</label><input type="time" id="acol"/></div>
+    <div class="ti"><label>Late check-in</label><input type="time" id="acil"/></div>
+    <div class="ti"><label>Early check-out</label><input type="time" id="acoe"/></div>
+  </div>
+  <div class="fr"><label>Platform</label><select id="apl"><option>Airbnb</option><option>Agoda</option><option>Booking.com</option><option>Facebook</option><option>Direct</option></select></div>
+  <div class="sl">Payment</div>
+  <div class="f2">
+    <div><label>Status</label><select id="apy"><option value="full">Fully paid</option><option value="partial">Partially paid</option><option value="none" selected>No payment yet</option></select></div>
+    <div><label>Method</label><select id="ame"><option value="">— select —</option><option>GCash</option><option>Maya</option><option>Via app</option><option>Bank transfer</option><option>Cash</option><option>Pending</option></select></div>
+  </div>
+  <div class="fr"><label>Notes</label><input id="ano" placeholder="Special requests…"/></div>
+  <div id="aerr" class="er" style="display:none"></div>
+  <div class="mbb"><button class="bxx" onclick="cAll()">Cancel</button><button class="bsv" onclick="saveAdd()">Save booking</button></div>
+</div></div>
+
+<!-- TURNAROUND WARNING -->
+<div class="ov" id="ov-tw"><div class="md cm">
+  <h3>⚠️ Same-day turnaround</h3>
+  <div id="twb"></div>
+  <div class="mbb" id="twbt"></div>
+</div></div>
+
+<!-- EDIT -->
+<div class="ov" id="ov-ed"><div class="md">
+  <h3>Edit booking</h3>
+  <div class="ib">🔒 Dates locked — use Extend or Cancel to change dates.</div>
+  <div class="fr"><label>Guest name</label><input id="en"/></div>
+  <div class="f2"><div><label>Mobile</label><input id="em"/></div><div><label>Email</label><input id="ee"/></div></div>
+  <div class="lk" id="edates"></div>
+  <div class="sl">Timing</div>
+  <div class="tg">
+    <div class="ti"><label>Std check-in</label><input type="time" id="ecis"/></div>
+    <div class="ti"><label>Std check-out</label><input type="time" id="ecos"/></div>
+    <div class="ti"><label>Early check-in</label><input type="time" id="ecie"/></div>
+    <div class="ti"><label>Late check-out</label><input type="time" id="ecol"/></div>
+    <div class="ti"><label>Late check-in</label><input type="time" id="ecil"/></div>
+    <div class="ti"><label>Early check-out</label><input type="time" id="ecoe"/></div>
+  </div>
+  <div class="fr"><label>Platform</label><select id="epl"><option>Airbnb</option><option>Agoda</option><option>Booking.com</option><option>Facebook</option><option>Direct</option></select></div>
+  <div class="sl">Payment</div>
+  <div class="f2">
+    <div><label>Status</label><select id="epy"><option value="full">Fully paid</option><option value="partial">Partially paid</option><option value="none">No payment yet</option></select></div>
+    <div><label>Method</label><select id="eme2"><option value="">— select —</option><option>GCash</option><option>Maya</option><option>Via app</option><option>Bank transfer</option><option>Cash</option><option>Pending</option></select></div>
+  </div>
+  <div class="fr"><label>Notes</label><input id="eno"/></div>
+  <div id="eerr" class="er" style="display:none"></div>
+  <div class="mbb"><button class="bxx" onclick="cAll()">Cancel</button><button class="bsv" onclick="saveEdit()">Save changes</button></div>
+</div></div>
+
+<!-- EXTEND -->
+<div class="ov" id="ov-ex"><div class="md"><h3>Extend stay</h3><div id="exb"></div><div class="mbb" id="exbt"></div></div></div>
+
+<!-- CANCEL -->
+<div class="ov" id="ov-ca"><div class="md"><h3>Cancel booking</h3><div id="cab"></div><div class="mbb" id="cabt"></div></div></div>
+
+<!-- CANCEL CONFIRM -->
+<div class="ov" id="ov-cc"><div class="md cm">
+  <h3>Are you sure?</h3>
+  <p style="font-size:13px;color:#555;margin-bottom:13px">This permanently removes the booking and cannot be undone.</p>
+  <div class="mbb"><button class="bxx" onclick="cOv('ov-cc')">Keep booking</button><button class="bdl" onclick="execFull()">Yes, cancel it</button></div>
+</div></div>
+
+<!-- MAINTENANCE -->
+<div class="ov" id="ov-mn"><div class="md">
+  <h3 id="mnt">Block dates</h3>
+  <div id="mpre" class="pn3" style="display:none"></div>
+  <div class="f2"><div><label>From</label><input type="date" id="mfr"/></div><div><label>To</label><input type="date" id="mto"/></div></div>
+  <div class="fr"><label>Reason</label><select id="mre"><option>Maintenance / repairs</option><option>Renovation</option><option>Personal use</option><option>Deep cleaning</option><option>Other</option></select></div>
+  <div class="fr"><label>Notes (optional)</label><input id="mno" placeholder="e.g. aircon servicing…"/></div>
+  <div id="merr" class="er" style="display:none"></div>
+  <div class="mbb"><button class="bxx" onclick="cAll()">Cancel</button><button class="bsv" onclick="saveMaint()">Save block</button></div>
+</div></div>
+
+<!-- CLEAR DEMO -->
+<div class="ov" id="ov-cd"><div class="md cm">
+  <h3>Clear demo data?</h3>
+  <p style="font-size:13px;color:#555;margin-bottom:13px">Removes all sample bookings and blocks. Start fresh. Cannot be undone.</p>
+  <div class="mbb"><button class="bxx" onclick="cOv('ov-cd')">Cancel</button><button class="bdl" onclick="clearDemo()">Clear everything</button></div>
+</div></div>
+
+<!-- ALL BOOKINGS -->
+<div class="ov" id="ov-li"><div class="md lm">
+  <h3>All Bookings</h3>
+  <div class="ls2">
+    <input id="lsq" placeholder="Search name, platform, mobile…" oninput="renderList()"/>
+    <select id="lss" onchange="renderList()">
+      <option value="dd">Newest first</option>
+      <option value="da">Oldest first</option>
+      <option value="na">Name A→Z</option>
+      <option value="nd">Name Z→A</option>
+      <option value="up">Upcoming check-ins</option>
+    </select>
+  </div>
+  <div class="bl" id="blist"></div>
+  <div class="mbb" style="margin-top:9px"><button class="bxx" style="flex:1" onclick="cAll()">Close</button></div>
+</div></div>
+
+<script>
+// AUTH — SHA-256, no race condition
+const CU="admin";
+let CH="",pend=null,pfcl=null,active=null;
+const HR=crypto.subtle.digest("SHA-256",new TextEncoder().encode("amaya0827")).then(b=>{CH=Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,"0")).join("");});
+async function h256(s){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,"0")).join("");}
+async function doLogin(){
+  await HR;
+  const u=document.getElementById("lu").value.trim(),p=document.getElementById("lp").value;
+  const h=await h256(p);
+  if(u===CU&&h===CH){document.getElementById("ls").style.display="none";document.getElementById("as").style.display="block";document.getElementById("lerr").style.display="none";loadData();renderCal();}
+  else{document.getElementById("lerr").style.display="block";document.getElementById("lp").value="";}
+}
+function doLogout(){document.getElementById("as").style.display="none";document.getElementById("ls").style.display="flex";document.getElementById("lu").value="";document.getElementById("lp").value="";cAll();}
+
+// DATA
+const MN=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const TD=new Date().toISOString().slice(0,10);
+let cy=new Date().getFullYear(),cm=new Date().getMonth(),nid=10;
+const DB=[
+  {id:1,name:"Maria Santos",mobile:"+63 912 345 6789",email:"maria@email.com",ci:"2026-05-03",co:"2026-05-06",ciS:"14:00",coS:"12:00",ciE:"",ciL:"",coE:"",coL:"",platform:"Airbnb",pay:"full",method:"GCash",notes:"Prefers high floor",cd:true,ur:true,at:"2026-04-10"},
+  {id:2,name:"Juan dela Cruz",mobile:"+63 917 222 3333",email:"",ci:"2026-05-10",co:"2026-05-13",ciS:"14:00",coS:"12:00",ciE:"",ciL:"18:00",coE:"",coL:"",platform:"Booking.com",pay:"partial",method:"Via app",notes:"Late check-in confirmed",cd:false,ur:false,at:"2026-04-12"},
+  {id:3,name:"Maria Santos",mobile:"+63 912 345 6789",email:"maria@email.com",ci:"2026-05-13",co:"2026-05-16",ciS:"14:00",coS:"12:00",ciE:"",ciL:"",coE:"",coL:"",platform:"Airbnb",pay:"none",method:"",notes:"Same-day turnaround demo",cd:false,ur:false,at:"2026-04-18"},
+  {id:4,name:"Anna Reyes",mobile:"+63 998 777 1234",email:"anna@gmail.com",ci:"2026-05-25",co:"2026-05-27",ciS:"14:00",coS:"12:00",ciE:"",ciL:"",coE:"",coL:"",platform:"Agoda",pay:"full",method:"Bank transfer",notes:"",cd:false,ur:false,at:"2026-04-20"}
+];
+const DBL=[{id:5,from:"2026-05-17",to:"2026-05-19",reason:"Maintenance / repairs",notes:"Aircon servicing"}];
+let bk=[],bl=[];
+
+function sv(){try{localStorage.setItem("bt_b",JSON.stringify(bk));localStorage.setItem("bt_bl",JSON.stringify(bl));}catch(e){}}
+function loadData(){
+  try{
+    const b=localStorage.getItem("bt_b"),l=localStorage.getItem("bt_bl");
+    bk=b?JSON.parse(b):JSON.parse(JSON.stringify(DB));
+    bl=l?JSON.parse(l):JSON.parse(JSON.stringify(DBL));
+  }catch(e){bk=JSON.parse(JSON.stringify(DB));bl=JSON.parse(JSON.stringify(DBL));}
+  const ids=[...bk.map(x=>x.id),...bl.map(x=>x.id)];
+  nid=ids.length?Math.max(...ids)+1:10;
+}
+function clearDemo(){bk=[];bl=[];nid=1;sv();cOv("ov-cd");active=null;renderCal();document.getElementById("dpanel").innerHTML='<div class="ph">✅ Cleared. Tap any date to add your first booking.</div>';}
+
+// HELPERS
+function f12(t){if(!t)return null;const[h,m]=t.split(":").map(Number);const ap=h>=12?"PM":"AM";const h12=h%12||12;return h12+":"+(m<10?"0"+m:m)+" "+ap;}
+function dR(ci,co){const d=[],c=new Date(ci),e=new Date(co);while(c<e){d.push(c.toISOString().slice(0,10));c.setDate(c.getDate()+1);}return d;}
+function aD(ds,n){const d=new Date(ds);d.setDate(d.getDate()+n);return d.toISOString().slice(0,10);}
+function gB(ds,ex){return bk.find(b=>b.id!==ex&&dR(b.ci,b.co).includes(ds));}
+function gCI(ds){return bk.find(b=>b.ci===ds);}
+function gCO(ds){return bk.find(b=>b.co===ds);}
+function gBl(ds){return bl.find(b=>dR(b.from,aD(b.to,1)).includes(ds));}
+function cG(n){return bk.filter(b=>b.name.toLowerCase()===n.toLowerCase()).length;}
+function pC(p){return({Airbnb:"ba",Agoda:"bg",["Booking.com"]:"bb",Facebook:"bf",Direct:"bd"}[p]||"bd");}
+function pyL(p){return({full:"Fully paid",partial:"Partially paid",none:"No payment yet"}[p]);}
+function pyC(p){return({full:"pf",partial:"pp",none:"pn2"}[p]);}
+function mC(m){return({GCash:"gc",Maya:"my",["Bank transfer"]:"bk2",["Via app"]:"ap",Cash:"cs"}[m]||"nw");}
+function eCo(b){return b.coL||b.coE||b.coS;}
+function eCi(b){return b.ciE||b.ciL||b.ciS;}
+function cAll(){document.querySelectorAll(".ov").forEach(o=>o.classList.remove("sh"));}
+function cOv(id){document.getElementById(id).classList.remove("sh");}
+
+// OCCUPANCY
+function updOcc(){
+  const dim=new Date(cy,cm+1,0).getDate();let bkd=0;
+  for(let d=1;d<=dim;d++){const ds=cy+"-"+String(cm+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");if(gB(ds,null)||gCO(ds)||gBl(ds))bkd++;}
+  const pct=Math.round((bkd/dim)*100);
+  document.getElementById("ofrac").textContent=bkd+"/"+dim;
+  document.getElementById("opct").textContent=pct+"%";
+  document.getElementById("ofill").style.width=pct+"%";
+  document.getElementById("omonth").textContent=MN[cm]+" "+cy;
+}
+
+// CALENDAR
+function renderCal(){
+  updOcc();
+  document.getElementById("mlbl").textContent=MN[cm]+" "+cy;
+  const cal=document.getElementById("cal");cal.innerHTML="";
+  ["Su","Mo","Tu","We","Th","Fr","Sa"].forEach(d=>{const e=document.createElement("div");e.className="dn";e.textContent=d;cal.appendChild(e);});
+  const first=new Date(cy,cm,1).getDay(),days=new Date(cy,cm+1,0).getDate();
+  for(let i=0;i<first;i++){const e=document.createElement("div");e.className="dy em";cal.appendChild(e);}
+  const mkP=(cls,txt)=>{const p=document.createElement("span");p.className=cls;p.textContent=txt;return p;};
+  const mkC=(cls,txt)=>{const c=document.createElement("span");c.className="ch "+cls;c.textContent=txt;return c;};
+  for(let d=1;d<=days;d++){
+    const ds=cy+"-"+String(cm+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
+    const isTd=ds===TD,book=gB(ds,null),ciB=gCI(ds),coB=gCO(ds),blk=gBl(ds);
+    const el=document.createElement("div");
+    const num=()=>{const n=document.createElement("div");n.className="dn2";n.textContent=d;return n;};
+    if(blk){
+      el.className="dy mn2"+(isTd?" td":"");el.appendChild(num());
+      if(isTd)el.appendChild(mkP("tp2","TODAY"));
+      el.appendChild(mkC("chm",blk.reason.split("/")[0].trim()));
+      el.onclick=()=>showBlk(blk);
+    } else if(ciB&&coB){
+      el.className="dy tr"+(isTd?" td":"");el.appendChild(num());
+      el.appendChild(mkP("trbdg","↑↓"));
+      el.appendChild(mkC("chout","↓ "+coB.name.split(" ")[0]));
+      el.appendChild(mkC("chin","↑ "+ciB.name.split(" ")[0]));
+      el.onclick=()=>showTurn(coB,ciB);
+    } else if(coB&&!book){
+      el.className="dy co"+(isTd?" td":"");el.appendChild(num());
+      if(isTd)el.appendChild(mkP("tp2","TODAY"));
+      el.appendChild(mkC("chout","↓ "+coB.name.split(" ")[0]));
+      el.onclick=()=>showDet(coB);
+    } else if(book){
+      el.className="dy bk"+(isTd?" td":"");el.appendChild(num());
+      if(isTd)el.appendChild(mkP("tp2","TODAY"));
+      const ch=document.createElement("span");ch.className="ch chb";
+      if(cG(book.name)>1){const dot=document.createElement("span");dot.className="rdot";ch.appendChild(dot);}
+      ch.appendChild(document.createTextNode((book.ci===ds?"↑ ":"")+book.name.split(" ")[0]));
+      el.appendChild(ch);el.onclick=()=>showDet(book);
+    } else {
+      el.className="dy av"+(isTd?" td":"");el.appendChild(num());
+      if(isTd)el.appendChild(mkP("tp2","TODAY"));
+      const h=document.createElement("div");h.className="ah2";h.textContent="+ book";el.appendChild(h);
+      el.onclick=()=>openAdd(ds);
+    }
+    cal.appendChild(el);
+  }
+}
+
+// TURNAROUND DETAIL
+function showTurn(oB,iB){
+  active=oB;
+  const cot=eCo(oB),cit=eCi(iB),cd=oB.cd,ur=oB.ur;
+  document.getElementById("dpanel").innerHTML=`
+    <div class="pt">⚡ Turnaround day</div>
+    <div class="cu">⚡ <div><strong>Urgent — same-day turnaround</strong><br>
+    <strong>↓ ${oB.name}</strong> out at ${f12(cot)} · <strong>↑ ${iB.name}</strong> in at ${f12(cit)}<br>
+    Cleaner must prepare unit between ${f12(cot)} and ${f12(cit)}.</div></div>
+    <div class="tt">
+      <button class="tbtn tcl${cd?" dn3":""}" onclick="tapCl()">${cd?"✓ Cleaner contacted":"🧹 Cleaner contacted?"}</button>
+      <button class="tbtn trd${ur?" dn3":""}" onclick="tapRd()">${ur?"✓ Unit ready":"✅ Unit ready?"}</button>
+    </div>
+    <div style="margin-top:9px">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#999;margin-bottom:3px">Checkout — ${oB.name}</div>
+      <div class="dr"><span class="dl">Platform</span><span class="bdg ${pC(oB.platform)}">${oB.platform}</span></div>
+      <div class="dr"><span class="dl">Payment</span><span class="bdg ${pyC(oB.pay)}">${pyL(oB.pay)}</span></div>
+      <div class="dr"><span class="dl">Mobile</span><span class="dv" style="color:#1A56DB">${oB.mobile||"—"}</span></div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#999;margin:6px 0 3px">Check-in — ${iB.name}</div>
+      <div class="dr"><span class="dl">Platform</span><span class="bdg ${pC(iB.platform)}">${iB.platform}</span></div>
+      <div class="dr"><span class="dl">Payment</span><span class="bdg ${pyC(iB.pay)}">${pyL(iB.pay)}</span></div>
+      <div class="dr"><span class="dl">Mobile</span><span class="dv" style="color:#1A56DB">${iB.mobile||"—"}</span></div>
+    </div>
+    <div class="acb">
+      <button class="btn be" onclick="active=bk.find(b=>b.id==${oB.id});showDet(active)">↓ Checkout details</button>
+      <button class="btn bx" onclick="active=bk.find(b=>b.id==${iB.id});showDet(active)">↑ Check-in details</button>
+    </div>`;
+}
+
+// DETAIL
+function showDet(b){
+  active=b;
+  const rep=cG(b.name)>1,cnt=cG(b.name);
+  const cot=eCo(b),cit=eCi(b),cd=b.cd,ur=b.ur;
+  const nxIn=gCI(b.co),isTurn=!!nxIn;
+  const lw=b.coL?" — <strong>do not schedule before "+f12(b.coL)+"</strong>":"";
+  const ciX=b.ciE?'<br><small style="color:#BA7517">⏰ Early check-in</small>':b.ciL?'<br><small style="color:#888">⏰ Late check-in</small>':"";
+  const coX=b.coL?'<br><small style="color:#BA7517">⏰ Late check-out</small>':b.coE?'<br><small style="color:#4A8A20">⏰ Early check-out</small>':"";
+  const clBox=isTurn
+    ?`<div class="cu">⚡ <div><strong>Urgent — same-day turnaround!</strong><br>Contact cleaner immediately. ${nxIn.name} checks in at <strong>${f12(eCi(nxIn))}</strong>${lw}</div></div>`
+    :cd?`<div class="rb">🧹 Cleaner confirmed for <strong>${b.co} at ${f12(cot)}</strong>${lw}</div>`
+    :`<div class="cb">🧹 <div><strong>Contact cleaner</strong> for checkout on <strong>${b.co} at ${f12(cot)}</strong>${lw}</div></div>`;
+  document.getElementById("dpanel").innerHTML=`
+    <div class="pt">Booking details</div>
+    <div class="dr"><span class="dl">Guest</span><strong class="dv">${b.name}</strong></div>
+    <div class="dr"><span class="dl">Booker</span><span class="bdg ${rep?"rp":"nw"}">${rep?"⭐ Repeat ("+cnt+"x)":"New guest"}</span></div>
+    <div class="dr"><span class="dl">Mobile</span><span class="dv" style="color:#1A56DB">${b.mobile||"—"}</span></div>
+    ${b.email?`<div class="dr"><span class="dl">Email</span><span class="dv" style="color:#1A56DB">${b.email}</span></div>`:""}
+    <div class="dr"><span class="dl">Platform</span><span class="bdg ${pC(b.platform)}">${b.platform}</span></div>
+    <div class="dr"><span class="dl">Payment</span><span class="bdg ${pyC(b.pay)}">${pyL(b.pay)}</span></div>
+    ${b.method?`<div class="dr"><span class="dl">Paid via</span><span class="bdg ${mC(b.method)}">${b.method}</span></div>`:""}
+    <div class="dr"><span class="dl">Check-in</span><span class="dv">${b.ci} at <strong>${f12(cit)}</strong>${ciX}</span></div>
+    <div class="dr"><span class="dl">Check-out</span><span class="dv">${b.co} at <strong>${f12(cot)}</strong>${coX}</span></div>
+    ${b.notes?`<div class="dr"><span class="dl">Notes</span><span class="dv">${b.notes}</span></div>`:""}
+    <div class="tt">
+      <button class="tbtn tcl${cd?" dn3":""}" onclick="tapCl()">${cd?"✓ Cleaner contacted":"🧹 Cleaner contacted?"}</button>
+      <button class="tbtn trd${ur?" dn3":""}" onclick="tapRd()">${ur?"✓ Unit ready":"✅ Unit ready?"}</button>
+    </div>
+    ${clBox}
+    <div class="acb">
+      <button class="btn be" onclick="openEdit()">✏️ Edit</button>
+      <button class="btn bx" onclick="openExt()">📅 Extend</button>
+      <button class="btn bc" onclick="openCan()">✕ Cancel</button>
+    </div>`;
+}
+
+function showBlk(bl2){
+  active=null;
+  document.getElementById("dpanel").innerHTML=`
+    <div class="pt">🔧 Maintenance block</div>
+    <div class="dr"><span class="dl">Reason</span><strong class="dv">${bl2.reason}</strong></div>
+    <div class="dr"><span class="dl">From</span><span class="dv">${bl2.from}</span></div>
+    <div class="dr"><span class="dl">To</span><span class="dv">${bl2.to}</span></div>
+    ${bl2.notes?`<div class="dr"><span class="dl">Notes</span><span class="dv">${bl2.notes}</span></div>`:""}
+    <div class="acb">
+      <button class="btn be" onclick="openEditBlk(${bl2.id})">✏️ Edit</button>
+      <button class="btn bc" onclick="delBlk(${bl2.id})">✕ Remove</button>
+    </div>`;
+}
+
+function tapCl(){if(!active)return;active.cd=!active.cd;if(!active.cd)active.ur=false;sv();renderCal();showDet(active);}
+function tapRd(){if(!active)return;if(!active.cd){alert("Please confirm cleaner has been contacted first.");return;}active.ur=!active.ur;sv();renderCal();showDet(active);}
+function chgM(d){cm+=d;if(cm>11){cm=0;cy++;}if(cm<0){cm=11;cy--;}renderCal();}
+
+// ADD
+function openAdd(pre){
+  ["an","am","ae","ano"].forEach(id=>document.getElementById(id).value="");
+  const ci=pre||TD,co=pre?aD(pre,1):TD;
+  document.getElementById("aci").value=ci;document.getElementById("aco").value=co;
+  document.getElementById("acis").value="14:00";document.getElementById("acos").value="12:00";
+  ["acie","acil","acoe","acol"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("apy").value="none";document.getElementById("ame").value="";
+  document.getElementById("aerr").style.display="none";
+  const pn=document.getElementById("apre");
+  if(pre){pn.textContent="📅 Check-in pre-filled for "+pre;pn.style.display="block";}else pn.style.display="none";
+  document.getElementById("ov-add").classList.add("sh");
+}
+function saveAdd(){
+  const name=document.getElementById("an").value.trim();
+  const ci=document.getElementById("aci").value,co=document.getElementById("aco").value;
+  const err=document.getElementById("aerr");
+  if(!name||!ci||!co){err.textContent="Please fill in guest name and both dates.";err.style.display="block";return;}
+  if(co<=ci){err.textContent="Check-out must be after check-in.";err.style.display="block";return;}
+  const conf=dR(ci,co).find(ds=>gB(ds,null)||gBl(ds));
+  if(conf){err.textContent="Conflict on "+conf+" — already blocked or booked.";err.style.display="block";return;}
+  const b={id:nid++,name,mobile:document.getElementById("am").value.trim(),email:document.getElementById("ae").value.trim(),
+    ci,co,ciS:document.getElementById("acis").value,coS:document.getElementById("acos").value,
+    ciE:document.getElementById("acie").value,ciL:document.getElementById("acil").value,
+    coE:document.getElementById("acoe").value,coL:document.getElementById("acol").value,
+    platform:document.getElementById("apl").value,pay:document.getElementById("apy").value,
+    method:document.getElementById("ame").value,notes:document.getElementById("ano").value.trim(),
+    cd:false,ur:false,at:TD};
+  // Soft turnaround warning
+  const exCo=gCO(ci);
+  if(exCo){
+    pend=b;cAll();
+    document.getElementById("twb").innerHTML=`<div class="wb"><strong>↓ ${exCo.name}</strong> checks out on <strong>${ci} at ${f12(eCo(exCo))}</strong><br><strong>↑ ${name}</strong> would check in at <strong>${f12(eCi(b))}</strong><br><br>Cleaner must prepare unit between these times. Confirm this is enough time.</div>`;
+    document.getElementById("twbt").innerHTML=`<button class="bxx" onclick="cOv('ov-tw');pend=null;">Cancel</button><button class="bsv" onclick="commitPend()">Proceed anyway</button>`;
+    document.getElementById("ov-tw").classList.add("sh");return;
+  }
+  commitBk(b);
+}
+function commitPend(){if(!pend)return;commitBk(pend);pend=null;cAll();}
+function commitBk(b){bk.push(b);sv();cAll();renderCal();showDet(b);}
+
+// EDIT
+function openEdit(){
+  if(!active)return;const b=active;
+  document.getElementById("en").value=b.name;document.getElementById("em").value=b.mobile||"";document.getElementById("ee").value=b.email||"";
+  document.getElementById("ecis").value=b.ciS||"14:00";document.getElementById("ecos").value=b.coS||"12:00";
+  document.getElementById("ecie").value=b.ciE||"";document.getElementById("ecil").value=b.ciL||"";
+  document.getElementById("ecoe").value=b.coE||"";document.getElementById("ecol").value=b.coL||"";
+  document.getElementById("epl").value=b.platform;document.getElementById("epy").value=b.pay;
+  document.getElementById("eme2").value=b.method||"";document.getElementById("eno").value=b.notes||"";
+  document.getElementById("edates").innerHTML="🔒 Dates: <strong>"+b.ci+"</strong> → <strong>"+b.co+"</strong>";
+  document.getElementById("eerr").style.display="none";
+  document.getElementById("ov-ed").classList.add("sh");
+}
+function saveEdit(){
+  if(!active)return;const b=active;
+  const name=document.getElementById("en").value.trim();
+  const err=document.getElementById("eerr");
+  if(!name){err.textContent="Guest name cannot be empty.";err.style.display="block";return;}
+  b.name=name;b.mobile=document.getElementById("em").value.trim();b.email=document.getElementById("ee").value.trim();
+  b.ciS=document.getElementById("ecis").value;b.coS=document.getElementById("ecos").value;
+  b.ciE=document.getElementById("ecie").value;b.ciL=document.getElementById("ecil").value;
+  b.coE=document.getElementById("ecoe").value;b.coL=document.getElementById("ecol").value;
+  b.platform=document.getElementById("epl").value;b.pay=document.getElementById("epy").value;
+  b.method=document.getElementById("eme2").value;b.notes=document.getElementById("eno").value.trim();
+  sv();cAll();renderCal();showDet(b);
+}
+
+// EXTEND
+function openExt(){
+  if(!active)return;const b=active;
+  const nd=aD(b.co,1),conf=gB(nd,b.id)||gBl(nd);
+  const body=document.getElementById("exb"),btns=document.getElementById("exbt");
+  if(conf){
+    body.innerHTML=`<div class="er">Cannot extend — ${nd} is already blocked or booked.</div><p style="font-size:13px;color:#666">Current checkout: <strong>${b.co}</strong></p>`;
+    btns.innerHTML=`<button class="bxx" style="flex:1" onclick="cAll()">Close</button>`;
+  } else {
+    const ip=b.pay==="full";
+    body.innerHTML=`<p style="font-size:13px;margin-bottom:8px;color:#666">Current checkout: <strong>${b.co}</strong></p>
+    <div class="fr"><label>New check-out date</label><input type="date" id="exd" min="${nd}" value="${nd}"/></div>
+    ${ip?`<div class="ib">Guest is fully paid. If extension unpaid, status flips to partially paid.</div>`:""}
+    <div class="f2">
+      <div><label>Extension paid?</label><select id="expy"><option value="no">Not paid${ip?" — mark partial":""}</option><option value="yes">Already paid</option></select></div>
+      <div><label>Method</label><select id="exme"><option value="">— select —</option><option>GCash</option><option>Maya</option><option>Via app</option><option>Bank transfer</option><option>Cash</option></select></div>
+    </div>
+    <div id="exer" class="er" style="display:none"></div>
+    <p style="font-size:11px;color:#888;margin-top:5px">🧹 Cleaner date updates automatically.</p>`;
+    btns.innerHTML=`<button class="bxx" onclick="cAll()">Cancel</button><button class="bsv" onclick="confExt()">Confirm</button>`;
+  }
+  document.getElementById("ov-ex").classList.add("sh");
+}
+function confExt(){
+  const b=active,nc=document.getElementById("exd").value;
+  const err=document.getElementById("exer");
+  if(!nc||nc<=b.co){err.textContent="New checkout must be after "+b.co+".";err.style.display="block";return;}
+  const conf=dR(aD(b.co,1),nc).find(ds=>gB(ds,b.id)||gBl(ds));
+  if(conf){err.textContent="Conflict on "+conf+".";err.style.display="block";return;}
+  const ep=document.getElementById("expy").value==="yes";
+  const em=document.getElementById("exme").value;
+  if(b.pay==="full"&&!ep)b.pay="partial";
+  else if(b.pay==="none"&&ep)b.pay="partial";
+  if(em)b.method=em;
+  b.co=nc;b.cd=false;b.ur=false;
+  sv();cAll();renderCal();showDet(b);
+}
+
+// CANCEL
+function openCan(){
+  if(!active)return;const b=active;
+  const days=dR(b.ci,b.co);
+  document.getElementById("cab").innerHTML=`
+    <p style="font-size:13px;margin-bottom:9px;color:#666">Cancelling for <strong>${b.name}</strong> (${b.ci} → ${b.co})</p>
+    <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:9px">
+      <label style="display:flex;gap:7px;font-size:13px;cursor:pointer;padding:8px;border:1px solid #ddd;border-radius:5px">
+        <input type="radio" name="ct" value="full" checked onchange="tgP(false)" style="margin-top:2px">
+        <div><strong>Cancel full booking</strong><br><span style="font-size:11px;color:#888">Removes all ${days.length} day(s)</span></div>
+      </label>
+      <label style="display:flex;gap:7px;font-size:13px;cursor:pointer;padding:8px;border:1px solid #ddd;border-radius:5px">
+        <input type="radio" name="ct" value="partial" onchange="tgP(true)" style="margin-top:2px">
+        <div><strong>Remove specific days</strong><br><span style="font-size:11px;color:#888">Trim from start or end only</span></div>
+      </label>
+    </div>
+    <div id="psec" style="display:none">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#999;margin-bottom:4px">Select days to remove</div>
+      <div class="ds">${days.map(d=>`<label><input type="checkbox" value="${d}"> ${d}</label>`).join("")}</div>
+      <div id="perr" class="er" style="display:none;margin-top:6px"></div>
+    </div>`;
+  document.getElementById("cabt").innerHTML=`<button class="bxx" onclick="cAll()">Keep booking</button><button class="bdl" onclick="reqCan()">Continue</button>`;
+  document.getElementById("ov-ca").classList.add("sh");
+}
+function tgP(s){document.getElementById("psec").style.display=s?"block":"none";}
+function reqCan(){
+  const type=document.querySelector('input[name="ct"]:checked')?.value;
+  if(type==="full"){pfcl=active;cOv("ov-ca");document.getElementById("ov-cc").classList.add("sh");}
+  else confPart();
+}
+function execFull(){
+  const b=pfcl;if(!b)return;
+  bk=bk.filter(x=>x.id!==b.id);sv();cAll();renderCal();
+  document.getElementById("dpanel").innerHTML=`<div class="ph">Booking for ${b.name} cancelled.</div>`;
+  active=null;pfcl=null;
+}
+function confPart(){
+  const b=active;
+  const sel=[...document.querySelectorAll("#psec input:checked")].map(c=>c.value);
+  const pe=document.getElementById("perr");
+  if(!sel.length){pe.textContent="Select at least one day.";pe.style.display="block";return;}
+  const rem=dR(b.ci,b.co).filter(d=>!sel.includes(d));
+  if(!rem.length){bk=bk.filter(x=>x.id!==b.id);sv();cAll();renderCal();document.getElementById("dpanel").innerHTML=`<div class="ph">All days removed — booking deleted.</div>`;active=null;return;}
+  const s=rem.sort();b.ci=s[0];b.co=aD(s[s.length-1],1);
+  sv();cAll();renderCal();showDet(b);
+}
+
+// MAINTENANCE
+function openMaint(pre){
+  document.getElementById("mnt").textContent="Block dates";
+  const f=pre||TD;
+  document.getElementById("mfr").value=f;document.getElementById("mto").value=f;
+  document.getElementById("mre").value="Maintenance / repairs";document.getElementById("mno").value="";
+  document.getElementById("merr").style.display="none";
+  delete document.getElementById("ov-mn").dataset.eid;
+  const pn=document.getElementById("mpre");
+  if(pre){pn.textContent="📅 Date pre-filled for "+pre;pn.style.display="block";}else pn.style.display="none";
+  document.getElementById("ov-mn").classList.add("sh");
+}
+function openEditBlk(id){
+  const b=bl.find(x=>x.id===id);if(!b)return;
+  document.getElementById("mnt").textContent="Edit block";
+  document.getElementById("mfr").value=b.from;document.getElementById("mto").value=b.to;
+  document.getElementById("mre").value=b.reason;document.getElementById("mno").value=b.notes||"";
+  document.getElementById("merr").style.display="none";document.getElementById("mpre").style.display="none";
+  document.getElementById("ov-mn").dataset.eid=id;
+  document.getElementById("ov-mn").classList.add("sh");
+}
+function saveMaint(){
+  const fr=document.getElementById("mfr").value,to=document.getElementById("mto").value;
+  const re=document.getElementById("mre").value,no=document.getElementById("mno").value.trim();
+  const err=document.getElementById("merr");
+  if(!fr||!to){err.textContent="Please select both dates.";err.style.display="block";return;}
+  if(to<fr){err.textContent="End date must be on or after start date.";err.style.display="block";return;}
+  const eid=parseInt(document.getElementById("ov-mn").dataset.eid||"0");
+  const conf=dR(fr,aD(to,1)).find(ds=>gB(ds,null));
+  if(conf){err.textContent="Conflict on "+conf+" — a guest is booked.";err.style.display="block";return;}
+  if(eid){const b=bl.find(x=>x.id===eid);if(b){b.from=fr;b.to=to;b.reason=re;b.notes=no;}}
+  else bl.push({id:nid++,from:fr,to:to,reason:re,notes:no});
+  delete document.getElementById("ov-mn").dataset.eid;
+  sv();cAll();renderCal();
+  document.getElementById("dpanel").innerHTML=`<div class="ph">Block saved: ${re} · ${fr} to ${to}.</div>`;
+}
+function delBlk(id){bl=bl.filter(b=>b.id!==id);sv();renderCal();document.getElementById("dpanel").innerHTML=`<div class="ph">Block removed.</div>`;}
+
+// ALL BOOKINGS
+function openList(){
+  document.getElementById("lsq").value="";document.getElementById("lss").value="dd";
+  renderList();document.getElementById("ov-li").classList.add("sh");
+}
+function renderList(){
+  const q=document.getElementById("lsq").value.toLowerCase(),sort=document.getElementById("lss").value;
+  let list=[...bk];
+  if(q)list=list.filter(b=>b.name.toLowerCase().includes(q)||b.platform.toLowerCase().includes(q)||(b.method||"").toLowerCase().includes(q)||(b.mobile||"").includes(q));
+  if(sort==="dd")list.sort((a,b)=>b.at.localeCompare(a.at));
+  else if(sort==="da")list.sort((a,b)=>a.at.localeCompare(b.at));
+  else if(sort==="na")list.sort((a,b)=>a.name.localeCompare(b.name));
+  else if(sort==="nd")list.sort((a,b)=>b.name.localeCompare(a.name));
+  else if(sort==="up"){list=list.filter(b=>b.ci>=TD);list.sort((a,b)=>a.ci.localeCompare(b.ci));}
+  const el=document.getElementById("blist");
+  if(!list.length){el.innerHTML=`<div class="el">No bookings found.</div>`;return;}
+  el.innerHTML=list.map(b=>{
+    const rep=cG(b.name)>1,ni=dR(b.ci,b.co).length,isTurn=!!gCI(b.co);
+    return`<div class="bc2" onclick="pickBk(${b.id})">
+      <div class="bc2t">
+        <div><div class="bc2n">${rep?"⭐ ":""}${b.name}${isTurn?' <span style="color:#E8A020;font-size:10px">⚡</span>':""}</div>
+        <div class="bc2d">${b.ci} → ${b.co} · ${ni} night${ni!==1?"s":""}</div></div>
+        <span class="bdg ${pyC(b.pay)}" style="flex-shrink:0">${pyL(b.pay)}</span>
+      </div>
+      <div class="bc2b">
+        <span class="bdg ${pC(b.platform)}">${b.platform}</span>
+        ${b.method?`<span class="bdg ${mC(b.method)}">${b.method}</span>`:""}
+        ${b.mobile?`<span style="font-size:11px;color:#888">${b.mobile}</span>`:""}
+      </div>
+    </div>`;
+  }).join("");
+}
+function pickBk(id){
+  const b=bk.find(x=>x.id===id);if(!b)return;
+  cAll();const d=new Date(b.ci);cy=d.getFullYear();cm=d.getMonth();
+  renderCal();showDet(b);
+}
+</script>
+</body>
+</html>
