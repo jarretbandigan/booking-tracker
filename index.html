@@ -59,7 +59,7 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
 .dy.mn2{background:#EBEBEB;cursor:pointer}.dy.mn2:hover{border-color:#888}
 .dy.tr{background:linear-gradient(180deg,#FEF3E2 50%,#EAF3DE 50%);cursor:pointer;border-color:#E8A020;animation:pb 2s infinite}
 @keyframes pb{0%,100%{border-color:#E8A020}50%{border-color:#C17D1A}}
-.dy.td{box-shadow:0 0 0 2px #1A56DB;border-color:#1A56DB!important}
+.dy.td{box-shadow:0 0 0 2px #1A56DB;border-color:#1A56DB}
 .dn2{font-weight:700;font-size:12px;line-height:1;margin-bottom:2px}
 .dy.av .dn2{color:#1E4D08}.dy.bk .dn2{color:#7E1D3F}.dy.co .dn2{color:#7A4A00}.dy.mn2 .dn2{color:#444}.dy.tr .dn2{color:#7A4A00}.dy.td .dn2{color:#1A56DB}
 .tp2{position:absolute;top:2px;right:2px;background:#1A56DB;color:#fff;font-size:8px;font-weight:700;border-radius:2px;padding:0 3px;line-height:13px;z-index:2}
@@ -157,6 +157,20 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
 .gm-stay-dt{font-weight:700;font-size:12px}
 .gm-stay-inf{display:flex;gap:4px;flex-wrap:wrap;align-items:center;margin-top:3px}
 .gm-el{text-align:center;color:#aaa;font-size:13px;padding:18px}
+/* v1.3.0 */
+.dy.pm{background:#f0f0f0;cursor:default}
+.dy.pbk{background:#F5E8EE;cursor:pointer}.dy.pbk:hover{border-color:#D4537E}
+.dy.pco{background:#FAF2E6;cursor:pointer}.dy.pco:hover{border-color:#C17D1A}
+.dy.pbk .dn2{color:#9B6070}.dy.pco .dn2{color:#9A7040}
+.dy.og{border-color:#22c55e;animation:og 2s infinite}
+.dy.og:not(.bk){background:#E8F5EE}
+@keyframes og{0%,100%{border-color:#22c55e}50%{border-color:#16a34a}}
+.dy.upd{border:2px dotted #E8A020!important}
+.bel-sec{margin-bottom:12px}
+.bel-sec-hd{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#999;margin-bottom:5px}
+.bel-row{background:#fafafa;border:1px solid #e8e8e8;border-radius:6px;padding:8px 10px;margin-bottom:4px;font-size:12px;cursor:pointer}
+.bel-row:hover{border-color:#2D5F0F}
+.bel-none{font-size:12px;color:#aaa;padding:4px 0}
 </style>
 
 <!-- LOGIN -->
@@ -177,6 +191,7 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
     <div class="hbs">
       <button class="hb" onclick="openList()">📋 All Bookings</button>
       <button class="hb" onclick="openGM()">👥 Guests</button>
+      <button class="hb" onclick="openBell()">🔔 Alerts</button>
       <button class="hb" onclick="openWN()">✨ What's New</button>
       <button class="hb" onclick="doExport()">📤 Export</button>
       <button class="hb" onclick="triggerImport()">📥 Import</button>
@@ -212,6 +227,8 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
       <div class="lgi"><span style="color:#1B5E20;font-weight:700">↑</span>Check-in</div>
       <div class="lgi"><span style="color:#7A4A00;font-weight:700">↓</span>Check-out</div>
       <div class="lgi"><span style="color:#E8A020;font-weight:700">↑↓</span>Turnaround</div>
+      <div class="lgi"><div class="ld" style="background:#E8F5EE;border:2px solid #22c55e"></div>Ongoing</div>
+      <div class="lgi"><div class="ld" style="border:2px dotted #E8A020;background:transparent"></div>Unpaid</div>
     </div>
     <div class="cg" id="cal"></div>
     <div class="pn" id="dpanel"><div class="ph">📅 Tap any date to get started<br><span style="font-size:11px">Free dates open booking form · Booked dates show details</span></div></div>
@@ -250,6 +267,13 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
   <h3>⚠️ Same-day turnaround</h3>
   <div id="twb"></div>
   <div class="mbb" id="twbt"></div>
+</div></div>
+
+<!-- OVERWRITE WARNING -->
+<div class="ov" id="ov-ow"><div class="md cm">
+  <h3>⚠️ Unpaid booking exists</h3>
+  <div class="wb" id="ow-msg" style="margin-bottom:12px"></div>
+  <div class="mbb"><button class="bxx" onclick="cAll();pend=null;pendOver=null;">Cancel</button><button class="bdl" onclick="confirmOw()">Confirm Overwrite</button></div>
 </div></div>
 
 <!-- EDIT -->
@@ -339,14 +363,16 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
 
 <!-- WHAT'S NEW -->
 <div class="ov" id="ov-wn"><div class="md">
-  <h3>✨ What's New — v1.2.0</h3>
+  <h3>✨ What's New — v1.3.0</h3>
   <div style="font-size:13px;color:#444;line-height:1.7;margin-bottom:13px">
-    <div style="margin-bottom:6px"><strong>👥 Guest Masterlist</strong><br>All your guests in one place. Tap 👥 Guests in the header to view every guest's stay history, platforms, and payment summary. Search by name, mobile, or email. Filter to repeat guests only.</div>
-    <div style="font-size:11px;color:#aaa">A booking amount field will be added in a future version to enable full spend tracking.</div>
+    <div style="margin-bottom:6px"><strong>🔔 Notification Bell</strong><br>Tap 🔔 Alerts in the header to see cleaner reminders, unpaid bookings, pending reservations, and upcoming confirmed stays — all in one place.</div>
+    <div style="margin-bottom:6px"><strong>📅 Past &amp; Ongoing Visual States</strong><br>Past empty dates are greyed out. Past bookings fade to muted colours. Ongoing bookings — stays that started in the past but haven't ended yet — pulse green so you always know what's still active.</div>
+    <div><strong>⚠️ Unpaid Booking Overwrite</strong><br>When adding a booking that conflicts with an unpaid or pending booking, you now get a prompt to overwrite instead of a hard block.</div>
   </div>
   <div style="border-top:1px solid #eee;padding-top:10px;margin-bottom:10px">
     <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#aaa;letter-spacing:.5px;margin-bottom:6px">Previous releases</div>
     <div style="font-size:12px;color:#666;line-height:1.7">
+      <div style="margin-bottom:4px"><strong>v1.2.0</strong> — Guest Masterlist with search, filter, and full stay history</div>
       <div style="margin-bottom:4px"><strong>v1.1.0</strong> — Security fix, save failure alerts, Export &amp; Import backup</div>
       <div><strong>v1.0.0</strong> — MVP: calendar, bookings, cleaner flow, payment tracking</div>
     </div>
@@ -376,11 +402,18 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
   </div>
 </div></div>
 
+<!-- NOTIFICATIONS BELL -->
+<div class="ov" id="ov-bell"><div class="md lm">
+  <h3>🔔 Alerts</h3>
+  <div id="bell-body"></div>
+  <div class="mbb" style="margin-top:9px"><button class="bxx" style="flex:1" onclick="cOv('ov-bell')">Close</button></div>
+</div></div>
+
 <script>
 // AUTH — SHA-256, pre-computed hash (plaintext password not stored in source)
 const CU="admin";
 const CH="fba447b7c72af7dbd2482b4bc07352abbb8292df3b28956d91692e65eaafde2e";
-let pend=null,pfcl=null,active=null;
+let pend=null,pendOver=null,pfcl=null,active=null;
 async function h256(s){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,"0")).join("");}
 async function doLogin(){
   const u=document.getElementById("lu").value.trim(),p=document.getElementById("lp").value;
@@ -431,6 +464,7 @@ function eCo(b){return b.coL||b.coE||b.coS;}
 function eCi(b){return b.ciE||b.ciL||b.ciS;}
 function cAll(){document.querySelectorAll(".ov").forEach(o=>o.classList.remove("sh"));}
 function cOv(id){document.getElementById(id).classList.remove("sh");}
+function isUnpaid(b){return b.pay==="none"||b.pay==="partial"||b.method==="Pending";}
 
 // OCCUPANCY
 function updOcc(){
@@ -455,7 +489,8 @@ function renderCal(){
   const mkC=(cls,txt)=>{const c=document.createElement("span");c.className="ch "+cls;c.textContent=txt;return c;};
   for(let d=1;d<=days;d++){
     const ds=cy+"-"+String(cm+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
-    const isTd=ds===TD,book=gB(ds,null),ciB=gCI(ds),coB=gCO(ds),blk=gBl(ds);
+    const isTd=ds===TD,isPast=ds<TD;
+    const book=gB(ds,null),ciB=gCI(ds),coB=gCO(ds),blk=gBl(ds);
     const el=document.createElement("div");
     const num=()=>{const n=document.createElement("div");n.className="dn2";n.textContent=d;return n;};
     if(blk){
@@ -464,28 +499,46 @@ function renderCal(){
       el.appendChild(mkC("chm",blk.reason.split("/")[0].trim()));
       el.onclick=()=>showBlk(blk);
     } else if(ciB&&coB){
-      el.className="dy tr"+(isTd?" td":"");el.appendChild(num());
+      const ogTr=ciB.co>TD;
+      el.className="dy tr"+(isTd?" td":"")+(ogTr?" og":"");
+      el.appendChild(num());
       el.appendChild(mkP("trbdg","↑↓"));
       el.appendChild(mkC("chout","↓ "+coB.name.split(" ")[0]));
       el.appendChild(mkC("chin","↑ "+ciB.name.split(" ")[0]));
       el.onclick=()=>showTurn(coB,ciB);
     } else if(coB&&!book){
-      el.className="dy co"+(isTd?" td":"");el.appendChild(num());
+      const cls=isPast?"pco":"co";
+      el.className="dy "+cls+(isTd?" td":"");
+      if(isUnpaid(coB))el.classList.add("upd");
+      el.appendChild(num());
       if(isTd)el.appendChild(mkP("tp2","TODAY"));
       el.appendChild(mkC("chout","↓ "+coB.name.split(" ")[0]));
       el.onclick=()=>showDet(coB);
     } else if(book){
-      el.className="dy bk"+(isTd?" td":"");el.appendChild(num());
+      const isOg=book.co>TD;
+      let cls;
+      if(isPast&&isOg)cls="og";
+      else if(isTd&&isOg)cls="bk td og";
+      else if(isTd)cls="bk td";
+      else if(isPast)cls="pbk";
+      else cls="bk";
+      el.className="dy "+cls;
+      if(isUnpaid(book))el.classList.add("upd");
+      el.appendChild(num());
       if(isTd)el.appendChild(mkP("tp2","TODAY"));
       const ch=document.createElement("span");ch.className="ch chb";
       if(cG(book.name)>1){const dot=document.createElement("span");dot.className="rdot";ch.appendChild(dot);}
       ch.appendChild(document.createTextNode((book.ci===ds?"↑ ":"")+book.name.split(" ")[0]));
       el.appendChild(ch);el.onclick=()=>showDet(book);
     } else {
-      el.className="dy av"+(isTd?" td":"");el.appendChild(num());
-      if(isTd)el.appendChild(mkP("tp2","TODAY"));
-      const h=document.createElement("div");h.className="ah2";h.textContent="+ book";el.appendChild(h);
-      el.onclick=()=>openAdd(ds);
+      if(isPast){
+        el.className="dy pm";el.appendChild(num());
+      } else {
+        el.className="dy av"+(isTd?" td":"");el.appendChild(num());
+        if(isTd)el.appendChild(mkP("tp2","TODAY"));
+        const h=document.createElement("div");h.className="ah2";h.textContent="+ book";el.appendChild(h);
+        el.onclick=()=>openAdd(ds);
+      }
     }
     cal.appendChild(el);
   }
@@ -594,8 +647,6 @@ function saveAdd(){
   const err=document.getElementById("aerr");
   if(!name||!ci||!co){err.textContent="Please fill in guest name and both dates.";err.style.display="block";return;}
   if(co<=ci){err.textContent="Check-out must be after check-in.";err.style.display="block";return;}
-  const conf=dR(ci,co).find(ds=>gB(ds,null)||gBl(ds));
-  if(conf){err.textContent="Conflict on "+conf+" — already blocked or booked.";err.style.display="block";return;}
   const b={id:nid++,name,mobile:document.getElementById("am").value.trim(),email:document.getElementById("ae").value.trim(),
     ci,co,ciS:document.getElementById("acis").value,coS:document.getElementById("acos").value,
     ciE:document.getElementById("acie").value,ciL:document.getElementById("acil").value,
@@ -603,6 +654,18 @@ function saveAdd(){
     platform:document.getElementById("apl").value,pay:document.getElementById("apy").value,
     method:document.getElementById("ame").value,notes:document.getElementById("ano").value.trim(),
     cd:false,ur:false,at:TD};
+  const conf=dR(ci,co).find(ds=>gB(ds,null)||gBl(ds));
+  if(conf){
+    const conflictBook=gB(conf,null);
+    if(conflictBook&&isUnpaid(conflictBook)){
+      pendOver=conflictBook;pend=b;
+      cAll();
+      const contact=conflictBook.mobile||conflictBook.email||"—";
+      document.getElementById("ow-msg").innerHTML=`There is currently an unpaid or pending booking for these dates. Booker: <strong>${conflictBook.name}</strong>, ${contact}. Do you want to overwrite this booking?`;
+      document.getElementById("ov-ow").classList.add("sh");return;
+    }
+    err.textContent="Conflict on "+conf+" — already blocked or booked.";err.style.display="block";return;
+  }
   // Soft turnaround warning
   const exCo=gCO(ci);
   if(exCo){
@@ -615,6 +678,20 @@ function saveAdd(){
 }
 function commitPend(){if(!pend)return;commitBk(pend);pend=null;cAll();}
 function commitBk(b){bk.push(b);sv();cAll();renderCal();showDet(b);}
+function confirmOw(){
+  if(!pend||!pendOver)return;
+  const b=pend;
+  bk=bk.filter(x=>x.id!==pendOver.id);
+  pendOver=null;pend=null;cAll();
+  const exCo=gCO(b.ci);
+  if(exCo){
+    pend=b;
+    document.getElementById("twb").innerHTML=`<div class="wb"><strong>↓ ${exCo.name}</strong> checks out on <strong>${b.ci} at ${f12(eCo(exCo))}</strong><br><strong>↑ ${b.name}</strong> would check in at <strong>${f12(eCi(b))}</strong><br><br>Cleaner must prepare unit between these times. Confirm this is enough time.</div>`;
+    document.getElementById("twbt").innerHTML=`<button class="bxx" onclick="cOv('ov-tw');pend=null;">Cancel</button><button class="bsv" onclick="commitPend()">Proceed anyway</button>`;
+    document.getElementById("ov-tw").classList.add("sh");return;
+  }
+  commitBk(b);
+}
 
 // EDIT
 function openEdit(){
@@ -944,6 +1021,33 @@ function confirmImport(){
   sv();cAll();renderCal();active=null;
   document.getElementById("dpanel").innerHTML='<div class="ph">✅ Backup restored — '+bk.length+' booking'+(bk.length!==1?'s':'')+(bl.length?' and '+bl.length+' block'+(bl.length!==1?'s':''):'')+' loaded.</div>';
   pendingImport=null;
+}
+
+// ALERTS BELL
+function openBell(){
+  const upcoming=bk.filter(b=>b.co>=TD).sort((a,b)=>a.co.localeCompare(b.co));
+  const nextCo=upcoming[0]||null;
+  const cleanerHtml=nextCo
+    ?`<div class="bel-row" onclick="pickBk(${nextCo.id});cOv('ov-bell')"><strong>${nextCo.name}</strong> checks out <strong>${nextCo.co}</strong> at ${f12(eCo(nextCo))||"—"}${nextCo.cd?'<span style="color:#4A8A20;margin-left:6px">✓ Contacted</span>':'<span style="color:#E8A020;margin-left:6px">⚠ Not contacted</span>'}</div>`
+    :`<div class="bel-none">✓ No upcoming checkouts.</div>`;
+  const unpaid=bk.filter(b=>b.pay==="none"&&b.co>=TD).sort((a,b)=>a.ci.localeCompare(b.ci));
+  const unpaidHtml=unpaid.length
+    ?unpaid.map(b=>`<div class="bel-row" onclick="pickBk(${b.id});cOv('ov-bell')"><strong>${b.name}</strong> · ${b.ci} → ${b.co} · ${b.platform}<span style="color:#D4537E;margin-left:6px">No payment</span></div>`).join("")
+    :`<div class="bel-none">✓ None.</div>`;
+  const pendRes=bk.filter(b=>b.method==="Pending"&&b.co>=TD).sort((a,b)=>a.ci.localeCompare(b.ci));
+  const pendHtml=pendRes.length
+    ?pendRes.map(b=>`<div class="bel-row" onclick="pickBk(${b.id});cOv('ov-bell')"><strong>${b.name}</strong> · ${b.ci} → ${b.co} · ${b.platform}<span style="color:#7A4A00;margin-left:6px">Pending</span></div>`).join("")
+    :`<div class="bel-none">✓ None.</div>`;
+  const confirmed=bk.filter(b=>b.pay==="full"&&b.ci>=TD).sort((a,b)=>a.ci.localeCompare(b.ci));
+  const confHtml=confirmed.length
+    ?confirmed.map(b=>`<div class="bel-row" onclick="pickBk(${b.id});cOv('ov-bell')"><strong>${b.name}</strong> · ${b.ci} → ${b.co} · ${b.platform}<span style="color:#1E4D08;margin-left:6px">Fully paid</span></div>`).join("")
+    :`<div class="bel-none">✓ No upcoming confirmed bookings.</div>`;
+  document.getElementById("bell-body").innerHTML=`
+    <div class="bel-sec"><div class="bel-sec-hd">🧹 Cleaner Reminder</div>${cleanerHtml}</div>
+    <div class="bel-sec"><div class="bel-sec-hd">💸 Unpaid Bookings</div>${unpaidHtml}</div>
+    <div class="bel-sec"><div class="bel-sec-hd">⏳ Pending Reservations</div>${pendHtml}</div>
+    <div class="bel-sec"><div class="bel-sec-hd">✅ Upcoming Confirmed</div>${confHtml}</div>`;
+  document.getElementById("ov-bell").classList.add("sh");
 }
 
 // WHAT'S NEW
