@@ -156,7 +156,6 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
       <button class="hb" onclick="openWN()">✨ What's New</button>
       <button class="hb" onclick="doExport()">📤 Export</button>
       <button class="hb" onclick="triggerImport()">📥 Import</button>
-      <button class="hb hbd" onclick="document.getElementById('ov-cd').classList.add('sh')">🗑 Clear demo</button>
       <button class="hb" onclick="doLogout()">Sign out</button>
     </div>
   </div>
@@ -280,13 +279,6 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
   <div class="mbb"><button class="bxx" onclick="cAll()">Cancel</button><button class="bsv" onclick="saveMaint()">Save block</button></div>
 </div></div>
 
-<!-- CLEAR DEMO -->
-<div class="ov" id="ov-cd"><div class="md cm">
-  <h3>Clear demo data?</h3>
-  <p style="font-size:13px;color:#555;margin-bottom:13px">Removes all sample bookings and blocks. Start fresh. Cannot be undone.</p>
-  <div class="mbb"><button class="bxx" onclick="cOv('ov-cd')">Cancel</button><button class="bdl" onclick="clearDemo()">Clear everything</button></div>
-</div></div>
-
 <!-- ALL BOOKINGS -->
 <div class="ov" id="ov-li"><div class="md lm">
   <h3>All Bookings</h3>
@@ -350,13 +342,6 @@ function doLogout(){document.getElementById("as").style.display="none";document.
 const MN=["January","February","March","April","May","June","July","August","September","October","November","December"];
 const TD=new Date().toISOString().slice(0,10);
 let cy=new Date().getFullYear(),cm=new Date().getMonth(),nid=10;
-const DB=[
-  {id:1,name:"Maria Santos",mobile:"+63 912 345 6789",email:"maria@email.com",ci:"2026-05-03",co:"2026-05-06",ciS:"14:00",coS:"12:00",ciE:"",ciL:"",coE:"",coL:"",platform:"Airbnb",pay:"full",method:"GCash",notes:"Prefers high floor",cd:true,ur:true,at:"2026-04-10"},
-  {id:2,name:"Juan dela Cruz",mobile:"+63 917 222 3333",email:"",ci:"2026-05-10",co:"2026-05-13",ciS:"14:00",coS:"12:00",ciE:"",ciL:"18:00",coE:"",coL:"",platform:"Booking.com",pay:"partial",method:"Via app",notes:"Late check-in confirmed",cd:false,ur:false,at:"2026-04-12"},
-  {id:3,name:"Maria Santos",mobile:"+63 912 345 6789",email:"maria@email.com",ci:"2026-05-13",co:"2026-05-16",ciS:"14:00",coS:"12:00",ciE:"",ciL:"",coE:"",coL:"",platform:"Airbnb",pay:"none",method:"",notes:"Same-day turnaround demo",cd:false,ur:false,at:"2026-04-18"},
-  {id:4,name:"Anna Reyes",mobile:"+63 998 777 1234",email:"anna@gmail.com",ci:"2026-05-25",co:"2026-05-27",ciS:"14:00",coS:"12:00",ciE:"",ciL:"",coE:"",coL:"",platform:"Agoda",pay:"full",method:"Bank transfer",notes:"",cd:false,ur:false,at:"2026-04-20"}
-];
-const DBL=[{id:5,from:"2026-05-17",to:"2026-05-19",reason:"Maintenance / repairs",notes:"Aircon servicing"}];
 let bk=[],bl=[];
 
 function sv(){
@@ -371,14 +356,12 @@ function sv(){
 function loadData(){
   try{
     const b=localStorage.getItem("bt_b"),l=localStorage.getItem("bt_bl");
-    bk=b?JSON.parse(b):JSON.parse(JSON.stringify(DB));
-    bl=l?JSON.parse(l):JSON.parse(JSON.stringify(DBL));
-  }catch(e){bk=JSON.parse(JSON.stringify(DB));bl=JSON.parse(JSON.stringify(DBL));}
+    bk=b?JSON.parse(b):[];
+    bl=l?JSON.parse(l):[];
+  }catch(e){bk=[];bl=[];}
   const ids=[...bk.map(x=>x.id),...bl.map(x=>x.id)];
   nid=ids.length?Math.max(...ids)+1:10;
 }
-function clearDemo(){bk=[];bl=[];nid=1;sv();cOv("ov-cd");active=null;renderCal();document.getElementById("dpanel").innerHTML='<div class="ph">✅ Cleared. Tap any date to add your first booking.</div>';}
-
 // HELPERS
 function f12(t){if(!t)return null;const[h,m]=t.split(":").map(Number);const ap=h>=12?"PM":"AM";const h12=h%12||12;return h12+":"+(m<10?"0"+m:m)+" "+ap;}
 function dR(ci,co){const d=[],c=new Date(ci),e=new Date(co);while(c<e){d.push(c.toISOString().slice(0,10));c.setDate(c.getDate()+1);}return d;}

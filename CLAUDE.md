@@ -77,7 +77,7 @@ Booking Tracker is a single-file, browser-based property booking management app 
 ```
 booking-tracker/
 │
-├── index.html      Entire application (734 lines, ~48KB)
+├── index.html      Entire application (805 lines, ~51KB)
 │                   Contains: HTML structure, all CSS, all JavaScript
 │                   No external dependencies. Works offline.
 │
@@ -93,23 +93,22 @@ index.html
 │
 ├── style               Lines 11 to 137     All CSS
 ├── LOGIN               Lines 139 to 148    Login screen HTML
-├── APP                 Lines 150 to 197    App shell, header, occupancy bar, calendar, detail panel
-├── ADD                 Lines 198 to 224    Add booking modal
-├── TURNAROUND          Lines 225 to 231    Same-day turnaround warning modal
-├── EDIT                Lines 232 to 258    Edit booking modal
-├── EXTEND              Lines 259 to 261    Extend stay modal
-├── CANCEL              Lines 262 to 264    Cancel booking modal
-├── CANCEL CONFIRM      Lines 265 to 271    Full cancel double-confirm modal
-├── MAINTENANCE         Lines 272 to 282    Block dates modal
-├── CLEAR DEMO          Lines 283 to 289    Clear demo data confirm modal
-├── ALL BOOKINGS        Lines 290 to 306    All bookings list modal
-├── IMPORT FILE         Lines 307 to 309    Hidden file input for import
-├── IMPORT CONFIRM      Lines 310 to 323    Import confirm modal with validation
-├── WHAT'S NEW          Lines 324 to 334    v1.1.0 release notes modal
+├── APP                 Lines 150 to 196    App shell, header, occupancy bar, calendar, detail panel
+├── ADD                 Lines 197 to 223    Add booking modal
+├── TURNAROUND          Lines 224 to 230    Same-day turnaround warning modal
+├── EDIT                Lines 231 to 257    Edit booking modal
+├── EXTEND              Lines 258 to 260    Extend stay modal
+├── CANCEL              Lines 261 to 263    Cancel booking modal
+├── CANCEL CONFIRM      Lines 264 to 270    Full cancel double-confirm modal
+├── MAINTENANCE         Lines 271 to 281    Block dates modal
+├── ALL BOOKINGS        Lines 282 to 298    All bookings list modal
+├── IMPORT FILE         Lines 299 to 301    Hidden file input for import
+├── IMPORT CONFIRM      Lines 302 to 315    Import confirm modal with validation
+├── WHAT'S NEW          Lines 316 to 326    v1.1.0 release notes modal
 │
-└── script              Lines 335 to 820    All application logic
+└── script              Lines 327 to 803    All application logic
     ├── AUTH            SHA-256 login, logout
-    ├── DATA            Demo data, localStorage save/load, clearDemo
+    ├── DATA            localStorage save/load
     ├── HELPERS         fmt12, dRange, addDays, getters, class mappers
     ├── OCCUPANCY       Monthly occupancy calculation
     ├── CALENDAR        renderCal — builds all 7 tile states
@@ -216,9 +215,8 @@ bt_bl  Blocks array
 
 **Data Persistence**
 - All data saved to localStorage after every mutation
-- Loaded on login, falls back to demo data if empty
+- Loaded on login, falls back to empty state for new users
 - nid recalculated on every load
-- Clear demo button with confirmation
 
 ### 4.3 Known Limitations
 
