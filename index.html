@@ -134,6 +134,29 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
 .bc2b{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
 .el{text-align:center;color:#aaa;font-size:13px;padding:18px}
 .cm{width:290px}
+/* Guest Masterlist */
+.gm-ctrl{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.gm-ctrl input{flex:1;min-width:120px;border:1px solid #ddd;border-radius:5px;padding:6px 8px;font-size:13px;background:#fafafa}
+.gm-chips{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.gm-chip{padding:4px 10px;border-radius:12px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid #ddd;background:#fff;color:#555}
+.gm-chip.act{background:#2D5F0F;border-color:#2D5F0F;color:#fff}
+.gm-body{display:flex;flex-direction:column;gap:5px;max-height:310px;overflow-y:auto}
+.gm-row{background:#fafafa;border:1px solid #e8e8e8;border-radius:7px;padding:9px 11px;cursor:pointer;transition:border-color .12s}
+.gm-row:hover{border-color:#2D5F0F}
+.gm-rn{font-weight:700;font-size:13px;margin-bottom:3px}
+.gm-rs{font-size:11px;color:#888;margin-bottom:4px}
+.gm-stat{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.gm-hd{display:flex;align-items:center;gap:8px;margin-bottom:11px}
+.gm-back{background:#f0f0f0;border:1px solid #ddd;border-radius:5px;padding:4px 9px;font-size:12px;cursor:pointer;font-weight:600}
+.gm-back:hover{background:#e5e5e5}
+.gm-pname{font-size:15px;font-weight:700;flex:1}
+.gm-pbody{display:flex;flex-direction:column;gap:5px;max-height:350px;overflow-y:auto}
+.gm-psec{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#999;margin:9px 0 4px}
+.gm-stay{background:#fafafa;border:1px solid #e8e8e8;border-radius:7px;padding:9px 11px}
+.gm-stay-hd{display:flex;justify-content:space-between;align-items:flex-start;gap:7px;margin-bottom:4px}
+.gm-stay-dt{font-weight:700;font-size:12px}
+.gm-stay-inf{display:flex;gap:4px;flex-wrap:wrap;align-items:center;margin-top:3px}
+.gm-el{text-align:center;color:#aaa;font-size:13px;padding:18px}
 </style>
 
 <!-- LOGIN -->
@@ -153,6 +176,7 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
     <h1>📋 Booking Tracker</h1>
     <div class="hbs">
       <button class="hb" onclick="openList()">📋 All Bookings</button>
+      <button class="hb" onclick="openGM()">👥 Guests</button>
       <button class="hb" onclick="openWN()">✨ What's New</button>
       <button class="hb" onclick="doExport()">📤 Export</button>
       <button class="hb" onclick="triggerImport()">📥 Import</button>
@@ -315,13 +339,41 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
 
 <!-- WHAT'S NEW -->
 <div class="ov" id="ov-wn"><div class="md">
-  <h3>✨ What's New — v1.1.0</h3>
+  <h3>✨ What's New — v1.2.0</h3>
   <div style="font-size:13px;color:#444;line-height:1.7;margin-bottom:13px">
-    <div style="margin-bottom:10px"><strong>🔒 Security fix</strong><br>Removed plaintext password from source code. Credentials are no longer visible in View Source or DevTools.</div>
-    <div style="margin-bottom:10px"><strong>⚠️ Save failure alerts</strong><br>If auto-save to local storage fails for any reason, a visible error banner now appears so no change is ever lost silently.</div>
-    <div><strong>📤 Export &amp; 📥 Import</strong><br>Back up all bookings and blocks to a single JSON file. Restore from any backup with a summary preview and confirmation step before overwriting.</div>
+    <div style="margin-bottom:6px"><strong>👥 Guest Masterlist</strong><br>All your guests in one place. Tap 👥 Guests in the header to view every guest's stay history, platforms, and payment summary. Search by name, mobile, or email. Filter to repeat guests only.</div>
+    <div style="font-size:11px;color:#aaa">A booking amount field will be added in a future version to enable full spend tracking.</div>
+  </div>
+  <div style="border-top:1px solid #eee;padding-top:10px;margin-bottom:10px">
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#aaa;letter-spacing:.5px;margin-bottom:6px">Previous releases</div>
+    <div style="font-size:12px;color:#666;line-height:1.7">
+      <div style="margin-bottom:4px"><strong>v1.1.0</strong> — Security fix, save failure alerts, Export &amp; Import backup</div>
+      <div><strong>v1.0.0</strong> — MVP: calendar, bookings, cleaner flow, payment tracking</div>
+    </div>
   </div>
   <div class="mbb"><button class="bxx" style="flex:1" onclick="cOv('ov-wn')">Close</button></div>
+</div></div>
+
+<!-- GUEST MASTERLIST -->
+<div class="ov" id="ov-gm"><div class="md lm">
+  <div id="gm-lv">
+    <h3>👥 Guests</h3>
+    <div class="gm-ctrl"><input id="gmq" placeholder="Search name, mobile, email…" oninput="renderGM()"/></div>
+    <div class="gm-chips">
+      <span class="gm-chip act" data-f="all" onclick="gmFilt(this)">All</span>
+      <span class="gm-chip" data-f="rep" onclick="gmFilt(this)">⭐ Repeat</span>
+    </div>
+    <div class="gm-body" id="gm-list"></div>
+    <div class="mbb" style="margin-top:9px"><button class="bxx" style="flex:1" onclick="cAll()">Close</button></div>
+  </div>
+  <div id="gm-pv" style="display:none">
+    <div class="gm-hd">
+      <button class="gm-back" onclick="gmBack()">← Back</button>
+      <div class="gm-pname" id="gm-pname"></div>
+    </div>
+    <div id="gm-pbody" class="gm-pbody"></div>
+    <div class="mbb" style="margin-top:9px"><button class="bxx" style="flex:1" onclick="gmBack()">← Back to guests</button></div>
+  </div>
 </div></div>
 
 <script>
@@ -750,6 +802,102 @@ function pickBk(id){
   const b=bk.find(x=>x.id===id);if(!b)return;
   cAll();const d=new Date(b.ci);cy=d.getFullYear();cm=d.getMonth();
   renderCal();showDet(b);
+}
+
+// GUESTS
+let gmFilter='all';
+function openGM(){
+  document.getElementById("gmq").value="";
+  gmFilter='all';
+  document.querySelectorAll(".gm-chip").forEach(c=>c.classList.toggle("act",c.dataset.f==="all"));
+  document.getElementById("gm-lv").style.display="block";
+  document.getElementById("gm-pv").style.display="none";
+  renderGM();
+  document.getElementById("ov-gm").classList.add("sh");
+}
+function buildGuests(){
+  const map={};
+  bk.forEach(b=>{
+    const k=b.name.toLowerCase();
+    if(!map[k])map[k]={name:b.name,mobile:b.mobile||"",email:b.email||"",stays:[],platforms:new Set(),payFull:0,payPart:0,payNone:0};
+    const g=map[k];
+    g.stays.push(b);g.platforms.add(b.platform);
+    if(b.pay==="full")g.payFull++;else if(b.pay==="partial")g.payPart++;else g.payNone++;
+    if(b.mobile)g.mobile=b.mobile;if(b.email)g.email=b.email;
+  });
+  Object.values(map).forEach(g=>{
+    g.stays.sort((a,b)=>b.ci.localeCompare(a.ci));
+    g.last=g.stays[0].ci;
+    const fut=[...g.stays].filter(s=>s.ci>=TD).sort((a,b)=>a.ci<b.ci?-1:1);
+    g.upcoming=fut[0]||null;
+    g.platforms=[...g.platforms];
+  });
+  return Object.values(map).sort((x,y)=>y.stays.length-x.stays.length||y.last.localeCompare(x.last));
+}
+function gmFilt(chip){
+  gmFilter=chip.dataset.f;
+  document.querySelectorAll(".gm-chip").forEach(c=>c.classList.toggle("act",c===chip));
+  renderGM();
+}
+function renderGM(){
+  const q=document.getElementById("gmq").value.toLowerCase();
+  let guests=buildGuests();
+  if(q)guests=guests.filter(g=>g.name.toLowerCase().includes(q)||(g.mobile||"").includes(q)||(g.email||"").toLowerCase().includes(q));
+  if(gmFilter==="rep")guests=guests.filter(g=>g.stays.length>1);
+  const el=document.getElementById("gm-list");
+  if(!guests.length){el.innerHTML=`<div class="gm-el">No guests found.</div>`;return;}
+  el.innerHTML=guests.map(g=>{
+    const rep=g.stays.length>1;
+    const paySum=[g.payFull?g.payFull+" full":"",g.payPart?g.payPart+" partial":"",g.payNone?g.payNone+" unpaid":""].filter(Boolean).join(" · ")||"—";
+    const plBadges=g.platforms.map(p=>`<span class="bdg ${pC(p)}">${p}</span>`).join("");
+    const lastLabel=g.upcoming?`Next: ${g.upcoming.ci}`:`Last: ${g.last}`;
+    return`<div class="gm-row" onclick="openGMProf(this.dataset.name)" data-name="${g.name.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}">
+      <div class="gm-rn">${rep?'⭐ ':''}${g.name}</div>
+      <div class="gm-rs">${g.stays.length} stay${g.stays.length!==1?'s':''} · ${lastLabel}${g.mobile?' · '+g.mobile:''}</div>
+      <div class="gm-stat">${plBadges}<span style="font-size:11px;color:#888;margin-left:2px">${paySum}</span></div>
+    </div>`;
+  }).join("");
+}
+function openGMProf(name){
+  const guests=buildGuests();
+  const g=guests.find(x=>x.name.toLowerCase()===name.toLowerCase());
+  if(!g)return;
+  const rep=g.stays.length>1;
+  document.getElementById("gm-pname").innerHTML=(rep?'⭐ ':'')+g.name+(rep?` <span style="font-size:12px;font-weight:400;color:#888">(${g.stays.length} stays)</span>`:'');
+  const paySum=[g.payFull?g.payFull+" full":"",g.payPart?g.payPart+" partial":"",g.payNone?g.payNone+" unpaid":""].filter(Boolean).join(" · ")||"—";
+  const plBadges=g.platforms.map(p=>`<span class="bdg ${pC(p)}">${p}</span>`).join(" ");
+  const staysHtml=g.stays.map(b=>{
+    const ni=dR(b.ci,b.co).length;
+    return`<div class="gm-stay">
+      <div class="gm-stay-hd">
+        <div><div class="gm-stay-dt">${b.ci} → ${b.co}</div><div style="font-size:11px;color:#888">${ni} night${ni!==1?'s':''}</div></div>
+        <span class="bdg ${pyC(b.pay)}">${pyL(b.pay)}</span>
+      </div>
+      <div class="gm-stay-inf">
+        <span class="bdg ${pC(b.platform)}">${b.platform}</span>
+        ${b.method?`<span class="bdg ${mC(b.method)}">${b.method}</span>`:''}
+        ${b.notes?`<span style="font-size:11px;color:#888">${b.notes}</span>`:''}
+      </div>
+    </div>`;
+  }).join("");
+  document.getElementById("gm-pbody").innerHTML=`
+    <div class="gm-psec">Contact</div>
+    ${g.mobile?`<div class="dr"><span class="dl">Mobile</span><span class="dv" style="color:#1A56DB">${g.mobile}</span></div>`:`<div class="dr"><span class="dl">Mobile</span><span class="dv" style="color:#aaa">—</span></div>`}
+    ${g.email?`<div class="dr"><span class="dl">Email</span><span class="dv" style="color:#1A56DB">${g.email}</span></div>`:''}
+    <div class="gm-psec">Summary</div>
+    <div class="dr"><span class="dl">Total stays</span><span class="dv">${g.stays.length}</span></div>
+    <div class="dr"><span class="dl">Platforms</span><span class="dv">${plBadges}</span></div>
+    <div class="dr"><span class="dl">Payment summary</span><span class="dv">${paySum}</span></div>
+    <div class="gm-psec">Stay history</div>
+    ${staysHtml}
+    <p style="font-size:11px;color:#aaa;margin-top:9px;text-align:center">A booking amount field will be added in a future version to enable full spend tracking.</p>`;
+  document.getElementById("gm-lv").style.display="none";
+  document.getElementById("gm-pv").style.display="block";
+}
+function gmBack(){
+  document.getElementById("gm-lv").style.display="block";
+  document.getElementById("gm-pv").style.display="none";
+  renderGM();
 }
 
 // EXPORT / IMPORT
