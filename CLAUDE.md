@@ -2,7 +2,7 @@
 
 > This file is read automatically by Claude Code every session.
 > It contains the full context needed to work on this project.
-> Last updated: 2026-05-22 | Version: v1.0.0
+> Last updated: 2026-05-23 | Version: v1.2.0
 
 ---
 
@@ -77,7 +77,7 @@ Booking Tracker is a single-file, browser-based property booking management app 
 ```
 booking-tracker/
 │
-├── index.html      Entire application (805 lines, ~51KB)
+├── index.html      Entire application (954 lines, ~60KB)
 │                   Contains: HTML structure, all CSS, all JavaScript
 │                   No external dependencies. Works offline.
 │
@@ -91,22 +91,23 @@ Single file architecture is intentional. Do not propose splitting unless the own
 ```
 index.html
 │
-├── style               Lines 11 to 137     All CSS
-├── LOGIN               Lines 139 to 148    Login screen HTML
-├── APP                 Lines 150 to 196    App shell, header, occupancy bar, calendar, detail panel
-├── ADD                 Lines 197 to 223    Add booking modal
-├── TURNAROUND          Lines 224 to 230    Same-day turnaround warning modal
-├── EDIT                Lines 231 to 257    Edit booking modal
-├── EXTEND              Lines 258 to 260    Extend stay modal
-├── CANCEL              Lines 261 to 263    Cancel booking modal
-├── CANCEL CONFIRM      Lines 264 to 270    Full cancel double-confirm modal
-├── MAINTENANCE         Lines 271 to 281    Block dates modal
-├── ALL BOOKINGS        Lines 282 to 298    All bookings list modal
-├── IMPORT FILE         Lines 299 to 301    Hidden file input for import
-├── IMPORT CONFIRM      Lines 302 to 315    Import confirm modal with validation
-├── WHAT'S NEW          Lines 316 to 326    v1.1.0 release notes modal
+├── style               Lines 11 to 161     All CSS
+├── LOGIN               Lines 162 to 172    Login screen HTML
+├── APP                 Lines 173 to 220    App shell, header, occupancy bar, calendar, detail panel
+├── ADD                 Lines 221 to 247    Add booking modal
+├── TURNAROUND          Lines 248 to 254    Same-day turnaround warning modal
+├── EDIT                Lines 255 to 281    Edit booking modal
+├── EXTEND              Lines 282 to 284    Extend stay modal
+├── CANCEL              Lines 285 to 287    Cancel booking modal
+├── CANCEL CONFIRM      Lines 288 to 294    Full cancel double-confirm modal
+├── MAINTENANCE         Lines 295 to 305    Block dates modal
+├── ALL BOOKINGS        Lines 306 to 322    All bookings list modal
+├── IMPORT FILE         Lines 323 to 325    Hidden file input for import
+├── IMPORT CONFIRM      Lines 326 to 339    Import confirm modal with validation
+├── WHAT'S NEW          Lines 340 to 356    v1.2.0 release notes modal
+├── GUEST MASTERLIST    Lines 357 to 378    Guest Masterlist modal (list + profile views)
 │
-└── script              Lines 327 to 803    All application logic
+└── script              Lines 379 to 953    All application logic
     ├── AUTH            SHA-256 login, logout
     ├── DATA            localStorage save/load
     ├── HELPERS         fmt12, dRange, addDays, getters, class mappers
@@ -122,6 +123,7 @@ index.html
     ├── CANCEL          openCan, tgP, reqCan, execFull, confPart
     ├── MAINTENANCE     openMaint, openEditBlk, saveMaint, delBlk
     ├── ALL BOOKINGS    openList, renderList, pickBk
+    ├── GUESTS          openGM, buildGuests, gmFilt, renderGM, openGMProf, gmBack
     ├── EXPORT/IMPORT   doExport, triggerImport, readImport, confirmImport
     └── WHAT'S NEW      openWN
 ```
@@ -150,7 +152,7 @@ bt_bl  Blocks array
 - Do not treat this as a secure auth system
 - Session lives in JS memory only, clears on tab close
 
-### 4.2 Full Feature List (all verified working as of v1.0.0)
+### 4.2 Full Feature List (all verified working as of v1.2.0)
 
 **Calendar**
 - 7 tile states: empty, available, booked, checkout, maintenance, turnaround, today
@@ -213,6 +215,15 @@ bt_bl  Blocks array
 - Badge and count if guest name appears more than once
 - Red dot on calendar chip
 
+**Guest Masterlist**
+- Full guest list built dynamically from bt_b — no new storage keys
+- Search by name, mobile, or email
+- Filter chip: All / Repeat
+- Guest card shows name, stay count, next/last date, platform badges, payment summary
+- Tap card opens profile: contact info, summary stats, full stay history newest-first
+- Stay history shows dates, nights, platform, payment status, method, and notes per stay
+- "Booking amount field coming in future version" notice in profile
+
 **Data Persistence**
 - All data saved to localStorage after every mutation
 - Loaded on login, falls back to empty state for new users
@@ -237,14 +248,14 @@ bt_bl  Blocks array
 - Export and Import JSON backup with validation and confirm modal
 - What's New modal
 
-**v1.2.0: Guest Masterlist — NEXT**
-- Guest profile modal, full screen, opened from header button
+**v1.2.0: Guest Masterlist — Complete**
+- Guest profile modal opened from header 👥 Guests button
 - Search by name, mobile, email
-- Filter chips: All, Repeat, VIP, Flagged
-- Guest card showing name, total stays, last stay date, platform badges, tag color dot
-- Tap card opens full profile: all stays, total revenue, payment methods, notes, host rating
+- Filter chips: All, Repeat
+- Guest card showing name, total stays, next/last date, platform badges, payment summary
+- Tap card opens full profile: contact info, summary stats, full stay history newest-first
 
-**v1.3.0: Navigation — PENDING**
+**v1.3.0: Navigation — NEXT**
 - Bottom navigation bar: Home, Guests, Reports, Settings
 - Settings tab absorbs: Export, Import, Clear Demo, What's New, Password
 - Header cleaned up
@@ -280,10 +291,11 @@ bt_bl  Blocks array
 
 | Version | Date | Summary |
 |---|---|---|
+| v1.2.0 | May 2026 | Guest Masterlist added. Header 👥 Guests button opens full guest view built from existing bt_b data. List view with search and Repeat filter. Profile view with contact info, stay summary, and full stay history. What's New updated. 954 lines. |
 | v1.1.0 | May 2026 | Password removed from source, replaced with pre-computed SHA-256 hash. Silent save failure now shows visible error banner. Export and import JSON backup added with file validation and confirm modal. What's New modal added. |
 | v1.0.0 | May 2026 | MVP complete. Login, calendar, full booking lifecycle, cleaner flow, payment tracking, turnaround detection, localStorage persistence, all bookings list, maintenance blocks, occupancy tracker. 23 checks passing. |
 
-Next release: v1.2.0
+Next release: v1.3.0
 
 ---
 
