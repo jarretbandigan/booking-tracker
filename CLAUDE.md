@@ -2,7 +2,7 @@
 
 > This file is read automatically by Claude Code every session.
 > It contains the full context needed to work on this project.
-> Last updated: 2026-05-23 | Version: v1.2.0
+> Last updated: 2026-05-24 | Version: v1.3.0
 
 ---
 
@@ -77,7 +77,7 @@ Booking Tracker is a single-file, browser-based property booking management app 
 ```
 booking-tracker/
 │
-├── index.html      Entire application (954 lines, ~60KB)
+├── index.html      Entire application (1057 lines, ~67KB)
 │                   Contains: HTML structure, all CSS, all JavaScript
 │                   No external dependencies. Works offline.
 │
@@ -91,33 +91,35 @@ Single file architecture is intentional. Do not propose splitting unless the own
 ```
 index.html
 │
-├── style               Lines 11 to 161     All CSS
-├── LOGIN               Lines 162 to 172    Login screen HTML
-├── APP                 Lines 173 to 220    App shell, header, occupancy bar, calendar, detail panel
-├── ADD                 Lines 221 to 247    Add booking modal
-├── TURNAROUND          Lines 248 to 254    Same-day turnaround warning modal
-├── EDIT                Lines 255 to 281    Edit booking modal
-├── EXTEND              Lines 282 to 284    Extend stay modal
-├── CANCEL              Lines 285 to 287    Cancel booking modal
-├── CANCEL CONFIRM      Lines 288 to 294    Full cancel double-confirm modal
-├── MAINTENANCE         Lines 295 to 305    Block dates modal
-├── ALL BOOKINGS        Lines 306 to 322    All bookings list modal
-├── IMPORT FILE         Lines 323 to 325    Hidden file input for import
-├── IMPORT CONFIRM      Lines 326 to 339    Import confirm modal with validation
-├── WHAT'S NEW          Lines 340 to 356    v1.2.0 release notes modal
-├── GUEST MASTERLIST    Lines 357 to 378    Guest Masterlist modal (list + profile views)
+├── style               Lines 11 to 174     All CSS (v1.3.0 adds past/ongoing/unpaid/bell classes)
+├── LOGIN               Lines 176 to 186    Login screen HTML
+├── APP                 Lines 187 to 237    App shell, header (🔔 Alerts button added), occupancy bar, calendar, detail panel
+├── ADD                 Lines 238 to 264    Add booking modal
+├── TURNAROUND          Lines 265 to 271    Same-day turnaround warning modal
+├── OVERWRITE WARNING   Lines 272 to 278    Unpaid booking overwrite confirm modal (v1.3.0)
+├── EDIT                Lines 279 to 305    Edit booking modal
+├── EXTEND              Lines 306 to 308    Extend stay modal
+├── CANCEL              Lines 309 to 311    Cancel booking modal
+├── CANCEL CONFIRM      Lines 312 to 318    Full cancel double-confirm modal
+├── MAINTENANCE         Lines 319 to 329    Block dates modal
+├── ALL BOOKINGS        Lines 330 to 346    All bookings list modal
+├── IMPORT FILE         Lines 347 to 349    Hidden file input for import
+├── IMPORT CONFIRM      Lines 350 to 363    Import confirm modal with validation
+├── WHAT'S NEW          Lines 364 to 382    v1.3.0 release notes modal
+├── GUEST MASTERLIST    Lines 383 to 404    Guest Masterlist modal (list + profile views)
+├── NOTIFICATIONS BELL  Lines 405 to 411    Alerts bell modal — 4-section notification panel (v1.3.0)
 │
-└── script              Lines 379 to 953    All application logic
+└── script              Lines 412 to 1057   All application logic
     ├── AUTH            SHA-256 login, logout
     ├── DATA            localStorage save/load
-    ├── HELPERS         fmt12, dRange, addDays, getters, class mappers
+    ├── HELPERS         fmt12, dRange, addDays, getters, class mappers, isUnpaid (v1.3.0)
     ├── OCCUPANCY       Monthly occupancy calculation
-    ├── CALENDAR        renderCal — builds all 7 tile states
+    ├── CALENDAR        renderCal — 11 tile states (past/ongoing/unpaid added in v1.3.0)
     ├── TURNAROUND      showTurn — split tile detail view
     ├── DETAIL          showDet — booking detail panel
     ├── BLOCK DETAIL    showBlk — maintenance block detail
     ├── CLEANER TAPS    tapCl, tapRd — two-tap cleaner flow
-    ├── ADD             openAdd, saveAdd, commitPend, commitBk
+    ├── ADD             openAdd, saveAdd, commitPend, commitBk, confirmOw (v1.3.0)
     ├── EDIT            openEdit, saveEdit
     ├── EXTEND          openExt, confExt
     ├── CANCEL          openCan, tgP, reqCan, execFull, confPart
@@ -125,6 +127,7 @@ index.html
     ├── ALL BOOKINGS    openList, renderList, pickBk
     ├── GUESTS          openGM, buildGuests, gmFilt, renderGM, openGMProf, gmBack
     ├── EXPORT/IMPORT   doExport, triggerImport, readImport, confirmImport
+    ├── ALERTS BELL     openBell (v1.3.0)
     └── WHAT'S NEW      openWN
 ```
 
@@ -152,10 +155,15 @@ bt_bl  Blocks array
 - Do not treat this as a secure auth system
 - Session lives in JS memory only, clears on tab close
 
-### 4.2 Full Feature List (all verified working as of v1.2.0)
+### 4.2 Full Feature List (all verified working as of v1.3.0)
 
 **Calendar**
-- 7 tile states: empty, available, booked, checkout, maintenance, turnaround, today
+- 11 tile states: empty, available, booked, checkout, maintenance, turnaround, today, past-empty, past-booked, past-checkout, ongoing
+- Past empty tiles: faded gray, no click handler
+- Past ended booking tiles: muted pink (.pbk), still tappable
+- Past ended checkout tiles: muted amber (.pco), still tappable
+- Ongoing booking tiles: pulsing green border + green bg on past days; today gets blue box-shadow + green pulse
+- Unpaid/pending tiles: 2px dotted amber border (.upd) via isUnpaid() — overlays any tile state
 - Click tiles to open detail panel or add booking
 - Navigate months with arrows
 - Check-in and checkout arrow chips on tiles
@@ -171,6 +179,7 @@ bt_bl  Blocks array
 - Pre-fills check-in date from calendar tile tap
 - Hard conflict check for overlapping bookings or blocks
 - Soft turnaround warning modal
+- Unpaid overwrite prompt: if conflict is an unpaid/pending booking, offer to overwrite instead of hard error (v1.3.0)
 
 **Edit Booking**
 - All fields editable except dates
@@ -224,6 +233,14 @@ bt_bl  Blocks array
 - Stay history shows dates, nights, platform, payment status, method, and notes per stay
 - "Booking amount field coming in future version" notice in profile
 
+**Notification Bell (v1.3.0)**
+- 🔔 Alerts button in header opens 4-section panel
+- Section 1: Cleaner Reminder — nearest upcoming checkout with contact status
+- Section 2: Unpaid Bookings — future bookings with pay=none
+- Section 3: Pending Reservations — future bookings with method=Pending
+- Section 4: Upcoming Confirmed — future fully paid bookings sorted by check-in
+- Each row tappable: closes bell and navigates calendar to that booking
+
 **Data Persistence**
 - All data saved to localStorage after every mutation
 - Loaded on login, falls back to empty state for new users
@@ -255,7 +272,14 @@ bt_bl  Blocks array
 - Guest card showing name, total stays, next/last date, platform badges, payment summary
 - Tap card opens full profile: contact info, summary stats, full stay history newest-first
 
-**v1.3.0: Navigation — NEXT**
+**v1.3.0: Calendar Polish + Alerts — Complete**
+- Past tile visual states: empty=gray no-click, booked=muted pink, checkout=muted amber
+- Ongoing bookings pulse green (started past, ends future)
+- Unpaid/pending bookings show dotted amber border on all their tiles
+- Unpaid overwrite prompt when adding a booking over an unpaid conflict
+- Notification bell (🔔 Alerts): cleaner reminders, unpaid, pending, confirmed sections
+
+**v1.4.0: Navigation — NEXT**
 - Bottom navigation bar: Home, Guests, Reports, Settings
 - Settings tab absorbs: Export, Import, Clear Demo, What's New, Password
 - Header cleaned up
@@ -291,11 +315,12 @@ bt_bl  Blocks array
 
 | Version | Date | Summary |
 |---|---|---|
+| v1.3.0 | May 2026 | Calendar polish and alerts. Past tile visual states (gray/muted pink/muted amber). Ongoing bookings pulse green. Unpaid/pending tiles get dotted amber border. Unpaid overwrite prompt in saveAdd. 🔔 Alerts bell with 4-section notification panel. 1057 lines. |
 | v1.2.0 | May 2026 | Guest Masterlist added. Header 👥 Guests button opens full guest view built from existing bt_b data. List view with search and Repeat filter. Profile view with contact info, stay summary, and full stay history. What's New updated. 954 lines. |
 | v1.1.0 | May 2026 | Password removed from source, replaced with pre-computed SHA-256 hash. Silent save failure now shows visible error banner. Export and import JSON backup added with file validation and confirm modal. What's New modal added. |
 | v1.0.0 | May 2026 | MVP complete. Login, calendar, full booking lifecycle, cleaner flow, payment tracking, turnaround detection, localStorage persistence, all bookings list, maintenance blocks, occupancy tracker. 23 checks passing. |
 
-Next release: v1.3.0
+Next release: v1.4.0
 
 ---
 
