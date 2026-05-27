@@ -2,7 +2,7 @@
 
 > This file is read automatically by Claude Code every session.
 > It contains the full context needed to work on this project.
-> Last updated: 2026-05-27 | Version: v1.3.0
+> Last updated: 2026-05-27 | Version: v1.3.1
 
 ---
 
@@ -155,7 +155,7 @@ bt_bl  Blocks array
 - Do not treat this as a secure auth system
 - Session lives in JS memory only, clears on tab close
 
-### 4.2 Full Feature List (all verified working as of v1.3.0)
+### 4.2 Full Feature List (all verified working as of v1.3.1)
 
 **Calendar — Three-Channel Color System**
 - 12 tile states: empty, available, booked, pending/reserved (.rsv), checkout, maintenance, turnaround, today, past-empty, past-booked, past-checkout, ongoing
@@ -272,18 +272,23 @@ bt_bl  Blocks array
 - Guest card showing name, total stays, next/last date, platform badges, payment summary
 - Tap card opens full profile: contact info, summary stats, full stay history newest-first
 
-**v1.3.0: Calendar Polish + Alerts + Three-Channel Color System — Complete**
-- Past tile visual states: empty=flat gray, booked=muted pink inset, checkout=muted amber inset
-- 3D card effect: today+future tiles raised; past tiles flat or pressed-in
-- Three-channel tile color system: background=type, border=time status, chip=payment status
-- Pending/reserved tile type (.rsv, light purple) for bookings with method=Pending
-- Ongoing bookings green border + green bg on ALL days (past+today+future), past days are inset
-- Today=blue ring always wins over ongoing green; turnaround amber pulse never overridden
-- Payment chips replace dotted amber border: green=paid, amber=partial, red=unpaid, gray=pending
-- Turnaround tile shows independent payment chip per guest
+**v1.3.0: Calendar Polish + Alerts — Complete**
+- Past tile visual states: empty=gray no-click, booked=muted pink, checkout=muted amber
+- Ongoing bookings pulse green (started past, ends future)
+- Unpaid/pending bookings show dotted amber border on all their tiles
 - Unpaid overwrite prompt when adding a booking over an unpaid conflict
 - Notification bell (🔔 Alerts): cleaner reminders, unpaid, pending, confirmed sections
-- Legend updated: tile swatches + chip color mini-row with real chip samples
+
+**v1.3.1: Three-Channel Color System + 3D Card Depth — Complete**
+- Three-channel tile design: background=type of day, border=time status, chip bg=payment status
+- Adds .rsv pending/reserved tile state (light purple bg) for bookings with method=Pending
+- Ongoing bookings: green border + green bg on ALL days including future days of the stay
+- Past days of ongoing bookings are flat/inset; today+future days are raised cards
+- 3D card depth: today+future tiles raised with drop shadow; past empty flat; past bookings inset
+- Today blue ring always wins over ongoing green; turnaround amber pulse never overridden
+- Payment chips: .cpf green, .cpp amber, .cpn red, .cpd gray — replaces dotted .upd border
+- Turnaround tile shows independent payment chip per guest (was a single tile-level indicator)
+- Legend updated: new Pending/Reserved swatch + chip colour mini-row with real chip samples
 
 **v1.4.0: Navigation — NEXT**
 - Bottom navigation bar: Home, Guests, Reports, Settings
@@ -321,7 +326,8 @@ bt_bl  Blocks array
 
 | Version | Date | Summary |
 |---|---|---|
-| v1.3.0 | May 2026 | Calendar polish, alerts, three-channel color system, 3D card depth. Past tiles flat/inset. Today+future tiles raised. Three-channel design: bg=type, border=time, chip=payment. Adds .rsv (pending/reserved, light purple). Ongoing green border on all days. Payment chips replace .upd dotted border. Turnaround tile has independent payment chips per guest. 🔔 Alerts bell. Legend updated with chip mini-row. 1070 lines. |
+| v1.3.1 | May 2026 | Three-channel color system and 3D card depth. Channel 1 bg=type (adds .rsv pending/reserved, light purple). Channel 2 border=time (ongoing green on all days, today blue ring always wins). Channel 3 chip=payment (.cpf/.cpp/.cpn/.cpd replaces .upd dotted border). Past tiles flat/inset, today+future tiles raised. Turnaround shows independent payment chip per guest. Adds payChipClass() and dirClass() helpers. Legend chip mini-row. 1070 lines. |
+| v1.3.0 | May 2026 | Calendar polish and alerts. Past tile visual states (gray/muted pink/muted amber). Ongoing bookings pulse green. Unpaid/pending tiles get dotted amber border. Unpaid overwrite prompt in saveAdd. 🔔 Alerts bell with 4-section notification panel. 1057 lines. |
 | v1.2.0 | May 2026 | Guest Masterlist added. Header 👥 Guests button opens full guest view built from existing bt_b data. List view with search and Repeat filter. Profile view with contact info, stay summary, and full stay history. What's New updated. 954 lines. |
 | v1.1.0 | May 2026 | Password removed from source, replaced with pre-computed SHA-256 hash. Silent save failure now shows visible error banner. Export and import JSON backup added with file validation and confirm modal. What's New modal added. |
 | v1.0.0 | May 2026 | MVP complete. Login, calendar, full booking lifecycle, cleaner flow, payment tracking, turnaround detection, localStorage persistence, all bookings list, maintenance blocks, occupancy tracker. 23 checks passing. |
