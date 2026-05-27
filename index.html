@@ -51,8 +51,8 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
 .ld{width:10px;height:10px;border-radius:2px;flex-shrink:0}
 .cg{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:9px}
 .dn{text-align:center;font-size:10px;color:#999;padding:3px 0;font-weight:700}
-.dy{min-height:50px;border-radius:5px;padding:4px;font-size:11px;border:2px solid transparent;position:relative;transition:border-color .1s,background .1s}
-.dy.em{background:transparent;cursor:default}
+.dy{min-height:50px;border-radius:5px;padding:4px;font-size:11px;border:2px solid transparent;position:relative;transition:border-color .1s,background .1s,box-shadow .1s;box-shadow:0 2px 4px rgba(0,0,0,0.10),0 1px 2px rgba(0,0,0,0.06)}
+.dy.em{background:transparent;cursor:default;box-shadow:none}
 .dy.av{background:#EAF3DE;cursor:pointer}.dy.av:hover{background:#d4ecbf;border-color:#4A8A20}
 .dy.bk{background:#FBEAF0;cursor:pointer}.dy.bk:hover{border-color:#D4537E}
 .dy.co{background:#FEF3E2;cursor:pointer}.dy.co:hover{border-color:#C17D1A}
@@ -61,13 +61,17 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
 @keyframes pb{0%,100%{border-color:#E8A020}50%{border-color:#C17D1A}}
 .dy.td{box-shadow:0 0 0 2px #1A56DB;border-color:#1A56DB}
 .dn2{font-weight:700;font-size:12px;line-height:1;margin-bottom:2px}
-.dy.av .dn2{color:#1E4D08}.dy.bk .dn2{color:#7E1D3F}.dy.co .dn2{color:#7A4A00}.dy.mn2 .dn2{color:#444}.dy.tr .dn2{color:#7A4A00}.dy.td .dn2{color:#1A56DB}
+.dy.av .dn2{color:#1E4D08}.dy.bk .dn2{color:#7E1D3F}.dy.co .dn2{color:#7A4A00}.dy.mn2 .dn2{color:#444}.dy.tr .dn2{color:#7A4A00}.dy.td .dn2{color:#1A56DB}.dy.og .dn2{color:#166534}.dy.rsv .dn2{color:#6A1B9A}
 .tp2{position:absolute;top:2px;right:2px;background:#1A56DB;color:#fff;font-size:8px;font-weight:700;border-radius:2px;padding:0 3px;line-height:13px;z-index:2}
 .ch{font-size:10px;border-radius:2px;padding:1px 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;margin-top:1px;line-height:1.4}
-.chin{background:#C8E6C9;color:#1B5E20}
-.chout{background:#FAD9A0;color:#7A4A00}
-.chb{background:#F4C0D1;color:#7E1D3F}
-.chm{background:#D5D5D5;color:#444}
+.cid{color:#1B5E20;font-weight:700}
+.cod{color:#7A4A00;font-weight:700}
+.cmd{color:#333;font-weight:600}
+.cpf{background:#C8E6C9}
+.cpp{background:#FEF3E2}
+.cpn{background:#FFCDD2}
+.cpd{background:#E0E0E0}
+.chm{background:#D5D5D5;color:#444;font-weight:600}
 .rdot{display:inline-block;width:4px;height:4px;background:#D4537E;border-radius:50%;margin-right:2px;vertical-align:middle}
 .trbdg{position:absolute;top:2px;right:2px;background:#E8A020;color:#fff;font-size:8px;font-weight:700;border-radius:2px;padding:0 3px;line-height:13px}
 .ah2{font-size:9px;color:#4A8A20;opacity:.6;margin-top:1px}
@@ -157,15 +161,15 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
 .gm-stay-dt{font-weight:700;font-size:12px}
 .gm-stay-inf{display:flex;gap:4px;flex-wrap:wrap;align-items:center;margin-top:3px}
 .gm-el{text-align:center;color:#aaa;font-size:13px;padding:18px}
-/* v1.3.0 */
-.dy.pm{background:#f0f0f0;cursor:default}
-.dy.pbk{background:#F5E8EE;cursor:pointer}.dy.pbk:hover{border-color:#D4537E}
-.dy.pco{background:#FAF2E6;cursor:pointer}.dy.pco:hover{border-color:#C17D1A}
+/* v1.3.0 — Three-channel color system + 3D card effect */
+.dy.pm{background:#e8e8e8;cursor:default;box-shadow:none}
+.dy.pbk{background:#F5E8EE;cursor:pointer;box-shadow:inset 0 1px 3px rgba(0,0,0,0.08)}.dy.pbk:hover{border-color:#D4537E}
+.dy.pco{background:#FAF2E6;cursor:pointer;box-shadow:inset 0 1px 3px rgba(0,0,0,0.08)}.dy.pco:hover{border-color:#C17D1A}
 .dy.pbk .dn2{color:#9B6070}.dy.pco .dn2{color:#9A7040}
-.dy.og{border-color:#22c55e;animation:og 2s infinite}
-.dy.og:not(.bk){background:#E8F5EE}
-@keyframes og{0%,100%{border-color:#22c55e}50%{border-color:#16a34a}}
-.dy.upd{border:2px dotted #E8A020!important}
+.dy.rsv{background:#F3E5F5;cursor:pointer}.dy.rsv:hover{border-color:#9C27B0}
+.dy.og{background:#E8F5EE;border-color:#22c55e}
+.dy.pog{box-shadow:inset 0 1px 3px rgba(0,0,0,0.08)}
+.dy.td{border-color:#1A56DB;box-shadow:0 0 0 2px #1A56DB,0 3px 6px rgba(0,0,0,0.15)}
 .bel-sec{margin-bottom:12px}
 .bel-sec-hd{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#999;margin-bottom:5px}
 .bel-row{background:#fafafa;border:1px solid #e8e8e8;border-radius:6px;padding:8px 10px;margin-bottom:4px;font-size:12px;cursor:pointer}
@@ -221,14 +225,21 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
     <div class="leg">
       <div class="lgi"><div class="ld" style="background:#EAF3DE;border:1px solid #4A8A20"></div>Free</div>
       <div class="lgi"><div class="ld" style="background:#FBEAF0;border:1px solid #D4537E"></div>Booked</div>
+      <div class="lgi"><div class="ld" style="background:#F3E5F5;border:1px solid #9C27B0"></div>Pending/Reserved</div>
       <div class="lgi"><div class="ld" style="background:#FEF3E2;border:1px solid #C17D1A"></div>Checkout</div>
       <div class="lgi"><div class="ld" style="background:#EBEBEB;border:1px solid #888"></div>Blocked</div>
       <div class="lgi"><div class="ld" style="border:2px solid #1A56DB;background:transparent"></div>Today</div>
       <div class="lgi"><span style="color:#1B5E20;font-weight:700">↑</span>Check-in</div>
       <div class="lgi"><span style="color:#7A4A00;font-weight:700">↓</span>Check-out</div>
       <div class="lgi"><span style="color:#E8A020;font-weight:700">↑↓</span>Turnaround</div>
-      <div class="lgi"><div class="ld" style="background:#E8F5EE;border:2px solid #22c55e"></div>Ongoing</div>
-      <div class="lgi"><div class="ld" style="border:2px dotted #E8A020;background:transparent"></div>Unpaid</div>
+      <div class="lgi"><div class="ld" style="background:#E8F5EE;border:2px solid #22c55e"></div>Guest staying now</div>
+    </div>
+    <div class="leg" style="margin-top:-3px">
+      <span style="font-size:10px;color:#888;font-weight:600;margin-right:3px">Chip:</span>
+      <div class="lgi"><span style="background:#C8E6C9;color:#1B5E20;font-size:10px;border-radius:2px;padding:1px 5px;font-weight:700;white-space:nowrap">Guest</span>Fully paid</div>
+      <div class="lgi"><span style="background:#FEF3E2;color:#7A4A00;font-size:10px;border-radius:2px;padding:1px 5px;font-weight:700;white-space:nowrap">Guest</span>Partial payment</div>
+      <div class="lgi"><span style="background:#FFCDD2;color:#333;font-size:10px;border-radius:2px;padding:1px 5px;font-weight:700;white-space:nowrap">Guest</span>Unpaid</div>
+      <div class="lgi"><span style="background:#E0E0E0;color:#333;font-size:10px;border-radius:2px;padding:1px 5px;font-weight:700;white-space:nowrap">Guest</span>Pending</div>
     </div>
     <div class="cg" id="cal"></div>
     <div class="pn" id="dpanel"><div class="ph">📅 Tap any date to get started<br><span style="font-size:11px">Free dates open booking form · Booked dates show details</span></div></div>
@@ -465,6 +476,8 @@ function eCi(b){return b.ciE||b.ciL||b.ciS;}
 function cAll(){document.querySelectorAll(".ov").forEach(o=>o.classList.remove("sh"));}
 function cOv(id){document.getElementById(id).classList.remove("sh");}
 function isUnpaid(b){return b.pay==="none"||b.pay==="partial"||b.method==="Pending";}
+function payChipClass(b){if(b.method==="Pending")return"cpd";if(b.pay==="none")return"cpn";if(b.pay==="partial")return"cpp";return"cpf";}
+function dirClass(ds,b){return ds===b.ci?"cid":"cmd";}
 
 // OCCUPANCY
 function updOcc(){
@@ -499,34 +512,34 @@ function renderCal(){
       el.appendChild(mkC("chm",blk.reason.split("/")[0].trim()));
       el.onclick=()=>showBlk(blk);
     } else if(ciB&&coB){
-      const ogTr=ciB.co>TD;
-      el.className="dy tr"+(isTd?" td":"")+(ogTr?" og":"");
+      el.className="dy tr"+(isTd?" td":"")+(isPast?" pog":"");
       el.appendChild(num());
       el.appendChild(mkP("trbdg","↑↓"));
-      el.appendChild(mkC("chout","↓ "+coB.name.split(" ")[0]));
-      el.appendChild(mkC("chin","↑ "+ciB.name.split(" ")[0]));
+      el.appendChild(mkC("cod "+payChipClass(coB),"↓ "+coB.name.split(" ")[0]));
+      el.appendChild(mkC("cid "+payChipClass(ciB),"↑ "+ciB.name.split(" ")[0]));
       el.onclick=()=>showTurn(coB,ciB);
     } else if(coB&&!book){
       const cls=isPast?"pco":"co";
       el.className="dy "+cls+(isTd?" td":"");
-      if(isUnpaid(coB))el.classList.add("upd");
       el.appendChild(num());
       if(isTd)el.appendChild(mkP("tp2","TODAY"));
-      el.appendChild(mkC("chout","↓ "+coB.name.split(" ")[0]));
+      el.appendChild(mkC("cod "+payChipClass(coB),"↓ "+coB.name.split(" ")[0]));
       el.onclick=()=>showDet(coB);
     } else if(book){
-      const isOg=book.co>TD;
+      const isOg=book.ci<TD&&book.co>TD;
       let cls;
-      if(isPast&&isOg)cls="og";
-      else if(isTd&&isOg)cls="bk td og";
-      else if(isTd)cls="bk td";
+      if(isOg&&isPast)cls="og pog";
+      else if(isOg&&isTd)cls="og td";
+      else if(isOg)cls="og";
       else if(isPast)cls="pbk";
+      else if(book.method==="Pending")cls="rsv"+(isTd?" td":"");
+      else if(isTd)cls="bk td";
       else cls="bk";
       el.className="dy "+cls;
-      if(isUnpaid(book))el.classList.add("upd");
       el.appendChild(num());
       if(isTd)el.appendChild(mkP("tp2","TODAY"));
-      const ch=document.createElement("span");ch.className="ch chb";
+      const ch=document.createElement("span");
+      ch.className="ch "+dirClass(ds,book)+" "+payChipClass(book);
       if(cG(book.name)>1){const dot=document.createElement("span");dot.className="rdot";ch.appendChild(dot);}
       ch.appendChild(document.createTextNode((book.ci===ds?"↑ ":"")+book.name.split(" ")[0]));
       el.appendChild(ch);el.onclick=()=>showDet(book);
