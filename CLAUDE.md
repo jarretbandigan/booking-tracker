@@ -2,7 +2,7 @@
 
 > This file is read automatically by Claude Code every session.
 > It contains the full context needed to work on this project.
-> Last updated: 2026-05-24 | Version: v1.3.0
+> Last updated: 2026-05-27 | Version: v1.3.0
 
 ---
 
@@ -77,7 +77,7 @@ Booking Tracker is a single-file, browser-based property booking management app 
 ```
 booking-tracker/
 │
-├── index.html      Entire application (1057 lines, ~67KB)
+├── index.html      Entire application (1070 lines, ~68KB)
 │                   Contains: HTML structure, all CSS, all JavaScript
 │                   No external dependencies. Works offline.
 │
@@ -91,7 +91,7 @@ Single file architecture is intentional. Do not propose splitting unless the own
 ```
 index.html
 │
-├── style               Lines 11 to 174     All CSS (v1.3.0 adds past/ongoing/unpaid/bell classes)
+├── style               Lines 11 to 177     All CSS (three-channel color system: tile bg=type, border=time, chip=payment; 3D card depth)
 ├── LOGIN               Lines 176 to 186    Login screen HTML
 ├── APP                 Lines 187 to 237    App shell, header (🔔 Alerts button added), occupancy bar, calendar, detail panel
 ├── ADD                 Lines 238 to 264    Add booking modal
@@ -109,12 +109,12 @@ index.html
 ├── GUEST MASTERLIST    Lines 383 to 404    Guest Masterlist modal (list + profile views)
 ├── NOTIFICATIONS BELL  Lines 405 to 411    Alerts bell modal — 4-section notification panel (v1.3.0)
 │
-└── script              Lines 412 to 1057   All application logic
+└── script              Lines 415 to 1070   All application logic
     ├── AUTH            SHA-256 login, logout
     ├── DATA            localStorage save/load
-    ├── HELPERS         fmt12, dRange, addDays, getters, class mappers, isUnpaid (v1.3.0)
+    ├── HELPERS         fmt12, dRange, addDays, getters, class mappers, isUnpaid, payChipClass, dirClass
     ├── OCCUPANCY       Monthly occupancy calculation
-    ├── CALENDAR        renderCal — 11 tile states (past/ongoing/unpaid added in v1.3.0)
+    ├── CALENDAR        renderCal — 12 tile states (adds .rsv pending/reserved); three-channel chip system
     ├── TURNAROUND      showTurn — split tile detail view
     ├── DETAIL          showDet — booking detail panel
     ├── BLOCK DETAIL    showBlk — maintenance block detail
@@ -157,17 +157,17 @@ bt_bl  Blocks array
 
 ### 4.2 Full Feature List (all verified working as of v1.3.0)
 
-**Calendar**
-- 11 tile states: empty, available, booked, checkout, maintenance, turnaround, today, past-empty, past-booked, past-checkout, ongoing
-- Past empty tiles: faded gray, no click handler
-- Past ended booking tiles: muted pink (.pbk), still tappable
-- Past ended checkout tiles: muted amber (.pco), still tappable
-- Ongoing booking tiles: pulsing green border + green bg on past days; today gets blue box-shadow + green pulse
-- Unpaid/pending tiles: 2px dotted amber border (.upd) via isUnpaid() — overlays any tile state
+**Calendar — Three-Channel Color System**
+- 12 tile states: empty, available, booked, pending/reserved (.rsv), checkout, maintenance, turnaround, today, past-empty, past-booked, past-checkout, ongoing
+- **Channel 1 — Tile background = type of day:** available=green, booked=pink, pending/reserved=light purple (.rsv — method=Pending), checkout=amber, maintenance=gray, past-empty=darker gray, past-booked=muted pink, past-checkout=muted amber, ongoing=green (all days past+today+future)
+- **Channel 2 — Tile border = time status:** today=2px solid blue ring (always wins), ongoing=solid green border on ALL days of the booking span, turnaround=pulsing amber (never overridden), default=no border
+- **Channel 3 — Name chip background = payment status:** fully paid=green (.cpf), partial=amber (.cpp), no payment=red (.cpn), pending method=gray (.cpd). Chip text color indicates direction: check-in=dark green (.cid), checkout=dark amber (.cod), mid-stay=neutral (.cmd)
+- **3D card depth:** today+future tiles raised with drop shadow; past empty tiles flat (no shadow); past ended booking tiles pressed-in (inset shadow); past days of ongoing bookings also pressed-in (.pog)
+- Turnaround split tile shows two independent chips — each guest's payment status displayed separately
+- Past ended tiles still show payment chips so outstanding balances remain visible
+- Legend has two rows: tile type swatches + chip color mini-key (Fully paid / Partial / Unpaid / Pending)
 - Click tiles to open detail panel or add booking
 - Navigate months with arrows
-- Check-in and checkout arrow chips on tiles
-- Turnaround split tile with urgent pulsing amber border
 
 **Occupancy Bar**
 - Shows booked days as fraction and percentage with fill bar
@@ -272,12 +272,18 @@ bt_bl  Blocks array
 - Guest card showing name, total stays, next/last date, platform badges, payment summary
 - Tap card opens full profile: contact info, summary stats, full stay history newest-first
 
-**v1.3.0: Calendar Polish + Alerts — Complete**
-- Past tile visual states: empty=gray no-click, booked=muted pink, checkout=muted amber
-- Ongoing bookings pulse green (started past, ends future)
-- Unpaid/pending bookings show dotted amber border on all their tiles
+**v1.3.0: Calendar Polish + Alerts + Three-Channel Color System — Complete**
+- Past tile visual states: empty=flat gray, booked=muted pink inset, checkout=muted amber inset
+- 3D card effect: today+future tiles raised; past tiles flat or pressed-in
+- Three-channel tile color system: background=type, border=time status, chip=payment status
+- Pending/reserved tile type (.rsv, light purple) for bookings with method=Pending
+- Ongoing bookings green border + green bg on ALL days (past+today+future), past days are inset
+- Today=blue ring always wins over ongoing green; turnaround amber pulse never overridden
+- Payment chips replace dotted amber border: green=paid, amber=partial, red=unpaid, gray=pending
+- Turnaround tile shows independent payment chip per guest
 - Unpaid overwrite prompt when adding a booking over an unpaid conflict
 - Notification bell (🔔 Alerts): cleaner reminders, unpaid, pending, confirmed sections
+- Legend updated: tile swatches + chip color mini-row with real chip samples
 
 **v1.4.0: Navigation — NEXT**
 - Bottom navigation bar: Home, Guests, Reports, Settings
@@ -315,7 +321,7 @@ bt_bl  Blocks array
 
 | Version | Date | Summary |
 |---|---|---|
-| v1.3.0 | May 2026 | Calendar polish and alerts. Past tile visual states (gray/muted pink/muted amber). Ongoing bookings pulse green. Unpaid/pending tiles get dotted amber border. Unpaid overwrite prompt in saveAdd. 🔔 Alerts bell with 4-section notification panel. 1057 lines. |
+| v1.3.0 | May 2026 | Calendar polish, alerts, three-channel color system, 3D card depth. Past tiles flat/inset. Today+future tiles raised. Three-channel design: bg=type, border=time, chip=payment. Adds .rsv (pending/reserved, light purple). Ongoing green border on all days. Payment chips replace .upd dotted border. Turnaround tile has independent payment chips per guest. 🔔 Alerts bell. Legend updated with chip mini-row. 1070 lines. |
 | v1.2.0 | May 2026 | Guest Masterlist added. Header 👥 Guests button opens full guest view built from existing bt_b data. List view with search and Repeat filter. Profile view with contact info, stay summary, and full stay history. What's New updated. 954 lines. |
 | v1.1.0 | May 2026 | Password removed from source, replaced with pre-computed SHA-256 hash. Silent save failure now shows visible error banner. Export and import JSON backup added with file validation and confirm modal. What's New modal added. |
 | v1.0.0 | May 2026 | MVP complete. Login, calendar, full booking lifecycle, cleaner flow, payment tracking, turnaround detection, localStorage persistence, all bookings list, maintenance blocks, occupancy tracker. 23 checks passing. |
