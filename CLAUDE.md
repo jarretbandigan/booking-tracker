@@ -2,7 +2,7 @@
 
 > This file is read automatically by Claude Code every session.
 > It contains the full context needed to work on this project.
-> Last updated: 2026-05-27 | Version: v1.3.1
+> Last updated: 2026-05-28 | Version: v1.3.2
 
 ---
 
@@ -77,7 +77,7 @@ Booking Tracker is a single-file, browser-based property booking management app 
 ```
 booking-tracker/
 │
-├── index.html      Entire application (1070 lines, ~68KB)
+├── index.html      Entire application (1073 lines, ~68KB)
 │                   Contains: HTML structure, all CSS, all JavaScript
 │                   No external dependencies. Works offline.
 │
@@ -109,7 +109,7 @@ index.html
 ├── GUEST MASTERLIST    Lines 383 to 404    Guest Masterlist modal (list + profile views)
 ├── NOTIFICATIONS BELL  Lines 405 to 411    Alerts bell modal — 4-section notification panel (v1.3.0)
 │
-└── script              Lines 415 to 1070   All application logic
+└── script              Lines 415 to 1073   All application logic
     ├── AUTH            SHA-256 login, logout
     ├── DATA            localStorage save/load
     ├── HELPERS         fmt12, dRange, addDays, getters, class mappers, isUnpaid, payChipClass, dirClass
@@ -155,17 +155,18 @@ bt_bl  Blocks array
 - Do not treat this as a secure auth system
 - Session lives in JS memory only, clears on tab close
 
-### 4.2 Full Feature List (all verified working as of v1.3.1)
+### 4.2 Full Feature List (all verified working as of v1.3.2)
 
 **Calendar — Three-Channel Color System**
 - 12 tile states: empty, available, booked, pending/reserved (.rsv), checkout, maintenance, turnaround, today, past-empty, past-booked, past-checkout, ongoing
-- **Channel 1 — Tile background = type of day:** available=green, booked=pink, pending/reserved=light purple (.rsv — method=Pending), checkout=amber, maintenance=gray, past-empty=darker gray, past-booked=muted pink, past-checkout=muted amber, ongoing=green (all days past+today+future)
+- **Channel 1 — Tile background = type of day:** available=green (#EAF3DE), booked=soft blue (#DBEAFE), pending/reserved=light purple (.rsv — method=Pending), checkout=soft blue (#DBEAFE — same as booked, amber removed), maintenance=gray, past-empty=flat gray (#EFEFEF), past-booked=washed blue (#EDF4FF), past-checkout=washed blue (#EDF4FF), ongoing=green (#E8F5EE all days; past ongoing .pog=#DCF0E4 muted)
 - **Channel 2 — Tile border = time status:** today=2px solid blue ring (always wins), ongoing=solid green border on ALL days of the booking span, turnaround=pulsing amber (never overridden), default=no border
-- **Channel 3 — Name chip background = payment status:** fully paid=green (.cpf), partial=amber (.cpp), no payment=red (.cpn), pending method=gray (.cpd). Chip text color indicates direction: check-in=dark green (.cid), checkout=dark amber (.cod), mid-stay=neutral (.cmd)
+- **Channel 3 — Name chip background = payment status:** fully paid=dark green (#1B7E35/white, .cpf), partial=orange (#E65100/white, .cpp), no payment=deep red (#C62828/white, .cpn), pending method=gray (#616161/white, .cpd). All chips bold white text. Direction classes (.cid/.cod/.cmd) set font-weight only — no color override so chip bg shows through
 - **3D card depth:** today+future tiles raised with drop shadow; past empty tiles flat (no shadow); past ended booking tiles pressed-in (inset shadow); past days of ongoing bookings also pressed-in (.pog)
-- Turnaround split tile shows two independent chips — each guest's payment status displayed separately
+- **Past visual hierarchy:** past date numbers always gray (#BBBBBB) normal weight; today+future date numbers bold dark; creates clear temporal recession
+- Turnaround split tile shows two independent chips — each guest's payment status displayed separately; gradient top=blue/bottom=green
 - Past ended tiles still show payment chips so outstanding balances remain visible
-- Legend has two rows: tile type swatches + chip color mini-key (Fully paid / Partial / Unpaid / Pending)
+- Legend has two rows: tile type swatches (no Checkout swatch — merged with Booked) + chip color mini-key with saturated samples
 - Click tiles to open detail panel or add booking
 - Navigate months with arrows
 
@@ -177,6 +178,7 @@ bt_bl  Blocks array
 **Add Booking**
 - Full form: name, mobile, email, check-in, check-out, 6 timing fields, platform, payment status, payment method, notes
 - Pre-fills check-in date from calendar tile tap
+- Check-in date picker min=today (past dates blocked); check-out min auto-updates when check-in changes (v1.3.2)
 - Hard conflict check for overlapping bookings or blocks
 - Soft turnaround warning modal
 - Unpaid overwrite prompt: if conflict is an unpaid/pending booking, offer to overwrite instead of hard error (v1.3.0)
@@ -290,6 +292,12 @@ bt_bl  Blocks array
 - Turnaround tile shows independent payment chip per guest (was a single tile-level indicator)
 - Legend updated: new Pending/Reserved swatch + chip colour mini-row with real chip samples
 
+**v1.3.2: Calendar Visual Polish — Complete**
+- Unified booked/checkout tile color: checkout amber (#FEF3E2) replaced with soft blue (#DBEAFE) — all booked days (check-in, mid-stay, checkout) now same color; Checkout swatch removed from legend
+- Past date visual hierarchy: past-empty=#EFEFEF flat/no-shadow, past-booked/checkout=#EDF4FF inset, past-ongoing=.og.pog #DCF0E4; all past date numbers gray (#BBBBBB) normal weight
+- Chips saturated with white text: .cpf #1B7E35/white, .cpp #E65100/white, .cpn #C62828/white, .cpd #616161/white; direction classes (.cid/.cod) de-colored so chip bg shows through cleanly
+- Date picker blocks past dates: aci.min=TD set in openAdd(); aci onchange updates aco.min=aD(value,1) dynamically
+
 **v1.4.0: Navigation — NEXT**
 - Bottom navigation bar: Home, Guests, Reports, Settings
 - Settings tab absorbs: Export, Import, Clear Demo, What's New, Password
@@ -326,13 +334,14 @@ bt_bl  Blocks array
 
 | Version | Date | Summary |
 |---|---|---|
+| v1.3.2 | May 2026 | Calendar visual polish. Unified booked+checkout tile to soft blue (#DBEAFE/#EDF4FF) — checkout amber removed, Checkout legend swatch removed. Past date hierarchy: past-empty=#EFEFEF flat, past-booked/checkout=#EDF4FF inset, past-ongoing=.og.pog #DCF0E4; all gray #BBBBBB date nums normal weight. Chips saturated white text: cpf=#1B7E35, cpp=#E65100, cpn=#C62828, cpd=#616161; .cid/.cod de-colored. Date picker min=TD in openAdd(), aci onchange updates aco.min. 1073 lines. |
 | v1.3.1 | May 2026 | Three-channel color system and 3D card depth. Channel 1 bg=type (adds .rsv pending/reserved, light purple). Channel 2 border=time (ongoing green on all days, today blue ring always wins). Channel 3 chip=payment (.cpf/.cpp/.cpn/.cpd replaces .upd dotted border). Past tiles flat/inset, today+future tiles raised. Turnaround shows independent payment chip per guest. Adds payChipClass() and dirClass() helpers. Legend chip mini-row. 1070 lines. |
 | v1.3.0 | May 2026 | Calendar polish and alerts. Past tile visual states (gray/muted pink/muted amber). Ongoing bookings pulse green. Unpaid/pending tiles get dotted amber border. Unpaid overwrite prompt in saveAdd. 🔔 Alerts bell with 4-section notification panel. 1057 lines. |
 | v1.2.0 | May 2026 | Guest Masterlist added. Header 👥 Guests button opens full guest view built from existing bt_b data. List view with search and Repeat filter. Profile view with contact info, stay summary, and full stay history. What's New updated. 954 lines. |
 | v1.1.0 | May 2026 | Password removed from source, replaced with pre-computed SHA-256 hash. Silent save failure now shows visible error banner. Export and import JSON backup added with file validation and confirm modal. What's New modal added. |
 | v1.0.0 | May 2026 | MVP complete. Login, calendar, full booking lifecycle, cleaner flow, payment tracking, turnaround detection, localStorage persistence, all bookings list, maintenance blocks, occupancy tracker. 23 checks passing. |
 
-Next release: v1.4.0
+Next release: v1.4.0 (Navigation)
 
 ---
 
