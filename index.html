@@ -54,23 +54,23 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
 .dy{min-height:50px;border-radius:5px;padding:4px;font-size:11px;border:2px solid transparent;position:relative;transition:border-color .1s,background .1s,box-shadow .1s;box-shadow:0 2px 4px rgba(0,0,0,0.10),0 1px 2px rgba(0,0,0,0.06)}
 .dy.em{background:transparent;cursor:default;box-shadow:none}
 .dy.av{background:#EAF3DE;cursor:pointer}.dy.av:hover{background:#d4ecbf;border-color:#4A8A20}
-.dy.bk{background:#FBEAF0;cursor:pointer}.dy.bk:hover{border-color:#D4537E}
-.dy.co{background:#FEF3E2;cursor:pointer}.dy.co:hover{border-color:#C17D1A}
+.dy.bk{background:#DBEAFE;cursor:pointer}.dy.bk:hover{border-color:#2563EB}
+.dy.co{background:#DBEAFE;cursor:pointer}.dy.co:hover{border-color:#2563EB}
 .dy.mn2{background:#EBEBEB;cursor:pointer}.dy.mn2:hover{border-color:#888}
-.dy.tr{background:linear-gradient(180deg,#FEF3E2 50%,#EAF3DE 50%);cursor:pointer;border-color:#E8A020;animation:pb 2s infinite}
+.dy.tr{background:linear-gradient(180deg,#DBEAFE 50%,#EAF3DE 50%);cursor:pointer;border-color:#E8A020;animation:pb 2s infinite}
 @keyframes pb{0%,100%{border-color:#E8A020}50%{border-color:#C17D1A}}
 .dy.td{box-shadow:0 0 0 2px #1A56DB;border-color:#1A56DB}
 .dn2{font-weight:700;font-size:12px;line-height:1;margin-bottom:2px}
-.dy.av .dn2{color:#1E4D08}.dy.bk .dn2{color:#7E1D3F}.dy.co .dn2{color:#7A4A00}.dy.mn2 .dn2{color:#444}.dy.tr .dn2{color:#7A4A00}.dy.td .dn2{color:#1A56DB}.dy.og .dn2{color:#166534}.dy.rsv .dn2{color:#6A1B9A}
+.dy.av .dn2{color:#1E4D08}.dy.bk .dn2{color:#1E3A5F}.dy.co .dn2{color:#1E3A5F}.dy.mn2 .dn2{color:#444}.dy.tr .dn2{color:#1E3A5F}.dy.td .dn2{color:#1A56DB}.dy.og .dn2{color:#166534}.dy.rsv .dn2{color:#6A1B9A}
 .tp2{position:absolute;top:2px;right:2px;background:#1A56DB;color:#fff;font-size:8px;font-weight:700;border-radius:2px;padding:0 3px;line-height:13px;z-index:2}
 .ch{font-size:10px;border-radius:2px;padding:1px 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;margin-top:1px;line-height:1.4}
-.cid{color:#1B5E20;font-weight:700}
-.cod{color:#7A4A00;font-weight:700}
-.cmd{color:#333;font-weight:600}
-.cpf{background:#C8E6C9}
-.cpp{background:#FEF3E2}
-.cpn{background:#FFCDD2}
-.cpd{background:#E0E0E0}
+.cid{font-weight:700}
+.cod{font-weight:700}
+.cmd{font-weight:600}
+.cpf{background:#1B7E35;color:#fff;font-weight:700}
+.cpp{background:#E65100;color:#fff;font-weight:700}
+.cpn{background:#C62828;color:#fff;font-weight:700}
+.cpd{background:#616161;color:#fff;font-weight:700}
 .chm{background:#D5D5D5;color:#444;font-weight:600}
 .rdot{display:inline-block;width:4px;height:4px;background:#D4537E;border-radius:50%;margin-right:2px;vertical-align:middle}
 .trbdg{position:absolute;top:2px;right:2px;background:#E8A020;color:#fff;font-size:8px;font-weight:700;border-radius:2px;padding:0 3px;line-height:13px}
@@ -162,12 +162,15 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
 .gm-stay-inf{display:flex;gap:4px;flex-wrap:wrap;align-items:center;margin-top:3px}
 .gm-el{text-align:center;color:#aaa;font-size:13px;padding:18px}
 /* v1.3.0 — Three-channel color system + 3D card effect */
-.dy.pm{background:#e8e8e8;cursor:default;box-shadow:none}
-.dy.pbk{background:#F5E8EE;cursor:pointer;box-shadow:inset 0 1px 3px rgba(0,0,0,0.08)}.dy.pbk:hover{border-color:#D4537E}
-.dy.pco{background:#FAF2E6;cursor:pointer;box-shadow:inset 0 1px 3px rgba(0,0,0,0.08)}.dy.pco:hover{border-color:#C17D1A}
-.dy.pbk .dn2{color:#9B6070}.dy.pco .dn2{color:#9A7040}
+.dy.pm{background:#EFEFEF;cursor:default;box-shadow:none}
+.dy.pm .dn2{color:#BBBBBB;font-weight:normal}
+.dy.pbk{background:#EDF4FF;cursor:pointer;box-shadow:inset 0 1px 3px rgba(0,0,0,0.08)}.dy.pbk:hover{border-color:#2563EB}
+.dy.pco{background:#EDF4FF;cursor:pointer;box-shadow:inset 0 1px 3px rgba(0,0,0,0.08)}.dy.pco:hover{border-color:#2563EB}
+.dy.pbk .dn2{color:#BBBBBB;font-weight:normal}.dy.pco .dn2{color:#BBBBBB;font-weight:normal}
 .dy.rsv{background:#F3E5F5;cursor:pointer}.dy.rsv:hover{border-color:#9C27B0}
 .dy.og{background:#E8F5EE;border-color:#22c55e}
+.dy.og.pog{background:#DCF0E4}
+.dy.og.pog .dn2{color:#BBBBBB;font-weight:normal}
 .dy.pog{box-shadow:inset 0 1px 3px rgba(0,0,0,0.08)}
 .dy.td{border-color:#1A56DB;box-shadow:0 0 0 2px #1A56DB,0 3px 6px rgba(0,0,0,0.15)}
 .bel-sec{margin-bottom:12px}
@@ -224,22 +227,21 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
     </div>
     <div class="leg">
       <div class="lgi"><div class="ld" style="background:#EAF3DE;border:1px solid #4A8A20"></div>Free</div>
-      <div class="lgi"><div class="ld" style="background:#FBEAF0;border:1px solid #D4537E"></div>Booked</div>
+      <div class="lgi"><div class="ld" style="background:#DBEAFE;border:1px solid #2563EB"></div>Booked</div>
       <div class="lgi"><div class="ld" style="background:#F3E5F5;border:1px solid #9C27B0"></div>Pending/Reserved</div>
-      <div class="lgi"><div class="ld" style="background:#FEF3E2;border:1px solid #C17D1A"></div>Checkout</div>
       <div class="lgi"><div class="ld" style="background:#EBEBEB;border:1px solid #888"></div>Blocked</div>
       <div class="lgi"><div class="ld" style="border:2px solid #1A56DB;background:transparent"></div>Today</div>
       <div class="lgi"><span style="color:#1B5E20;font-weight:700">↑</span>Check-in</div>
-      <div class="lgi"><span style="color:#7A4A00;font-weight:700">↓</span>Check-out</div>
+      <div class="lgi"><span style="color:#1E3A5F;font-weight:700">↓</span>Check-out</div>
       <div class="lgi"><span style="color:#E8A020;font-weight:700">↑↓</span>Turnaround</div>
       <div class="lgi"><div class="ld" style="background:#E8F5EE;border:2px solid #22c55e"></div>Guest staying now</div>
     </div>
     <div class="leg" style="margin-top:-3px">
       <span style="font-size:10px;color:#888;font-weight:600;margin-right:3px">Chip:</span>
-      <div class="lgi"><span style="background:#C8E6C9;color:#1B5E20;font-size:10px;border-radius:2px;padding:1px 5px;font-weight:700;white-space:nowrap">Guest</span>Fully paid</div>
-      <div class="lgi"><span style="background:#FEF3E2;color:#7A4A00;font-size:10px;border-radius:2px;padding:1px 5px;font-weight:700;white-space:nowrap">Guest</span>Partial payment</div>
-      <div class="lgi"><span style="background:#FFCDD2;color:#333;font-size:10px;border-radius:2px;padding:1px 5px;font-weight:700;white-space:nowrap">Guest</span>Unpaid</div>
-      <div class="lgi"><span style="background:#E0E0E0;color:#333;font-size:10px;border-radius:2px;padding:1px 5px;font-weight:700;white-space:nowrap">Guest</span>Pending</div>
+      <div class="lgi"><span style="background:#1B7E35;color:#fff;font-size:10px;border-radius:2px;padding:1px 5px;font-weight:700;white-space:nowrap">Guest</span>Fully paid</div>
+      <div class="lgi"><span style="background:#E65100;color:#fff;font-size:10px;border-radius:2px;padding:1px 5px;font-weight:700;white-space:nowrap">Guest</span>Partial payment</div>
+      <div class="lgi"><span style="background:#C62828;color:#fff;font-size:10px;border-radius:2px;padding:1px 5px;font-weight:700;white-space:nowrap">Guest</span>Unpaid</div>
+      <div class="lgi"><span style="background:#616161;color:#fff;font-size:10px;border-radius:2px;padding:1px 5px;font-weight:700;white-space:nowrap">Guest</span>Pending</div>
     </div>
     <div class="cg" id="cal"></div>
     <div class="pn" id="dpanel"><div class="ph">📅 Tap any date to get started<br><span style="font-size:11px">Free dates open booking form · Booked dates show details</span></div></div>
@@ -252,7 +254,7 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
   <div id="apre" class="pn3" style="display:none"></div>
   <div class="fr"><label>Guest name</label><input id="an" placeholder="e.g. Maria Santos"/></div>
   <div class="f2"><div><label>Mobile</label><input id="am" placeholder="+63 9XX XXX XXXX"/></div><div><label>Email (optional)</label><input id="ae" placeholder="guest@email.com"/></div></div>
-  <div class="f2"><div><label>Check-in</label><input type="date" id="aci"/></div><div><label>Check-out</label><input type="date" id="aco"/></div></div>
+  <div class="f2"><div><label>Check-in</label><input type="date" id="aci" onchange="document.getElementById('aco').min=aD(this.value,1)"/></div><div><label>Check-out</label><input type="date" id="aco"/></div></div>
   <div class="sl">Timing</div>
   <div class="tg">
     <div class="ti"><label>Std check-in</label><input type="time" id="acis" value="14:00"/></div>
@@ -645,7 +647,8 @@ function chgM(d){cm+=d;if(cm>11){cm=0;cy++;}if(cm<0){cm=11;cy--;}renderCal();}
 function openAdd(pre){
   ["an","am","ae","ano"].forEach(id=>document.getElementById(id).value="");
   const ci=pre||TD,co=pre?aD(pre,1):TD;
-  document.getElementById("aci").value=ci;document.getElementById("aco").value=co;
+  document.getElementById("aci").value=ci;document.getElementById("aci").min=TD;
+  document.getElementById("aco").value=co;document.getElementById("aco").min=aD(ci,1);
   document.getElementById("acis").value="14:00";document.getElementById("acos").value="12:00";
   ["acie","acil","acoe","acol"].forEach(id=>document.getElementById(id).value="");
   document.getElementById("apy").value="none";document.getElementById("ame").value="";
