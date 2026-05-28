@@ -53,28 +53,31 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
 .dn{text-align:center;font-size:10px;color:#999;padding:3px 0;font-weight:700}
 .dy{min-height:50px;border-radius:5px;padding:4px;font-size:11px;border:2px solid transparent;position:relative;transition:border-color .1s,background .1s,box-shadow .1s;box-shadow:0 2px 4px rgba(0,0,0,0.10),0 1px 2px rgba(0,0,0,0.06)}
 .dy.em{background:transparent;cursor:default;box-shadow:none}
-.dy.av{background:#EAF3DE;cursor:pointer}.dy.av:hover{background:#d4ecbf;border-color:#4A8A20}
-.dy.bk{background:#DBEAFE;cursor:pointer}.dy.bk:hover{border-color:#2563EB}
-.dy.co{background:#DBEAFE;cursor:pointer}.dy.co:hover{border-color:#2563EB}
-.dy.mn2{background:#EBEBEB;cursor:pointer}.dy.mn2:hover{border-color:#888}
-.dy.tr{background:linear-gradient(180deg,#DBEAFE 50%,#EAF3DE 50%);cursor:pointer;border-color:#E8A020;animation:pb 2s infinite}
+.dy.av{background:#FFFFFF;cursor:pointer;border-color:#D1D5DB}.dy.av:hover{background:#F9FAFB;border-color:#9CA3AF}
+.dy.av .dn2{color:#374151}
+.dy.bk{background:#DBEAFE;cursor:pointer;border-color:#93C5FD}.dy.bk:hover{border-color:#60A5FA}
+.dy.bk .dn2{color:#1E3A5F}
+.dy.co{background:#DBEAFE;cursor:pointer;border-color:#93C5FD}.dy.co:hover{border-color:#60A5FA}
+.dy.co .dn2{color:#1E3A5F}
+.dy.mn2{background:#F3F4F6;cursor:pointer;border-color:#9CA3AF}.dy.mn2:hover{border-color:#6B7280}
+.dy.mn2 .dn2{color:#6B7280}
+.dy.tr{background:transparent;display:flex;flex-direction:column;padding:0;overflow:hidden;cursor:default;border-color:#E8A020;animation:pb 2s infinite}
 @keyframes pb{0%,100%{border-color:#E8A020}50%{border-color:#C17D1A}}
-.dy.td{box-shadow:0 0 0 2px #1A56DB;border-color:#1A56DB}
+.dy.td{border-color:#1D4ED8;box-shadow:0 0 0 2px #1D4ED8,0 3px 8px rgba(0,0,0,0.14)}
 .dn2{font-weight:700;font-size:12px;line-height:1;margin-bottom:2px}
-.dy.av .dn2{color:#1E4D08}.dy.bk .dn2{color:#1E3A5F}.dy.co .dn2{color:#1E3A5F}.dy.mn2 .dn2{color:#444}.dy.tr .dn2{color:#1E3A5F}.dy.td .dn2{color:#1A56DB}.dy.og .dn2{color:#166534}.dy.rsv .dn2{color:#6A1B9A}
-.tp2{position:absolute;top:2px;right:2px;background:#1A56DB;color:#fff;font-size:8px;font-weight:700;border-radius:2px;padding:0 3px;line-height:13px;z-index:2}
+.tp2{position:absolute;top:2px;right:2px;background:#1D4ED8;color:#fff;font-size:8px;font-weight:700;border-radius:2px;padding:0 3px;line-height:13px;z-index:3}
 .ch{font-size:10px;border-radius:2px;padding:1px 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;margin-top:1px;line-height:1.4}
 .cid{font-weight:700}
 .cod{font-weight:700}
 .cmd{font-weight:600}
-.cpf{background:#1B7E35;color:#fff;font-weight:700}
-.cpp{background:#E65100;color:#fff;font-weight:700}
-.cpn{background:#C62828;color:#fff;font-weight:700}
-.cpd{background:#616161;color:#fff;font-weight:700}
+.cpf{background:#15803D;color:#fff;font-weight:700}
+.cpp{background:#C2410C;color:#fff;font-weight:700}
+.cpn{background:#991B1B;color:#fff;font-weight:700}
+.cpd{background:#4B5563;color:#fff;font-weight:700}
 .chm{background:#D5D5D5;color:#444;font-weight:600}
 .rdot{display:inline-block;width:4px;height:4px;background:#D4537E;border-radius:50%;margin-right:2px;vertical-align:middle}
-.trbdg{position:absolute;top:2px;right:2px;background:#E8A020;color:#fff;font-size:8px;font-weight:700;border-radius:2px;padding:0 3px;line-height:13px}
-.ah2{font-size:9px;color:#4A8A20;opacity:.6;margin-top:1px}
+.trbdg{position:absolute;top:2px;right:2px;background:#E8A020;color:#fff;font-size:8px;font-weight:700;border-radius:2px;padding:0 3px;line-height:13px;z-index:3}
+.ah2{font-size:9px;color:#6B7280;opacity:.7;margin-top:1px}
 .pn{background:#fff;border-radius:9px;padding:12px;border:1px solid #e0e0e0}
 .pt{font-size:14px;font-weight:700;margin-bottom:9px}
 .dr{display:flex;justify-content:space-between;align-items:flex-start;padding:5px 0;border-bottom:1px solid #f0f0f0;font-size:12px;gap:7px}
@@ -161,18 +164,38 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
 .gm-stay-dt{font-weight:700;font-size:12px}
 .gm-stay-inf{display:flex;gap:4px;flex-wrap:wrap;align-items:center;margin-top:3px}
 .gm-el{text-align:center;color:#aaa;font-size:13px;padding:18px}
-/* v1.3.0 — Three-channel color system + 3D card effect */
-.dy.pm{background:#EFEFEF;cursor:default;box-shadow:none}
-.dy.pm .dn2{color:#BBBBBB;font-weight:normal}
-.dy.pbk{background:#EDF4FF;cursor:pointer;box-shadow:inset 0 1px 3px rgba(0,0,0,0.08)}.dy.pbk:hover{border-color:#2563EB}
-.dy.pco{background:#EDF4FF;cursor:pointer;box-shadow:inset 0 1px 3px rgba(0,0,0,0.08)}.dy.pco:hover{border-color:#2563EB}
-.dy.pbk .dn2{color:#BBBBBB;font-weight:normal}.dy.pco .dn2{color:#BBBBBB;font-weight:normal}
-.dy.rsv{background:#F3E5F5;cursor:pointer}.dy.rsv:hover{border-color:#9C27B0}
-.dy.og{background:#E8F5EE;border-color:#22c55e}
-.dy.og.pog{background:#DCF0E4}
-.dy.og.pog .dn2{color:#BBBBBB;font-weight:normal}
-.dy.pog{box-shadow:inset 0 1px 3px rgba(0,0,0,0.08)}
-.dy.td{border-color:#1A56DB;box-shadow:0 0 0 2px #1A56DB,0 3px 6px rgba(0,0,0,0.15)}
+/* Calendar tile states */
+.dy.pm{background:#F3F4F6;cursor:default;box-shadow:none;border-color:#E5E7EB}
+.dy.pm .dn2{color:#D1D5DB;font-weight:normal}
+.dy.pbk{background:#F9FAFB;cursor:pointer;border-color:#E5E7EB;box-shadow:inset 0 1px 3px rgba(0,0,0,0.07)}.dy.pbk:hover{border-color:#9CA3AF}
+.dy.pco{background:#F9FAFB;cursor:pointer;border-color:#E5E7EB;box-shadow:inset 0 1px 3px rgba(0,0,0,0.07)}.dy.pco:hover{border-color:#9CA3AF}
+.dy.pbk .dn2{color:#D1D5DB;font-weight:normal}.dy.pco .dn2{color:#D1D5DB;font-weight:normal}
+.ch.cfaded{opacity:0.5}
+.dy.yel{background:#FEF9C3;cursor:pointer;border-color:#FDE047}.dy.yel:hover{border-color:#EAB308}
+.dy.yel .dn2{color:#713F12}
+.dy.yel.td{border-color:#1D4ED8;box-shadow:0 0 0 2px #1D4ED8,0 3px 8px rgba(0,0,0,0.14)}
+.dy.og{background:#86EFAC;cursor:pointer;border-color:#16A34A}
+.dy.og .dn2{color:#14532D;font-weight:700}
+.dy.og.pog{background:#DCFCE7;border-color:#86EFAC;box-shadow:inset 0 1px 3px rgba(0,0,0,0.07)}
+.dy.og.pog .dn2{color:#9CA3AF;font-weight:normal}
+.dy.og.td{background:#4ADE80;border-color:#1D4ED8;box-shadow:0 0 0 3px rgba(29,78,216,0.20),0 4px 12px rgba(0,0,0,0.18)}
+.dy.og.td .dn2{color:#14532D;font-weight:700}
+.dy.og-upd{border-color:#C2410C}
+.ext-bdg{position:absolute;top:2px;left:2px;background:rgba(0,0,0,0.55);color:#fff;font-size:7px;font-weight:700;border-radius:3px;padding:0 3px;line-height:13px;letter-spacing:.3px;z-index:2}
+.cont-i{position:absolute;top:3px;left:3px;font-size:9px;color:#9CA3AF;line-height:1;pointer-events:none;z-index:1}
+.cont-o{position:absolute;bottom:3px;right:3px;font-size:9px;color:#9CA3AF;line-height:1;pointer-events:none;z-index:1}
+.tr-top{flex:1;padding:3px 4px;cursor:pointer;position:relative;overflow:hidden}
+.tr-bot{flex:1;padding:3px 4px;cursor:pointer;border-top:1px solid rgba(0,0,0,0.08);overflow:hidden}
+.tr-top .dn2{font-size:12px;font-weight:700;color:#374151;margin-bottom:1px}
+.hv-on{border:3px solid #1D4ED8!important;box-shadow:0 4px 12px rgba(0,0,0,0.20)!important;transform:scale(1.03);z-index:10;transition:all 0.15s ease}
+.dy.tr.hv-on{overflow:visible}
+.cg.hv-active .dy:not(.hv-on):not(.em){opacity:0.45;transition:all 0.15s ease}
+.lgnd{background:#fff;border-radius:7px;padding:8px 10px;border:1px solid #e8e8e8;margin-bottom:7px;display:flex;flex-direction:column;gap:6px}
+.lgnd-sec{display:flex;flex-direction:column;gap:3px}
+.lgnd-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#9CA3AF}
+.lgnd-row{display:flex;gap:7px;flex-wrap:wrap;align-items:center;font-size:11px;color:#555}
+.lgnd-note{font-size:10px;color:#9CA3AF;font-style:italic;margin-top:1px}
+@media(min-width:768px){.wp{max-width:900px}.dy{min-height:82px}.dn2{font-size:14px}.ch{font-size:11px}.lgnd-row{gap:10px}}
 .bel-sec{margin-bottom:12px}
 .bel-sec-hd{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#999;margin-bottom:5px}
 .bel-row{background:#fafafa;border:1px solid #e8e8e8;border-radius:6px;padding:8px 10px;margin-bottom:4px;font-size:12px;cursor:pointer}
@@ -225,23 +248,40 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
         <button class="ab" onclick="openAdd(null)">+ Add booking</button>
       </div>
     </div>
-    <div class="leg">
-      <div class="lgi"><div class="ld" style="background:#EAF3DE;border:1px solid #4A8A20"></div>Free</div>
-      <div class="lgi"><div class="ld" style="background:#DBEAFE;border:1px solid #2563EB"></div>Booked</div>
-      <div class="lgi"><div class="ld" style="background:#F3E5F5;border:1px solid #9C27B0"></div>Pending/Reserved</div>
-      <div class="lgi"><div class="ld" style="background:#EBEBEB;border:1px solid #888"></div>Blocked</div>
-      <div class="lgi"><div class="ld" style="border:2px solid #1A56DB;background:transparent"></div>Today</div>
-      <div class="lgi"><span style="color:#1B5E20;font-weight:700">↑</span>Check-in</div>
-      <div class="lgi"><span style="color:#1E3A5F;font-weight:700">↓</span>Check-out</div>
-      <div class="lgi"><span style="color:#E8A020;font-weight:700">↑↓</span>Turnaround</div>
-      <div class="lgi"><div class="ld" style="background:#E8F5EE;border:2px solid #22c55e"></div>Guest staying now</div>
-    </div>
-    <div class="leg" style="margin-top:-3px">
-      <span style="font-size:10px;color:#888;font-weight:600;margin-right:3px">Chip:</span>
-      <div class="lgi"><span style="background:#1B7E35;color:#fff;font-size:10px;border-radius:2px;padding:1px 5px;font-weight:700;white-space:nowrap">Guest</span>Fully paid</div>
-      <div class="lgi"><span style="background:#E65100;color:#fff;font-size:10px;border-radius:2px;padding:1px 5px;font-weight:700;white-space:nowrap">Guest</span>Partial payment</div>
-      <div class="lgi"><span style="background:#C62828;color:#fff;font-size:10px;border-radius:2px;padding:1px 5px;font-weight:700;white-space:nowrap">Guest</span>Unpaid</div>
-      <div class="lgi"><span style="background:#616161;color:#fff;font-size:10px;border-radius:2px;padding:1px 5px;font-weight:700;white-space:nowrap">Guest</span>Pending</div>
+    <div class="lgnd" id="lgnd">
+      <div class="lgnd-sec">
+        <span class="lgnd-lbl">Tile color</span>
+        <div class="lgnd-row">
+          <div class="lgi"><div class="ld" style="background:#FFFFFF;border:1px solid #D1D5DB;box-shadow:0 1px 2px rgba(0,0,0,0.08)"></div>Free</div>
+          <div class="lgi"><div class="ld" style="background:#DBEAFE;border:1px solid #93C5FD"></div>Booked</div>
+          <div class="lgi"><div class="ld" style="background:#FEF9C3;border:1px solid #FDE047"></div>Unpaid/pending</div>
+          <div class="lgi"><div class="ld" style="background:#DCFCE7;border:1px solid #86EFAC;box-shadow:inset 0 1px 2px rgba(0,0,0,0.07)"></div>Past stay</div>
+          <div class="lgi"><div class="ld" style="background:#4ADE80;border:2px solid #1D4ED8;box-shadow:0 0 0 2px rgba(29,78,216,0.18)"></div>Guest here today</div>
+          <div class="lgi"><div class="ld" style="background:#86EFAC;border:1px solid #16A34A"></div>Guest still staying</div>
+          <div class="lgi"><div class="ld" style="background:linear-gradient(180deg,#86EFAC 50%,#DBEAFE 50%);border:2px solid #E8A020"></div>Turnaround</div>
+          <div class="lgi"><div class="ld" style="background:#F3F4F6;border:1px solid #9CA3AF"></div>Blocked</div>
+          <div class="lgi"><div class="ld" style="background:#F9FAFB;border:1px solid #E5E7EB;box-shadow:inset 0 1px 2px rgba(0,0,0,0.05)"></div>Past date</div>
+        </div>
+      </div>
+      <div class="lgnd-sec">
+        <span class="lgnd-lbl">Payment chip</span>
+        <div class="lgnd-row">
+          <div class="lgi"><span class="ch cpf" style="display:inline-block;padding:1px 5px">↑ Guest</span>Fully paid</div>
+          <div class="lgi"><span class="ch cpp" style="display:inline-block;padding:1px 5px">↑ Guest</span>Partial</div>
+          <div class="lgi"><span class="ch cpn" style="display:inline-block;padding:1px 5px">↑ Guest</span>Unpaid</div>
+          <div class="lgi"><span class="ch cpd" style="display:inline-block;padding:1px 5px">↑ Guest</span>Pending</div>
+        </div>
+      </div>
+      <div class="lgnd-sec">
+        <span class="lgnd-lbl">Border meaning</span>
+        <div class="lgnd-row">
+          <div class="lgi"><div class="ld" style="background:transparent;border:2px solid #1D4ED8"></div>Today</div>
+          <div class="lgi"><div class="ld" style="background:transparent;border:2px solid #16A34A"></div>Ongoing stay</div>
+          <div class="lgi"><div class="ld" style="background:transparent;border:2px solid #E8A020"></div>Turnaround</div>
+          <div class="lgi"><div class="ld" style="background:transparent;border:2px solid #C2410C"></div>Extended, unpaid</div>
+        </div>
+      </div>
+      <div class="lgnd-note">Hover any date to see the full booking span</div>
     </div>
     <div class="cg" id="cal"></div>
     <div class="pn" id="dpanel"><div class="ph">📅 Tap any date to get started<br><span style="font-size:11px">Free dates open booking form · Booked dates show details</span></div></div>
@@ -480,6 +520,9 @@ function cOv(id){document.getElementById(id).classList.remove("sh");}
 function isUnpaid(b){return b.pay==="none"||b.pay==="partial"||b.method==="Pending";}
 function payChipClass(b){if(b.method==="Pending")return"cpd";if(b.pay==="none")return"cpn";if(b.pay==="partial")return"cpp";return"cpf";}
 function dirClass(ds,b){return ds===b.ci?"cid":"cmd";}
+let hvTimer;
+function hvOn(sel){clearTimeout(hvTimer);const c=document.getElementById("cal");c.classList.add("hv-active");c.querySelectorAll(".hv-on").forEach(t=>t.classList.remove("hv-on"));c.querySelectorAll(sel).forEach(t=>{t.classList.add("hv-on");if(t.classList.contains("tr-top")||t.classList.contains("tr-bot"))t.parentElement.classList.add("hv-on");});}
+function hvOff(){hvTimer=setTimeout(()=>{const c=document.getElementById("cal");c.classList.remove("hv-active");c.querySelectorAll(".hv-on").forEach(t=>t.classList.remove("hv-on"));},60);}
 
 // OCCUPANCY
 function updOcc(){
@@ -499,53 +542,105 @@ function renderCal(){
   const cal=document.getElementById("cal");cal.innerHTML="";
   ["Su","Mo","Tu","We","Th","Fr","Sa"].forEach(d=>{const e=document.createElement("div");e.className="dn";e.textContent=d;cal.appendChild(e);});
   const first=new Date(cy,cm,1).getDay(),days=new Date(cy,cm+1,0).getDate();
+  const mStr=cy+"-"+String(cm+1).padStart(2,"0");
+  const firstDayStr=mStr+"-01";
+  const lastDayStr=mStr+"-"+String(days).padStart(2,"0");
+  const noHover=window.matchMedia("(hover: none)").matches;
   for(let i=0;i<first;i++){const e=document.createElement("div");e.className="dy em";cal.appendChild(e);}
   const mkP=(cls,txt)=>{const p=document.createElement("span");p.className=cls;p.textContent=txt;return p;};
   const mkC=(cls,txt)=>{const c=document.createElement("span");c.className="ch "+cls;c.textContent=txt;return c;};
+  const addHv=(el,id,isBlk)=>{
+    if(noHover)return;
+    const sel=isBlk?"[data-blid='"+id+"']":"[data-bid='"+id+"']";
+    el.addEventListener("mouseenter",()=>hvOn(sel));
+    el.addEventListener("mouseleave",hvOff);
+  };
   for(let d=1;d<=days;d++){
-    const ds=cy+"-"+String(cm+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
+    const ds=mStr+"-"+String(d).padStart(2,"0");
     const isTd=ds===TD,isPast=ds<TD;
     const book=gB(ds,null),ciB=gCI(ds),coB=gCO(ds),blk=gBl(ds);
     const el=document.createElement("div");
     const num=()=>{const n=document.createElement("div");n.className="dn2";n.textContent=d;return n;};
+
     if(blk){
-      el.className="dy mn2"+(isTd?" td":"");el.appendChild(num());
+      // MAINTENANCE BLOCK
+      el.className="dy mn2"+(isTd?" td":"");
+      el.dataset.blid=blk.id;
+      el.appendChild(num());
       if(isTd)el.appendChild(mkP("tp2","TODAY"));
       el.appendChild(mkC("chm",blk.reason.split("/")[0].trim()));
       el.onclick=()=>showBlk(blk);
+      addHv(el,blk.id,true);
+
     } else if(ciB&&coB){
-      el.className="dy tr"+(isTd?" td":"")+(isPast?" pog":"");
-      el.appendChild(num());
+      // TURNAROUND — split into top/bottom halves
+      el.className="dy tr"+(isPast?" pog":"");
       el.appendChild(mkP("trbdg","↑↓"));
-      el.appendChild(mkC("cod "+payChipClass(coB),"↓ "+coB.name.split(" ")[0]));
-      el.appendChild(mkC("cid "+payChipClass(ciB),"↑ "+ciB.name.split(" ")[0]));
-      el.onclick=()=>showTurn(coB,ciB);
+      const topIsOg=coB.ci<ds;
+      const topBg=isUnpaid(coB)?"#FEF9C3":(topIsOg?"#86EFAC":"#DBEAFE");
+      const botBg=isUnpaid(ciB)?"#FEF9C3":"#DBEAFE";
+      // top half — outgoing guest
+      const tTop=document.createElement("div");
+      tTop.className="tr-top";tTop.style.background=topBg;tTop.dataset.bid=coB.id;
+      tTop.appendChild(num());
+      tTop.appendChild(mkC("cod "+payChipClass(coB),"↓ "+coB.name.split(" ")[0]));
+      tTop.onclick=(e)=>{e.stopPropagation();showTurn(coB,ciB);};
+      if(!noHover){tTop.addEventListener("mouseenter",()=>hvOn("[data-bid='"+coB.id+"']"));tTop.addEventListener("mouseleave",hvOff);}
+      // bottom half — incoming guest
+      const tBot=document.createElement("div");
+      tBot.className="tr-bot";tBot.style.background=botBg;tBot.dataset.bid=ciB.id;
+      tBot.appendChild(mkC("cid "+payChipClass(ciB),"↑ "+ciB.name.split(" ")[0]));
+      tBot.onclick=(e)=>{e.stopPropagation();showTurn(coB,ciB);};
+      if(!noHover){tBot.addEventListener("mouseenter",()=>hvOn("[data-bid='"+ciB.id+"']"));tBot.addEventListener("mouseleave",hvOff);}
+      el.appendChild(tTop);el.appendChild(tBot);
+
     } else if(coB&&!book){
-      const cls=isPast?"pco":"co";
+      // CHECKOUT ONLY
+      const coIsOg=coB.ci<TD&&!isPast&&!isTd;
+      let cls;
+      if(isPast)cls="pco";
+      else if(coIsOg)cls=isUnpaid(coB)?"og og-upd":"og";
+      else cls=isUnpaid(coB)?"yel":"co";
       el.className="dy "+cls+(isTd?" td":"");
+      el.dataset.bid=coB.id;
       el.appendChild(num());
       if(isTd)el.appendChild(mkP("tp2","TODAY"));
-      el.appendChild(mkC("cod "+payChipClass(coB),"↓ "+coB.name.split(" ")[0]));
+      const coFaded=isPast&&!isUnpaid(coB);
+      el.appendChild(mkC("cod "+payChipClass(coB)+(coFaded?" cfaded":""),"↓ "+coB.name.split(" ")[0]));
+      if(coB.ci<firstDayStr&&d===1){const ci=document.createElement("span");ci.className="cont-i";ci.textContent="← cont.";el.appendChild(ci);}
       el.onclick=()=>showDet(coB);
+      addHv(el,coB.id,false);
+
     } else if(book){
+      // BOOKING (check-in or mid-stay)
       const isOg=book.ci<TD&&book.co>TD;
       let cls;
       if(isOg&&isPast)cls="og pog";
       else if(isOg&&isTd)cls="og td";
-      else if(isOg)cls="og";
+      else if(isOg)cls=isUnpaid(book)?"og og-upd":"og";
       else if(isPast)cls="pbk";
-      else if(book.method==="Pending")cls="rsv"+(isTd?" td":"");
+      else if(isUnpaid(book))cls="yel"+(isTd?" td":"");
       else if(isTd)cls="bk td";
       else cls="bk";
       el.className="dy "+cls;
+      el.dataset.bid=book.id;
       el.appendChild(num());
       if(isTd)el.appendChild(mkP("tp2","TODAY"));
+      if(isOg&&!isPast&&!isTd&&isUnpaid(book))el.appendChild(mkP("ext-bdg","ext"));
+      const pastFullyPaid=isPast&&!isOg&&!isUnpaid(book);
+      const chipCls=dirClass(ds,book)+" "+payChipClass(book)+(pastFullyPaid?" cfaded":"");
       const ch=document.createElement("span");
-      ch.className="ch "+dirClass(ds,book)+" "+payChipClass(book);
+      ch.className="ch "+chipCls;
       if(cG(book.name)>1){const dot=document.createElement("span");dot.className="rdot";ch.appendChild(dot);}
       ch.appendChild(document.createTextNode((book.ci===ds?"↑ ":"")+book.name.split(" ")[0]));
-      el.appendChild(ch);el.onclick=()=>showDet(book);
+      el.appendChild(ch);
+      if(book.ci<firstDayStr&&d===1){const ci=document.createElement("span");ci.className="cont-i";ci.textContent="← cont.";el.appendChild(ci);}
+      if(book.co>lastDayStr&&d===days){const co=document.createElement("span");co.className="cont-o";co.textContent="cont. →";el.appendChild(co);}
+      el.onclick=()=>showDet(book);
+      addHv(el,book.id,false);
+
     } else {
+      // EMPTY
       if(isPast){
         el.className="dy pm";el.appendChild(num());
       } else {
