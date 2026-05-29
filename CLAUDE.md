@@ -2,7 +2,7 @@
 
 > This file is read automatically by Claude Code every session.
 > It contains the full context needed to work on this project.
-> Last updated: 2026-05-28 | Version: v1.3.2
+> Last updated: 2026-05-29 | Version: v1.4.0
 
 ---
 
@@ -77,7 +77,7 @@ Booking Tracker is a single-file, browser-based property booking management app 
 ```
 booking-tracker/
 │
-├── index.html      Entire application (1073 lines, ~68KB)
+├── index.html      Entire application (1168 lines, ~76KB)
 │                   Contains: HTML structure, all CSS, all JavaScript
 │                   No external dependencies. Works offline.
 │
@@ -91,30 +91,32 @@ Single file architecture is intentional. Do not propose splitting unless the own
 ```
 index.html
 │
-├── style               Lines 11 to 177     All CSS (three-channel color system: tile bg=type, border=time, chip=payment; 3D card depth)
-├── LOGIN               Lines 176 to 186    Login screen HTML
-├── APP                 Lines 187 to 237    App shell, header (🔔 Alerts button added), occupancy bar, calendar, detail panel
-├── ADD                 Lines 238 to 264    Add booking modal
-├── TURNAROUND          Lines 265 to 271    Same-day turnaround warning modal
-├── OVERWRITE WARNING   Lines 272 to 278    Unpaid booking overwrite confirm modal (v1.3.0)
-├── EDIT                Lines 279 to 305    Edit booking modal
-├── EXTEND              Lines 306 to 308    Extend stay modal
-├── CANCEL              Lines 309 to 311    Cancel booking modal
-├── CANCEL CONFIRM      Lines 312 to 318    Full cancel double-confirm modal
-├── MAINTENANCE         Lines 319 to 329    Block dates modal
-├── ALL BOOKINGS        Lines 330 to 346    All bookings list modal
-├── IMPORT FILE         Lines 347 to 349    Hidden file input for import
-├── IMPORT CONFIRM      Lines 350 to 363    Import confirm modal with validation
-├── WHAT'S NEW          Lines 364 to 382    v1.3.0 release notes modal
-├── GUEST MASTERLIST    Lines 383 to 404    Guest Masterlist modal (list + profile views)
-├── NOTIFICATIONS BELL  Lines 405 to 411    Alerts bell modal — 4-section notification panel (v1.3.0)
+├── style               Lines 11 to 204     All CSS (color system: bg=type, border=time, chip=payment; hover group; legend; responsive)
+├── LOGIN               Lines 206 to 216    Login screen HTML
+├── APP                 Lines 217 to 290    App shell, header, occupancy bar, legend (4-section), calendar grid, detail panel
+├── ADD                 Lines 291 to 317    Add booking modal
+├── TURNAROUND          Lines 318 to 324    Same-day turnaround warning modal
+├── OVERWRITE WARNING   Lines 325 to 331    Unpaid booking overwrite confirm modal (v1.3.0)
+├── EDIT                Lines 332 to 358    Edit booking modal
+├── EXTEND              Lines 359 to 361    Extend stay modal
+├── CANCEL              Lines 362 to 364    Cancel booking modal
+├── CANCEL CONFIRM      Lines 365 to 371    Full cancel double-confirm modal
+├── MAINTENANCE         Lines 372 to 382    Block dates modal
+├── ALL BOOKINGS        Lines 383 to 399    All bookings list modal
+├── IMPORT FILE         Lines 400 to 402    Hidden file input for import
+├── IMPORT CONFIRM      Lines 403 to 416    Import confirm modal with validation
+├── WHAT'S NEW          Lines 417 to 435    Release notes modal
+├── GUEST MASTERLIST    Lines 436 to 457    Guest Masterlist modal (list + profile views)
+├── NOTIFICATIONS BELL  Lines 458 to 464    Alerts bell modal — 4-section notification panel (v1.3.0)
 │
-└── script              Lines 415 to 1073   All application logic
+└── script              Lines 465 to 1168   All application logic
     ├── AUTH            SHA-256 login, logout
     ├── DATA            localStorage save/load
-    ├── HELPERS         fmt12, dRange, addDays, getters, class mappers, isUnpaid, payChipClass, dirClass
+    ├── HELPERS         fmt12, dRange, addDays, getters, class mappers, isUnpaid, payChipClass, dirClass,
+    │                   hvOn(sel), hvOff() — hover group highlight with 60ms debounce (v1.4.0)
     ├── OCCUPANCY       Monthly occupancy calculation
-    ├── CALENDAR        renderCal — 12 tile states (adds .rsv pending/reserved); three-channel chip system
+    ├── CALENDAR        renderCal — fully rewritten v1.4.0: 15 tile states, data-bid/data-blid on every tile,
+    │                   hover groups, ext badge, cont-i/cont-o cross-month indicators, split turnaround halves
     ├── TURNAROUND      showTurn — split tile detail view
     ├── DETAIL          showDet — booking detail panel
     ├── BLOCK DETAIL    showBlk — maintenance block detail
@@ -155,20 +157,21 @@ bt_bl  Blocks array
 - Do not treat this as a secure auth system
 - Session lives in JS memory only, clears on tab close
 
-### 4.2 Full Feature List (all verified working as of v1.3.2)
+### 4.2 Full Feature List (all verified working as of v1.4.0)
 
-**Calendar — Three-Channel Color System**
-- 12 tile states: empty, available, booked, pending/reserved (.rsv), checkout, maintenance, turnaround, today, past-empty, past-booked, past-checkout, ongoing
-- **Channel 1 — Tile background = type of day:** available=green (#EAF3DE), booked=soft blue (#DBEAFE), pending/reserved=light purple (.rsv — method=Pending), checkout=soft blue (#DBEAFE — same as booked, amber removed), maintenance=gray, past-empty=flat gray (#EFEFEF), past-booked=washed blue (#EDF4FF), past-checkout=washed blue (#EDF4FF), ongoing=green (#E8F5EE all days; past ongoing .pog=#DCF0E4 muted)
-- **Channel 2 — Tile border = time status:** today=2px solid blue ring (always wins), ongoing=solid green border on ALL days of the booking span, turnaround=pulsing amber (never overridden), default=no border
-- **Channel 3 — Name chip background = payment status:** fully paid=dark green (#1B7E35/white, .cpf), partial=orange (#E65100/white, .cpp), no payment=deep red (#C62828/white, .cpn), pending method=gray (#616161/white, .cpd). All chips bold white text. Direction classes (.cid/.cod/.cmd) set font-weight only — no color override so chip bg shows through
-- **3D card depth:** today+future tiles raised with drop shadow; past empty tiles flat (no shadow); past ended booking tiles pressed-in (inset shadow); past days of ongoing bookings also pressed-in (.pog)
-- **Past visual hierarchy:** past date numbers always gray (#BBBBBB) normal weight; today+future date numbers bold dark; creates clear temporal recession
-- Turnaround split tile shows two independent chips — each guest's payment status displayed separately; gradient top=blue/bottom=green
-- Past ended tiles still show payment chips so outstanding balances remain visible
-- Legend has two rows: tile type swatches (no Checkout swatch — merged with Booked) + chip color mini-key with saturated samples
-- Click tiles to open detail panel or add booking
-- Navigate months with arrows
+**Calendar — Color System + Hover Groups**
+- **15 tile states:** pm (past empty), pbk (past ended booked), pco (past ended checkout), av (available future), av.td (today empty), bk (confirmed future), co (future checkout), yel (unpaid/pending future), yel.td (today unpaid), og.pog (ongoing past days), og.td (ongoing today), og (ongoing future paid), og.og-upd (ongoing future unpaid — ext badge), mn2 (maintenance), tr (turnaround)
+- **Channel 1 — Tile bg = type:** white #FFFFFF available; blue #DBEAFE booked/checkout; yellow #FEF9C3 unpaid/pending; #DCFCE7 past ongoing; #4ADE80 today ongoing; #86EFAC ongoing future; #F3F4F6 maintenance/past-empty; #F9FAFB past ended
+- **Channel 2 — Tile border = time:** today=#1D4ED8 blue ring (always wins, even on yel.td via 3-class specificity); ongoing=#16A34A green; ongoing unpaid/ext=#C2410C orange; turnaround=pulsing #E8A020 amber (never overridden); default transparent or light gray
+- **Channel 3 — Chip bg = payment:** .cpf #15803D/white fully paid; .cpp #C2410C/white partial; .cpn #991B1B/white unpaid; .cpd #4B5563/white pending. Past fully-paid chips at opacity 0.5 (.cfaded); past unpaid/partial chips at full opacity so outstanding debt stays visible
+- **3D card depth:** today+future tiles raised (drop shadow); past empty flat (no shadow); past ended/ongoing-past inset shadow
+- **Hover group highlight (v1.4.0):** `data-bid` on every booked tile, `data-blid` on maintenance tiles. Mouseenter calls `hvOn(sel)` — all tiles with matching bid get `.hv-on` (blue border, scale 1.03, lift shadow, z-index 10); calendar grid gets `.hv-active` dimming all other tiles to opacity 0.45. `hvOff()` clears with 60ms debounce. Skipped on touch devices. **Turnaround fix:** outer `.dy.tr` also receives `.hv-on` when either half is in the group — tile lifts as one unit; `overflow:visible` on `.dy.tr.hv-on` unclips shadow and scale
+- **Cross-month indicators (v1.4.0):** `← cont.` label on d===1 if booking started in prior month; `cont. →` label on d===days if booking ends in next month
+- **Ext badge (v1.4.0):** ongoing future tiles where booking is not fully paid show dark pill badge "ext" — proxy for extension unpaid state until `originalCo` field added in future version
+- **Split turnaround tile:** `.dy.tr` is flex-column; `.tr-top` (outgoing) and `.tr-bot` (incoming) each have `data-bid` and independent inline background reflecting their payment state (#FEF9C3 unpaid, #86EFAC ongoing, #DBEAFE confirmed)
+- **Legend (v1.4.0):** 3-section redesign — Tile color swatches, Payment chip real samples, Border meaning squares, italic hover note
+- **Responsive (v1.4.0):** `@media(min-width:768px)` — `.wp` 900px, `.dy` 82px min-height, `.dn2` 14px, `.ch` 11px, legend gap 10px
+- Click tiles to open detail panel or add booking; navigate months with arrows
 
 **Occupancy Bar**
 - Shows booked days as fraction and percentage with fill bar
@@ -298,7 +301,16 @@ bt_bl  Blocks array
 - Chips saturated with white text: .cpf #1B7E35/white, .cpp #E65100/white, .cpn #C62828/white, .cpd #616161/white; direction classes (.cid/.cod) de-colored so chip bg shows through cleanly
 - Date picker blocks past dates: aci.min=TD set in openAdd(); aci onchange updates aco.min=aD(value,1) dynamically
 
-**v1.4.0: Navigation — NEXT**
+**v1.4.0: Calendar UX Overhaul — Complete**
+- 5-area visual overhaul: CSS and JS only, zero data/storage changes
+- New color system: white available, blue confirmed, yellow unpaid/pending, green ongoing spectrum, near-white past
+- Hover group highlight: data-bid/data-blid, hvOn/hvOff helpers, .hv-on lift+scale, .hv-active dimming, turnaround outer-tile fix
+- Cross-month indicators: ← cont. and cont. → on boundary tiles
+- Ext badge proxy for ongoing-future unpaid/partial tiles
+- Legend redesign: 3 sections (tile color / payment chip / border meaning) with real chip samples
+- Responsive calendar: @media(min-width:768px) expands tiles, font sizes, legend gap, wrapper to 900px
+
+**v1.5.0: Navigation — NEXT**
 - Bottom navigation bar: Home, Guests, Reports, Settings
 - Settings tab absorbs: Export, Import, Clear Demo, What's New, Password
 - Header cleaned up
@@ -334,6 +346,7 @@ bt_bl  Blocks array
 
 | Version | Date | Summary |
 |---|---|---|
+| v1.4.0 | May 2026 | Calendar UX overhaul — 5 areas, CSS+JS only, zero data changes. Area 1: new color system (white av, blue bk/co, yellow yel, green og spectrum, near-white past, chip colors cpf=#15803D/cpp=#C2410C/cpn=#991B1B/cpd=#4B5563 white text, cfaded opacity 0.5 for past paid). Area 2: hover group highlight — data-bid/data-blid on all tiles, hvOn(sel)/hvOff() 60ms debounce, .hv-on scale 1.03 blue border lift, .hv-active dims non-hovered to 0.45; turnaround outer .dy.tr gets hv-on so full tile lifts (.dy.tr.hv-on overflow:visible unclips shadow). Area 3: ← cont. / cont. → cross-month boundary labels. Area 4: legend redesign 3 sections (tile color, payment chip, border meaning) + italic note. Area 5: @media(min-width:768px) responsive — 900px wrapper, 82px tiles, 14px dn2, 11px chip. 1168 lines. |
 | v1.3.2 | May 2026 | Calendar visual polish. Unified booked+checkout tile to soft blue (#DBEAFE/#EDF4FF) — checkout amber removed, Checkout legend swatch removed. Past date hierarchy: past-empty=#EFEFEF flat, past-booked/checkout=#EDF4FF inset, past-ongoing=.og.pog #DCF0E4; all gray #BBBBBB date nums normal weight. Chips saturated white text: cpf=#1B7E35, cpp=#E65100, cpn=#C62828, cpd=#616161; .cid/.cod de-colored. Date picker min=TD in openAdd(), aci onchange updates aco.min. 1073 lines. |
 | v1.3.1 | May 2026 | Three-channel color system and 3D card depth. Channel 1 bg=type (adds .rsv pending/reserved, light purple). Channel 2 border=time (ongoing green on all days, today blue ring always wins). Channel 3 chip=payment (.cpf/.cpp/.cpn/.cpd replaces .upd dotted border). Past tiles flat/inset, today+future tiles raised. Turnaround shows independent payment chip per guest. Adds payChipClass() and dirClass() helpers. Legend chip mini-row. 1070 lines. |
 | v1.3.0 | May 2026 | Calendar polish and alerts. Past tile visual states (gray/muted pink/muted amber). Ongoing bookings pulse green. Unpaid/pending tiles get dotted amber border. Unpaid overwrite prompt in saveAdd. 🔔 Alerts bell with 4-section notification panel. 1057 lines. |
@@ -341,7 +354,7 @@ bt_bl  Blocks array
 | v1.1.0 | May 2026 | Password removed from source, replaced with pre-computed SHA-256 hash. Silent save failure now shows visible error banner. Export and import JSON backup added with file validation and confirm modal. What's New modal added. |
 | v1.0.0 | May 2026 | MVP complete. Login, calendar, full booking lifecycle, cleaner flow, payment tracking, turnaround detection, localStorage persistence, all bookings list, maintenance blocks, occupancy tracker. 23 checks passing. |
 
-Next release: v1.4.0 (Navigation)
+Next release: v1.5.0 (Navigation)
 
 ---
 
