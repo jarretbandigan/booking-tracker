@@ -201,6 +201,42 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
 .bel-row{background:#fafafa;border:1px solid #e8e8e8;border-radius:6px;padding:8px 10px;margin-bottom:4px;font-size:12px;cursor:pointer}
 .bel-row:hover{border-color:#2D5F0F}
 .bel-none{font-size:12px;color:#aaa;padding:4px 0}
+/* v1.5.0 — Navigation + Profile */
+#hpname{font-size:15px;font-weight:700;color:#fff}
+.hbi{padding:6px 8px;font-size:16px}
+#bnav{position:fixed;bottom:0;left:0;right:0;height:56px;background:#fff;border-top:1px solid #e5e7eb;display:flex;z-index:50}
+.bnt{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:9px;color:#6B7280;background:none;border:none;cursor:pointer;gap:2px;padding:0}
+.bnt span{display:block;font-size:18px}
+.bnt.act{color:#1D4ED8;font-weight:700}
+.tab-pane{padding-bottom:64px}
+.more-list{display:flex;flex-direction:column;gap:10px;padding:16px 0}
+.more-btn{width:100%;padding:14px 16px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;text-align:left;font-size:14px;cursor:pointer}
+.more-btn:hover{background:#f9fafb}
+.rpt-ph{text-align:center;padding:60px 20px;color:#9CA3AF}
+.rpt-ph span{font-size:40px;display:block;margin-bottom:12px}
+.rpt-ph h3{color:#374151;margin:0 0 8px}
+.rpt-ph p{font-size:13px;margin:0}
+.prof-sec{margin-bottom:14px}
+.prof-sec-hd{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#9CA3AF;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid #f0f0f0}
+.prof-toggle{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:13px}
+.prof-toggle input[type=checkbox]{width:auto}
+.prof-fee{display:none;margin-left:16px;margin-bottom:6px}
+.prof-fee label{display:block;font-size:11px;color:#666;font-weight:600;margin-bottom:2px}
+.prof-fee input{width:100%;border:1px solid #ddd;border-radius:5px;padding:5px 7px;font-size:13px;background:#fafafa}
+.prof-chk-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px}
+.prof-chk-grid label{display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer}
+.prof-chk-grid input[type=checkbox]{width:auto}
+.prof-saved{background:#EAF3DE;border:1px solid #4A8A20;border-radius:5px;padding:7px 10px;font-size:12px;color:#1E4D08;display:none;margin-top:8px}
+#ov-welcome{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;opacity:0;transition:opacity 0.35s ease}
+#ov-welcome.sh{display:flex}
+#ov-welcome.vis{opacity:1}
+.wlc-md{background:#fff;border-radius:14px;padding:24px 20px;width:300px;max-width:92vw;text-align:center}
+.wlc-icon{font-size:40px;margin-bottom:12px}
+.wlc-md h3{font-size:16px;font-weight:700;margin-bottom:8px;color:#1a1a1a}
+.wlc-md p{font-size:13px;color:#555;line-height:1.6;margin-bottom:16px}
+.wlc-btns{display:flex;flex-direction:column;gap:8px}
+.wlc-primary{background:#2D5F0F;color:#fff;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:700;cursor:pointer}
+.wlc-skip{background:none;border:none;font-size:12px;color:#9CA3AF;cursor:pointer;padding:4px}
 </style>
 
 <!-- LOGIN -->
@@ -217,17 +253,13 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
 <!-- APP -->
 <div id="as">
   <div class="ah">
-    <h1>📋 Booking Tracker</h1>
+    <span id="hpname">Booking Tracker</span>
     <div class="hbs">
-      <button class="hb" onclick="openList()">📋 All Bookings</button>
-      <button class="hb" onclick="openGM()">👥 Guests</button>
-      <button class="hb" onclick="openBell()">🔔 Alerts</button>
-      <button class="hb" onclick="openWN()">✨ What's New</button>
-      <button class="hb" onclick="doExport()">📤 Export</button>
-      <button class="hb" onclick="triggerImport()">📥 Import</button>
-      <button class="hb" onclick="doLogout()">Sign out</button>
+      <button class="hb hbi" id="hbell" onclick="openNotices()" title="Important Notices">🔔</button>
+      <button class="hb hbi" id="hprof" onclick="openProf()" title="Settings">⚙️</button>
     </div>
   </div>
+  <div id="tab-home" class="tab-pane">
   <div class="wp">
     <div id="sverr" class="er" style="display:none;margin-bottom:9px">⚠️ Auto-save failed — your last change was not stored. Try again or export a backup.</div>
     <div class="ob">
@@ -286,6 +318,54 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
     <div class="cg" id="cal"></div>
     <div class="pn" id="dpanel"><div class="ph">📅 Tap any date to get started<br><span style="font-size:11px">Free dates open booking form · Booked dates show details</span></div></div>
   </div>
+  </div>
+  <div id="tab-guests" class="tab-pane" style="display:none">
+    <div class="wp">
+      <div id="gm-lv">
+        <div style="padding:8px 0 8px;font-size:15px;font-weight:700">👥 Guests</div>
+        <div class="gm-ctrl"><input id="gmq" placeholder="Search name, mobile, email…" oninput="renderGM()"/></div>
+        <div class="gm-chips">
+          <span class="gm-chip act" data-f="all" onclick="gmFilt(this)">All</span>
+          <span class="gm-chip" data-f="rep" onclick="gmFilt(this)">⭐ Repeat</span>
+        </div>
+        <div class="gm-body" id="gm-list"></div>
+      </div>
+      <div id="gm-pv" style="display:none">
+        <div class="gm-hd">
+          <button class="gm-back" onclick="gmBack()">← Back</button>
+          <div class="gm-pname" id="gm-pname"></div>
+        </div>
+        <div id="gm-pbody" class="gm-pbody"></div>
+        <div class="mbb" style="margin-top:9px"><button class="bxx" style="flex:1" onclick="gmBack()">← Back to guests</button></div>
+      </div>
+    </div>
+  </div>
+  <div id="tab-reports" class="tab-pane" style="display:none">
+    <div class="wp">
+      <div class="rpt-ph">
+        <span>📊</span>
+        <h3>Reports coming soon</h3>
+        <p>Monthly income summary and occupancy stats will appear here in a future update.</p>
+      </div>
+    </div>
+  </div>
+  <div id="tab-more" class="tab-pane" style="display:none">
+    <div class="wp">
+      <div class="more-list">
+        <button class="more-btn" onclick="openList()">📋 All Bookings</button>
+        <button class="more-btn" onclick="doExport()">📤 Export backup</button>
+        <button class="more-btn" onclick="triggerImport()">📥 Import backup</button>
+        <button class="more-btn" onclick="openWN()">✨ What's New</button>
+        <button class="more-btn" style="color:#8B2110" onclick="doLogout()">🚪 Sign out</button>
+      </div>
+    </div>
+  </div>
+  <nav id="bnav">
+    <button class="bnt act" id="bnt-home" onclick="showTab('home')"><span>🏠</span>Home</button>
+    <button class="bnt" id="bnt-guests" onclick="showTab('guests')"><span>👥</span>Guests</button>
+    <button class="bnt" id="bnt-reports" onclick="showTab('reports')"><span>📊</span>Reports</button>
+    <button class="bnt" id="bnt-more" onclick="showTab('more')"><span>⋯</span>More</button>
+  </nav>
 </div>
 
 <!-- ADD -->
@@ -433,34 +513,105 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
   <div class="mbb"><button class="bxx" style="flex:1" onclick="cOv('ov-wn')">Close</button></div>
 </div></div>
 
-<!-- GUEST MASTERLIST -->
-<div class="ov" id="ov-gm"><div class="md lm">
-  <div id="gm-lv">
-    <h3>👥 Guests</h3>
-    <div class="gm-ctrl"><input id="gmq" placeholder="Search name, mobile, email…" oninput="renderGM()"/></div>
-    <div class="gm-chips">
-      <span class="gm-chip act" data-f="all" onclick="gmFilt(this)">All</span>
-      <span class="gm-chip" data-f="rep" onclick="gmFilt(this)">⭐ Repeat</span>
-    </div>
-    <div class="gm-body" id="gm-list"></div>
-    <div class="mbb" style="margin-top:9px"><button class="bxx" style="flex:1" onclick="cAll()">Close</button></div>
-  </div>
-  <div id="gm-pv" style="display:none">
-    <div class="gm-hd">
-      <button class="gm-back" onclick="gmBack()">← Back</button>
-      <div class="gm-pname" id="gm-pname"></div>
-    </div>
-    <div id="gm-pbody" class="gm-pbody"></div>
-    <div class="mbb" style="margin-top:9px"><button class="bxx" style="flex:1" onclick="gmBack()">← Back to guests</button></div>
-  </div>
-</div></div>
-
-<!-- NOTIFICATIONS BELL -->
+<!-- NOTIFICATIONS BELL (dormant — superseded by ov-notices in v1.5.0) -->
 <div class="ov" id="ov-bell"><div class="md lm">
   <h3>🔔 Alerts</h3>
   <div id="bell-body"></div>
   <div class="mbb" style="margin-top:9px"><button class="bxx" style="flex:1" onclick="cOv('ov-bell')">Close</button></div>
 </div></div>
+
+<!-- IMPORTANT NOTICES -->
+<div class="ov" id="ov-notices"><div class="md lm">
+  <h3>🔔 Important Notices</h3>
+  <div id="notices-body">
+    <div class="bel-sec"><div class="bel-sec-hd">🧹 Cleaner Reminder</div><div class="bel-none">Nothing to show right now.</div></div>
+    <div class="bel-sec"><div class="bel-sec-hd">💸 Payment Attention</div><div class="bel-none">Nothing to show right now.</div></div>
+    <div class="bel-sec"><div class="bel-sec-hd">✏️ Pencil Holds</div><div class="bel-none">Nothing to show right now.</div></div>
+    <div class="bel-sec"><div class="bel-sec-hd">✅ Upcoming Bookings</div><div class="bel-none">Nothing to show right now.</div></div>
+  </div>
+  <div class="mbb" style="margin-top:9px"><button class="bxx" style="flex:1" onclick="cOv('ov-notices')">Close</button></div>
+</div></div>
+
+<!-- PROPERTY PROFILE / SETTINGS -->
+<div class="ov" id="ov-prof"><div class="md" style="width:360px;max-width:97vw">
+  <h3>⚙️ Settings</h3>
+  <div class="prof-sec">
+    <div class="prof-sec-hd">Property Details</div>
+    <div class="fr"><label>Property nickname</label><input id="pr-name" placeholder="e.g. Makati Studio Unit"/></div>
+    <div class="fr"><label>Address (optional)</label><input id="pr-addr" placeholder="e.g. Salcedo Village, Makati"/></div>
+    <div class="f2">
+      <div><label>Type</label><select id="pr-type"><option value="">— select —</option><option>Condo</option><option>House</option><option>Apartment</option><option>Room</option><option>Other</option></select></div>
+      <div><label>Bedrooms</label><input type="number" id="pr-bed" min="0" max="20" placeholder="1"/></div>
+    </div>
+    <div class="f2">
+      <div><label>Bathrooms</label><input type="number" id="pr-bath" min="0" max="20" placeholder="1"/></div>
+      <div><label>Max occupancy</label><input type="number" id="pr-occ" min="1" max="50" placeholder="2"/></div>
+    </div>
+  </div>
+  <div class="prof-sec">
+    <div class="prof-sec-hd">Check-in / Check-out Times</div>
+    <div class="f2">
+      <div><label>Std check-in</label><input type="time" id="pr-ci" value="14:00"/></div>
+      <div><label>Std check-out</label><input type="time" id="pr-co" value="12:00"/></div>
+    </div>
+    <div class="prof-toggle"><input type="checkbox" id="pr-eci-tog" onchange="document.getElementById('pr-eci-fee').style.display=this.checked?'block':'none'"/><label for="pr-eci-tog">Allow early check-in</label></div>
+    <div class="prof-fee" id="pr-eci-fee"><label>Early check-in fee (₱)</label><input type="number" id="pr-eci-val" min="0" placeholder="e.g. 500"/></div>
+    <div class="prof-toggle"><input type="checkbox" id="pr-lco-tog" onchange="document.getElementById('pr-lco-fee').style.display=this.checked?'block':'none'"/><label for="pr-lco-tog">Allow late check-out</label></div>
+    <div class="prof-fee" id="pr-lco-fee"><label>Late check-out fee (₱)</label><input type="number" id="pr-lco-val" min="0" placeholder="e.g. 500"/></div>
+    <div style="font-size:11px;color:#9CA3AF;margin-top:4px">These are your defaults — individual bookings can override.</div>
+  </div>
+  <div class="prof-sec">
+    <div class="prof-sec-hd">Payment Policy</div>
+    <div style="font-size:11px;color:#666;font-weight:600;margin-bottom:5px">Accepted methods</div>
+    <div class="prof-chk-grid">
+      <label><input type="checkbox" id="pr-pm-gc" value="GCash" checked/> GCash</label>
+      <label><input type="checkbox" id="pr-pm-my" value="Maya"/> Maya</label>
+      <label><input type="checkbox" id="pr-pm-bt" value="Bank transfer"/> Bank transfer</label>
+      <label><input type="checkbox" id="pr-pm-cs" value="Cash"/> Cash</label>
+    </div>
+    <div class="prof-toggle"><input type="checkbox" id="pr-fp-tog"/><label for="pr-fp-tog">Require full payment upfront</label></div>
+    <div class="f2" style="margin-top:6px">
+      <div><label>Min downpayment (%)</label><input type="number" id="pr-dp" min="0" max="100" placeholder="50"/></div>
+      <div><label>Reservation expiry (hrs)</label><input type="number" id="pr-exp" min="1" placeholder="24"/></div>
+    </div>
+  </div>
+  <div class="prof-sec">
+    <div class="prof-sec-hd">House Rules</div>
+    <div class="f2">
+      <div><label>Min nights</label><input type="number" id="pr-min" min="1" placeholder="1"/></div>
+      <div></div>
+    </div>
+    <div class="prof-chk-grid">
+      <label><input type="checkbox" id="pr-no-smoke"/> No smoking</label>
+      <label><input type="checkbox" id="pr-no-pets"/> No pets</label>
+      <label><input type="checkbox" id="pr-no-party"/> No parties</label>
+    </div>
+    <div class="fr" style="margin-top:4px"><label>Custom rule (optional)</label><input id="pr-rule" placeholder="e.g. Quiet hours after 10pm"/></div>
+  </div>
+  <div class="prof-sec">
+    <div class="prof-sec-hd">Host Contact</div>
+    <div class="fr"><label>Your name</label><input id="pr-hname" placeholder="e.g. Jarret"/></div>
+    <div class="f2">
+      <div><label>Mobile</label><input id="pr-hmob" placeholder="+63 9XX XXX XXXX"/></div>
+      <div><label>GCash number</label><input id="pr-gcash" placeholder="+63 9XX XXX XXXX"/></div>
+    </div>
+  </div>
+  <div id="prof-saved" class="prof-saved">✓ Settings saved</div>
+  <div class="mbb"><button class="bxx" onclick="cOv('ov-prof')">Cancel</button><button class="bsv" onclick="saveProf()">Save settings</button></div>
+</div></div>
+
+<!-- FIRST-TIME WELCOME -->
+<div id="ov-welcome">
+  <div class="wlc-md">
+    <div class="wlc-icon">🏠</div>
+    <h3>Welcome to Booking Tracker</h3>
+    <p>Set up your property profile to personalise your experience. It only takes a minute.</p>
+    <div class="wlc-btns">
+      <button class="wlc-primary" onclick="closeWelcome();openProf()">Set up profile</button>
+      <button class="wlc-skip" onclick="closeWelcome()">Skip for now</button>
+    </div>
+  </div>
+</div>
 
 <script>
 // AUTH — SHA-256, pre-computed hash (plaintext password not stored in source)
@@ -471,16 +622,16 @@ async function h256(s){const b=await crypto.subtle.digest("SHA-256",new TextEnco
 async function doLogin(){
   const u=document.getElementById("lu").value.trim(),p=document.getElementById("lp").value;
   const h=await h256(p);
-  if(u===CU&&h===CH){document.getElementById("ls").style.display="none";document.getElementById("as").style.display="block";document.getElementById("lerr").style.display="none";loadData();renderCal();}
+  if(u===CU&&h===CH){document.getElementById("ls").style.display="none";document.getElementById("as").style.display="block";document.getElementById("lerr").style.display="none";loadData();updateHeader();if(!prof.name)setTimeout(showWelcome,500);renderCal();}
   else{document.getElementById("lerr").style.display="block";document.getElementById("lp").value="";}
 }
-function doLogout(){document.getElementById("as").style.display="none";document.getElementById("ls").style.display="flex";document.getElementById("lu").value="";document.getElementById("lp").value="";cAll();}
+function doLogout(){document.getElementById("as").style.display="none";document.getElementById("ls").style.display="flex";document.getElementById("lu").value="";document.getElementById("lp").value="";cAll();showTab('home');}
 
 // DATA
 const MN=["January","February","March","April","May","June","July","August","September","October","November","December"];
 const TD=new Date().toISOString().slice(0,10);
 let cy=new Date().getFullYear(),cm=new Date().getMonth(),nid=10;
-let bk=[],bl=[];
+let bk=[],bl=[],prof={},bellTs=0;
 
 function sv(){
   try{
@@ -491,12 +642,29 @@ function sv(){
     document.getElementById("sverr").style.display="block";
   }
 }
+function svP(){
+  try{
+    localStorage.setItem("bt_p",JSON.stringify(prof));
+    localStorage.setItem("bt_bell",bellTs.toString());
+  }catch(e){
+    document.getElementById("sverr").style.display="block";
+  }
+}
 function loadData(){
   try{
     const b=localStorage.getItem("bt_b"),l=localStorage.getItem("bt_bl");
     bk=b?JSON.parse(b):[];
     bl=l?JSON.parse(l):[];
-  }catch(e){bk=[];bl=[];}
+    const p=localStorage.getItem("bt_p");prof=p?JSON.parse(p):{};
+    const bell=localStorage.getItem("bt_bell");bellTs=bell?parseInt(bell):0;
+  }catch(e){bk=[];bl=[];prof={};bellTs=0;}
+  // Migration: add type field, normalise Pending payment method
+  let migrated=false;
+  bk.forEach(b=>{
+    if(b.type===undefined){b.type="confirmed";migrated=true;}
+    if(b.method==="Pending"){b.method="";b.pay="none";migrated=true;}
+  });
+  if(migrated)sv();
   const ids=[...bk.map(x=>x.id),...bl.map(x=>x.id)];
   nid=ids.length?Math.max(...ids)+1:10;
 }
@@ -1001,7 +1169,6 @@ function openGM(){
   document.getElementById("gm-lv").style.display="block";
   document.getElementById("gm-pv").style.display="none";
   renderGM();
-  document.getElementById("ov-gm").classList.add("sh");
 }
 function buildGuests(){
   const map={};
@@ -1091,7 +1258,7 @@ function gmBack(){
 // EXPORT / IMPORT
 let pendingImport=null;
 function doExport(){
-  const data={bt_b:bk,bt_bl:bl};
+  const data={bt_b:bk,bt_bl:bl,bt_p:prof};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
   const url=URL.createObjectURL(blob);
   const a=document.createElement("a");a.href=url;a.download="booking-tracker-backup.json";
@@ -1118,7 +1285,8 @@ function readImport(input){
     }
     pendingImport=data;
     imperr.style.display="none";
-    document.getElementById("impsummary").textContent="Found "+data.bt_b.length+" booking"+(data.bt_b.length!==1?"s":"")+" and "+data.bt_bl.length+" block"+(data.bt_bl.length!==1?"s":"")+".";
+    const profTxt=data.bt_p&&!Array.isArray(data.bt_p)?" Property profile included.":"";
+    document.getElementById("impsummary").textContent="Found "+data.bt_b.length+" booking"+(data.bt_b.length!==1?"s":"")+" and "+data.bt_bl.length+" block"+(data.bt_bl.length!==1?"s":"")+"."+profTxt;
     impok.style.display="block";impconfbtn.style.display="block";
     document.getElementById("ov-imp").classList.add("sh");
   };
@@ -1126,10 +1294,13 @@ function readImport(input){
 }
 function confirmImport(){
   if(!pendingImport)return;
-  bk=pendingImport.bt_b;bl=pendingImport.bt_bl;
+  bk=pendingImport.bt_b;
+  bl=pendingImport.bt_bl;
+  if(pendingImport.bt_p&&!Array.isArray(pendingImport.bt_p)&&typeof pendingImport.bt_p==="object")prof=pendingImport.bt_p;
+  else prof={};
   const ids=[...bk.map(x=>x.id),...bl.map(x=>x.id)];
   nid=ids.length?Math.max(...ids)+1:1;
-  sv();cAll();renderCal();active=null;
+  sv();svP();cAll();renderCal();updateHeader();active=null;
   document.getElementById("dpanel").innerHTML='<div class="ph">✅ Backup restored — '+bk.length+' booking'+(bk.length!==1?'s':'')+(bl.length?' and '+bl.length+' block'+(bl.length!==1?'s':''):'')+' loaded.</div>';
   pendingImport=null;
 }
@@ -1163,6 +1334,114 @@ function openBell(){
 
 // WHAT'S NEW
 function openWN(){document.getElementById("ov-wn").classList.add("sh");}
+
+// UPDATE HEADER
+function updateHeader(){
+  const n=prof.name?"Booking Tracker — "+prof.name:"Booking Tracker";
+  document.getElementById("hpname").textContent=n;
+}
+
+// TAB SYSTEM
+function showTab(tab){
+  ['home','guests','reports','more'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display=t===tab?'block':'none';
+    document.getElementById('bnt-'+t).classList.toggle('act',t===tab);
+  });
+  if(tab==='guests'){openGM();}
+}
+
+// PROPERTY PROFILE
+function openProf(){
+  document.getElementById("pr-name").value=prof.name||"";
+  document.getElementById("pr-addr").value=prof.addr||"";
+  document.getElementById("pr-type").value=prof.type||"";
+  document.getElementById("pr-bed").value=prof.bed||"";
+  document.getElementById("pr-bath").value=prof.bath||"";
+  document.getElementById("pr-occ").value=prof.occ||"";
+  document.getElementById("pr-ci").value=prof.ci||"14:00";
+  document.getElementById("pr-co").value=prof.co||"12:00";
+  const eciTog=prof.eciAllow||false;
+  document.getElementById("pr-eci-tog").checked=eciTog;
+  document.getElementById("pr-eci-fee").style.display=eciTog?"block":"none";
+  document.getElementById("pr-eci-val").value=prof.eciFee||"";
+  const lcoTog=prof.lcoAllow||false;
+  document.getElementById("pr-lco-tog").checked=lcoTog;
+  document.getElementById("pr-lco-fee").style.display=lcoTog?"block":"none";
+  document.getElementById("pr-lco-val").value=prof.lcoFee||"";
+  document.getElementById("pr-pm-gc").checked=prof.pmGC!==false;
+  document.getElementById("pr-pm-my").checked=prof.pmMy||false;
+  document.getElementById("pr-pm-bt").checked=prof.pmBt||false;
+  document.getElementById("pr-pm-cs").checked=prof.pmCs||false;
+  document.getElementById("pr-fp-tog").checked=prof.fullPay||false;
+  document.getElementById("pr-dp").value=prof.dpPct||"";
+  document.getElementById("pr-exp").value=prof.expHrs||"";
+  document.getElementById("pr-min").value=prof.minNights||"";
+  document.getElementById("pr-no-smoke").checked=prof.noSmoke||false;
+  document.getElementById("pr-no-pets").checked=prof.noPets||false;
+  document.getElementById("pr-no-party").checked=prof.noParty||false;
+  document.getElementById("pr-rule").value=prof.customRule||"";
+  document.getElementById("pr-hname").value=prof.hostName||"";
+  document.getElementById("pr-hmob").value=prof.hostMob||"";
+  document.getElementById("pr-gcash").value=prof.gcash||"";
+  document.getElementById("prof-saved").style.display="none";
+  document.getElementById("ov-prof").classList.add("sh");
+}
+function saveProf(){
+  const wasNew=!prof.name;
+  prof={
+    name:document.getElementById("pr-name").value.trim(),
+    addr:document.getElementById("pr-addr").value.trim(),
+    type:document.getElementById("pr-type").value,
+    bed:document.getElementById("pr-bed").value,
+    bath:document.getElementById("pr-bath").value,
+    occ:document.getElementById("pr-occ").value,
+    ci:document.getElementById("pr-ci").value,
+    co:document.getElementById("pr-co").value,
+    eciAllow:document.getElementById("pr-eci-tog").checked,
+    eciFee:document.getElementById("pr-eci-val").value,
+    lcoAllow:document.getElementById("pr-lco-tog").checked,
+    lcoFee:document.getElementById("pr-lco-val").value,
+    pmGC:document.getElementById("pr-pm-gc").checked,
+    pmMy:document.getElementById("pr-pm-my").checked,
+    pmBt:document.getElementById("pr-pm-bt").checked,
+    pmCs:document.getElementById("pr-pm-cs").checked,
+    fullPay:document.getElementById("pr-fp-tog").checked,
+    dpPct:document.getElementById("pr-dp").value,
+    expHrs:document.getElementById("pr-exp").value,
+    minNights:document.getElementById("pr-min").value,
+    noSmoke:document.getElementById("pr-no-smoke").checked,
+    noPets:document.getElementById("pr-no-pets").checked,
+    noParty:document.getElementById("pr-no-party").checked,
+    customRule:document.getElementById("pr-rule").value.trim(),
+    hostName:document.getElementById("pr-hname").value.trim(),
+    hostMob:document.getElementById("pr-hmob").value.trim(),
+    gcash:document.getElementById("pr-gcash").value.trim()
+  };
+  svP();
+  updateHeader();
+  if(wasNew&&prof.name)sessionStorage.setItem('bt_setup_done','1');
+  const saved=document.getElementById("prof-saved");
+  saved.style.display="block";
+  setTimeout(()=>{saved.style.display="none";cOv('ov-prof');},2000);
+}
+
+// IMPORTANT NOTICES (shell — logic built in branch 3)
+function openNotices(){
+  document.getElementById("ov-notices").classList.add("sh");
+}
+
+// FIRST-TIME WELCOME
+function showWelcome(){
+  if(prof.name||sessionStorage.getItem('bt_setup_done'))return;
+  const ov=document.getElementById("ov-welcome");
+  ov.classList.add("sh");
+  requestAnimationFrame(()=>ov.classList.add("vis"));
+}
+function closeWelcome(){
+  const ov=document.getElementById("ov-welcome");
+  ov.classList.remove("vis");
+  setTimeout(()=>{ov.classList.remove("sh");},350);
+}
 </script>
 </body>
 </html>
