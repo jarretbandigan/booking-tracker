@@ -822,6 +822,7 @@ function updOcc(){
 
 // CALENDAR
 function renderCal(){
+  if(bk.some(b=>b.type==="pencil"))checkPencilExpiry();
   updOcc();
   document.getElementById("mlbl").textContent=MN[cm]+" "+cy;
   const cal=document.getElementById("cal");cal.innerHTML="";
