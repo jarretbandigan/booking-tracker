@@ -201,6 +201,31 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
 .bel-row{background:#fafafa;border:1px solid #e8e8e8;border-radius:6px;padding:8px 10px;margin-bottom:4px;font-size:12px;cursor:pointer}
 .bel-row:hover{border-color:#2D5F0F}
 .bel-none{font-size:12px;color:#aaa;padding:4px 0}
+/* v1.5.0-pencil */
+.dy.pcl{background:#FEFCE8;cursor:pointer;border:2px dotted #FDE047;box-shadow:0 2px 4px rgba(0,0,0,0.10),0 1px 2px rgba(0,0,0,0.06)}
+.dy.pcl .dn2{color:#713F12;font-weight:700}
+.pcl-more{position:absolute;bottom:2px;left:2px;background:#78716C;color:#fff;font-size:7px;font-weight:700;border-radius:3px;padding:0 4px;line-height:14px;cursor:pointer;z-index:4}
+.pcl-panel{position:fixed;bottom:56px;left:0;right:0;background:#fff;border-top:2px solid #FDE047;border-radius:12px 12px 0 0;z-index:90;max-height:60vh;overflow-y:auto;padding:14px;box-shadow:0 -4px 16px rgba(0,0,0,0.12);display:none}
+.pcl-panel.sh{display:block}
+.pcl-panel-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.pcl-panel-hd h3{font-size:14px;font-weight:700}
+.pcl-close{background:#f0f0f0;border:1px solid #ddd;border-radius:5px;padding:4px 9px;font-size:12px;cursor:pointer;font-weight:600}
+.pcl-entry{background:#FEFCE8;border:1px solid #FDE047;border-radius:7px;padding:10px 11px;margin-bottom:7px}
+.pcl-entry-nm{font-weight:700;font-size:13px;margin-bottom:3px}
+.pcl-entry-dt{font-size:11px;color:#713F12;margin-bottom:4px}
+.pcl-entry-inf{font-size:11px;color:#888;margin-bottom:6px}
+.pcl-entry-act{display:flex;gap:6px}
+.pcl-lbl{display:inline-block;background:#FDE047;color:#713F12;font-size:10px;font-weight:700;border-radius:3px;padding:1px 5px;margin-bottom:4px}
+#toast-expiry{position:fixed;bottom:64px;left:16px;right:16px;background:#1F2937;color:#fff;border-radius:10px;padding:12px 16px;display:none;z-index:100;box-shadow:0 4px 12px rgba(0,0,0,0.25)}
+.toast-msg{font-size:13px;margin-bottom:8px}
+.toast-btns{display:flex;gap:8px}
+.toast-btn{padding:6px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none}
+.toast-view{background:#fff;color:#1F2937}
+.toast-dism{background:rgba(255,255,255,0.15);color:#fff}
+.pcl-bdg{background:#FEF9C3;color:#713F12;border:1px solid #FDE047;font-size:10px;font-weight:700;border-radius:3px;padding:1px 5px;margin-left:5px}
+.lf-chips{display:flex;gap:5px;margin-bottom:7px;flex-wrap:wrap}
+.lf-chip{padding:3px 9px;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid #ddd;background:#fff;color:#555}
+.lf-chip.act{background:#2D5F0F;border-color:#2D5F0F;color:#fff}
 /* v1.5.0 — Navigation + Profile */
 #hpname{font-size:15px;font-weight:700;color:#fff}
 .hbi{padding:6px 8px;font-size:16px}
@@ -268,6 +293,7 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
       <div class="ot"><div class="of2" id="ofill" style="width:0%"></div></div>
       <span class="op" id="opct">0%</span>
       <span class="om" id="omonth"></span>
+      <div id="otent" style="width:100%;font-size:11px;color:#9CA3AF;margin-top:3px;display:none"></div>
     </div>
     <div class="tp">
       <div class="mn">
@@ -286,6 +312,7 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
         <div class="lgnd-row">
           <div class="lgi"><div class="ld" style="background:#FFFFFF;border:1px solid #D1D5DB;box-shadow:0 1px 2px rgba(0,0,0,0.08)"></div>Free</div>
           <div class="lgi"><div class="ld" style="background:#DBEAFE;border:1px solid #93C5FD"></div>Booked</div>
+          <div class="lgi"><div class="ld" style="background:#FEFCE8;border:2px dotted #FDE047"></div>Pencil hold</div>
           <div class="lgi"><div class="ld" style="background:#FEF9C3;border:1px solid #FDE047"></div>Unpaid/pending</div>
           <div class="lgi"><div class="ld" style="background:#DCFCE7;border:1px solid #86EFAC;box-shadow:inset 0 1px 2px rgba(0,0,0,0.07)"></div>Past stay</div>
           <div class="lgi"><div class="ld" style="background:#4ADE80;border:2px solid #1D4ED8;box-shadow:0 0 0 2px rgba(29,78,216,0.18)"></div>Guest here today</div>
@@ -371,6 +398,13 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
 <div class="ov" id="ov-add"><div class="md">
   <h3>Add booking</h3>
   <div id="apre" class="pn3" style="display:none"></div>
+  <div class="fr" style="margin-bottom:10px">
+    <label>Booking type</label>
+    <div style="display:flex;gap:6px">
+      <button type="button" id="atype-conf" class="tbtn tcl dn3" onclick="setAType('confirmed')" style="flex:1;min-width:0">Confirmed</button>
+      <button type="button" id="atype-pcl" class="tbtn tcl" onclick="setAType('pencil')" style="flex:1;min-width:0">✏️ Pencil</button>
+    </div>
+  </div>
   <div class="fr"><label>Guest name</label><input id="an" placeholder="e.g. Maria Santos"/></div>
   <div class="f2"><div><label>Mobile</label><input id="am" placeholder="+63 9XX XXX XXXX"/></div><div><label>Email (optional)</label><input id="ae" placeholder="guest@email.com"/></div></div>
   <div class="f2"><div><label>Check-in</label><input type="date" id="aci" onchange="document.getElementById('aco').min=aD(this.value,1)"/></div><div><label>Check-out</label><input type="date" id="aco"/></div></div>
@@ -384,10 +418,12 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
     <div class="ti"><label>Early check-out</label><input type="time" id="acoe"/></div>
   </div>
   <div class="fr"><label>Platform</label><select id="apl"><option>Airbnb</option><option>Agoda</option><option>Booking.com</option><option>Facebook</option><option>Direct</option></select></div>
-  <div class="sl">Payment</div>
-  <div class="f2">
-    <div><label>Status</label><select id="apy"><option value="full">Fully paid</option><option value="partial">Partially paid</option><option value="none" selected>No payment yet</option></select></div>
-    <div><label>Method</label><select id="ame"><option value="">— select —</option><option>GCash</option><option>Maya</option><option>Via app</option><option>Bank transfer</option><option>Cash</option><option>Pending</option></select></div>
+  <div id="apay-sec">
+    <div class="sl">Payment</div>
+    <div class="f2">
+      <div><label>Status</label><select id="apy" onchange="toggleAddMethod()"><option value="full">Fully paid</option><option value="partial">Partially paid</option><option value="none" selected>No payment yet</option></select></div>
+      <div id="ame-row"><label>Method</label><select id="ame"><option value="">— select —</option><option>GCash</option><option>Maya</option><option>Via app</option><option>Bank transfer</option><option>Cash</option></select></div>
+    </div>
   </div>
   <div class="fr"><label>Notes</label><input id="ano" placeholder="Special requests…"/></div>
   <div id="aerr" class="er" style="display:none"></div>
@@ -462,6 +498,11 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
 <!-- ALL BOOKINGS -->
 <div class="ov" id="ov-li"><div class="md lm">
   <h3>All Bookings</h3>
+  <div class="lf-chips">
+    <span class="lf-chip act" data-lf="all" onclick="lFilt(this)">All</span>
+    <span class="lf-chip" data-lf="conf" onclick="lFilt(this)">Confirmed</span>
+    <span class="lf-chip" data-lf="pcl" onclick="lFilt(this)">✏️ Pencil</span>
+  </div>
   <div class="ls2">
     <input id="lsq" placeholder="Search name, platform, mobile…" oninput="renderList()"/>
     <select id="lss" onchange="renderList()">
@@ -599,6 +640,57 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
   <div class="mbb"><button class="bxx" onclick="cOv('ov-prof')">Cancel</button><button class="bsv" onclick="saveProf()">Save settings</button></div>
 </div></div>
 
+<!-- PENCIL BOOKINGS PANEL -->
+<div id="pcl-panel" class="pcl-panel">
+  <div class="pcl-panel-hd">
+    <h3 id="pcl-panel-title">Pencil bookings</h3>
+    <button class="pcl-close" onclick="closePclPanel()">Close</button>
+  </div>
+  <div id="pcl-list"></div>
+</div>
+
+<!-- PENCIL CONFIRM -->
+<div class="ov" id="ov-pcl-conf"><div class="md cm">
+  <h3 id="pcl-conf-title">Confirm booking</h3>
+  <div class="sl">Payment</div>
+  <div class="fr"><label>Status</label>
+    <select id="pcc-py" onchange="togglePclMethod()">
+      <option value="full">Fully paid</option>
+      <option id="pcc-py-part" value="partial">Partially paid</option>
+      <option value="none" selected>Not paid</option>
+    </select>
+  </div>
+  <div class="fr" id="pcc-me-row" style="display:none"><label>Method</label>
+    <select id="pcc-me"><option value="">— select —</option><option>GCash</option><option>Maya</option><option>Via app</option><option>Bank transfer</option><option>Cash</option></select>
+  </div>
+  <div id="pcl-conf-err" class="er" style="display:none"></div>
+  <div class="mbb"><button class="bxx" onclick="cOv('ov-pcl-conf')">Back</button><button class="bsv" onclick="confirmPcl()">Confirm booking</button></div>
+</div></div>
+
+<!-- DISPLACED PENCIL GUESTS -->
+<div class="ov" id="ov-displaced"><div class="md cm">
+  <h3 id="disp-title">Pencil bookings will be cancelled</h3>
+  <p style="font-size:12px;color:#555;margin-bottom:10px" id="disp-msg">Please contact these guests:</p>
+  <div id="disp-list" style="margin-bottom:12px;display:flex;flex-direction:column;gap:5px;max-height:200px;overflow-y:auto"></div>
+  <div class="mbb" id="disp-btns"></div>
+</div></div>
+
+<!-- EXPIRY DETAILS -->
+<div class="ov" id="ov-expiry"><div class="md cm">
+  <h3>Expired Pencil Bookings</h3>
+  <div id="expiry-list" style="display:flex;flex-direction:column;gap:5px;max-height:260px;overflow-y:auto;margin-bottom:11px"></div>
+  <div class="mbb"><button class="bxx" style="flex:1" onclick="cOv('ov-expiry')">Close</button></div>
+</div></div>
+
+<!-- EXPIRY TOAST -->
+<div id="toast-expiry">
+  <div class="toast-msg" id="toast-msg"></div>
+  <div class="toast-btns">
+    <button class="toast-btn toast-view" onclick="openExpiryDetails()">View Details</button>
+    <button class="toast-btn toast-dism" onclick="document.getElementById('toast-expiry').style.display='none'">Dismiss</button>
+  </div>
+</div>
+
 <!-- FIRST-TIME WELCOME -->
 <div id="ov-welcome">
   <div class="wlc-md">
@@ -617,11 +709,14 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
 const CU="admin";
 const CH="fba447b7c72af7dbd2482b4bc07352abbb8292df3b28956d91692e65eaafde2e";
 let pend=null,pendOver=null,pfcl=null,active=null;
+let expiryTimer=null,pclConfId=null,pclDispAction=null,pclExpired=[],listFilter='all',aType='confirmed';
+let dispOnConfirm=null,dispOnCancel=null;
+let bh=[];
 async function h256(s){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,"0")).join("");}
 async function doLogin(){
   const u=document.getElementById("lu").value.trim(),p=document.getElementById("lp").value;
   const h=await h256(p);
-  if(u===CU&&h===CH){document.getElementById("ls").style.display="none";document.getElementById("as").style.display="block";document.getElementById("lerr").style.display="none";loadData();updateHeader();if(!prof.name)setTimeout(showWelcome,500);renderCal();}
+  if(u===CU&&h===CH){document.getElementById("ls").style.display="none";document.getElementById("as").style.display="block";document.getElementById("lerr").style.display="none";loadData();updateHeader();if(!prof.name)setTimeout(showWelcome,500);renderCal();checkPencilExpiry();scheduleMidnightCheck();}
   else{document.getElementById("lerr").style.display="block";document.getElementById("lp").value="";}
 }
 function doLogout(){document.getElementById("as").style.display="none";document.getElementById("ls").style.display="flex";document.getElementById("lu").value="";document.getElementById("lp").value="";cAll();showTab('home');}
@@ -649,6 +744,13 @@ function svP(){
     document.getElementById("sverr").style.display="block";
   }
 }
+function svH(){
+  try{
+    localStorage.setItem("bt_bh",JSON.stringify(bh));
+  }catch(e){
+    document.getElementById("sverr").style.display="block";
+  }
+}
 function loadData(){
   try{
     const b=localStorage.getItem("bt_b"),l=localStorage.getItem("bt_bl");
@@ -656,7 +758,8 @@ function loadData(){
     bl=l?JSON.parse(l):[];
     const p=localStorage.getItem("bt_p");prof=p?JSON.parse(p):{};
     const bell=localStorage.getItem("bt_bell");bellTs=bell?parseInt(bell):0;
-  }catch(e){bk=[];bl=[];prof={};bellTs=0;}
+    const h=localStorage.getItem("bt_bh");bh=h?JSON.parse(h):[];
+  }catch(e){bk=[];bl=[];prof={};bellTs=0;bh=[];}
   // Migration: add type field, normalise Pending payment method
   let migrated=false;
   bk.forEach(b=>{
@@ -671,9 +774,10 @@ function loadData(){
 function f12(t){if(!t)return null;const[h,m]=t.split(":").map(Number);const ap=h>=12?"PM":"AM";const h12=h%12||12;return h12+":"+(m<10?"0"+m:m)+" "+ap;}
 function dR(ci,co){const d=[],c=new Date(ci),e=new Date(co);while(c<e){d.push(c.toISOString().slice(0,10));c.setDate(c.getDate()+1);}return d;}
 function aD(ds,n){const d=new Date(ds);d.setDate(d.getDate()+n);return d.toISOString().slice(0,10);}
-function gB(ds,ex){return bk.find(b=>b.id!==ex&&dR(b.ci,b.co).includes(ds));}
-function gCI(ds){return bk.find(b=>b.ci===ds);}
-function gCO(ds){return bk.find(b=>b.co===ds);}
+function gB(ds,ex){return bk.find(b=>b.id!==ex&&isConf(b)&&dR(b.ci,b.co).includes(ds));}
+function gBAny(ds,ex){return bk.find(b=>b.id!==ex&&dR(b.ci,b.co).includes(ds));}
+function gCI(ds){return bk.find(b=>isConf(b)&&b.ci===ds);}
+function gCO(ds){return bk.find(b=>isConf(b)&&b.co===ds);}
 function gBl(ds){return bl.find(b=>dR(b.from,aD(b.to,1)).includes(ds));}
 function cG(n){return bk.filter(b=>b.name.toLowerCase()===n.toLowerCase()).length;}
 function pC(p){return({Airbnb:"ba",Agoda:"bg",["Booking.com"]:"bb",Facebook:"bf",Direct:"bd"}[p]||"bd");}
@@ -687,6 +791,12 @@ function cOv(id){document.getElementById(id).classList.remove("sh");}
 function isUnpaid(b){return b.pay==="none"||b.pay==="partial"||b.method==="Pending";}
 function payChipClass(b){if(b.method==="Pending")return"cpd";if(b.pay==="none")return"cpn";if(b.pay==="partial")return"cpp";return"cpf";}
 function dirClass(ds,b){return ds===b.ci?"cid":"cmd";}
+function isPencil(b){return b.type==="pencil";}
+function isConf(b){return b.type==="confirmed";}
+function getPclOn(ds){return bk.filter(b=>isPencil(b)&&dR(b.ci,b.co).includes(ds));}
+function getConfOn(ds){return bk.find(b=>isConf(b)&&(dR(b.ci,b.co).includes(ds)||b.co===ds));}
+function pclOnRange(ci,co){const days=dR(ci,co);return bk.filter(b=>isPencil(b)&&days.some(d=>dR(b.ci,b.co).includes(d)));}
+function archivePcl(b,reason){bh.push(Object.assign({},b,{cancelReason:reason}));svH();}
 let hvTimer;
 function hvOn(sel){clearTimeout(hvTimer);const c=document.getElementById("cal");c.classList.add("hv-active");c.querySelectorAll(".hv-on").forEach(t=>t.classList.remove("hv-on"));c.querySelectorAll(sel).forEach(t=>{t.classList.add("hv-on");if(t.classList.contains("tr-top")||t.classList.contains("tr-bot"))t.parentElement.classList.add("hv-on");});}
 function hvOff(){hvTimer=setTimeout(()=>{const c=document.getElementById("cal");c.classList.remove("hv-active");c.querySelectorAll(".hv-on").forEach(t=>t.classList.remove("hv-on"));},60);}
@@ -700,10 +810,19 @@ function updOcc(){
   document.getElementById("opct").textContent=pct+"%";
   document.getElementById("ofill").style.width=pct+"%";
   document.getElementById("omonth").textContent=MN[cm]+" "+cy;
+  let tentDays=0;
+  for(let d=1;d<=dim;d++){
+    const ds=cy+"-"+String(cm+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
+    if(!gB(ds,null)&&!gCO(ds)&&!gBl(ds)&&getPclOn(ds).length>0)tentDays++;
+  }
+  const otent=document.getElementById("otent");
+  if(tentDays>0){otent.textContent="+ "+tentDays+" tentative day"+(tentDays!==1?"s":"")+" from pencil bookings";otent.style.display="block";}
+  else{otent.style.display="none";}
 }
 
 // CALENDAR
 function renderCal(){
+  if(bk.some(b=>b.type==="pencil"))checkPencilExpiry();
   updOcc();
   document.getElementById("mlbl").textContent=MN[cm]+" "+cy;
   const cal=document.getElementById("cal");cal.innerHTML="";
@@ -807,10 +926,33 @@ function renderCal(){
       addHv(el,book.id,false);
 
     } else {
-      // EMPTY
-      if(isPast){
+      const pclList=getPclOn(ds);
+      if(pclList.length>0){
+        // PENCIL TILE
+        el.className="dy pcl"+(isTd?" td":"");
+        el.appendChild(num());
+        if(isTd)el.appendChild(mkP("tp2","TODAY"));
+        const shown=pclList.slice(0,2);
+        shown.forEach(pb=>{
+          const chip=document.createElement("span");
+          chip.className="ch cpd "+dirClass(ds,pb);
+          chip.textContent=(pb.ci===ds?"↑ ":"")+pb.name.split(" ")[0];
+          chip.dataset.bid=pb.id;
+          if(!noHover){chip.addEventListener("mouseenter",()=>hvOn("[data-bid='"+pb.id+"']"));chip.addEventListener("mouseleave",hvOff);}
+          el.appendChild(chip);
+        });
+        if(pclList.length>2){
+          const more=document.createElement("span");
+          more.className="pcl-more";
+          more.textContent="+"+( pclList.length-2)+" more";
+          el.appendChild(more);
+        }
+        el.onclick=()=>openPclPanel(ds);
+      } else if(isPast){
+        // PAST EMPTY
         el.className="dy pm";el.appendChild(num());
       } else {
+        // AVAILABLE
         el.className="dy av"+(isTd?" td":"");el.appendChild(num());
         if(isTd)el.appendChild(mkP("tp2","TODAY"));
         const h=document.createElement("div");h.className="ah2";h.textContent="+ book";el.appendChild(h);
@@ -907,13 +1049,15 @@ function chgM(d){cm+=d;if(cm>11){cm=0;cy++;}if(cm<0){cm=11;cy--;}renderCal();}
 
 // ADD
 function openAdd(pre){
+  setAType('confirmed');
   ["an","am","ae","ano"].forEach(id=>document.getElementById(id).value="");
   const ci=pre||TD,co=pre?aD(pre,1):TD;
   document.getElementById("aci").value=ci;document.getElementById("aci").min=TD;
   document.getElementById("aco").value=co;document.getElementById("aco").min=aD(ci,1);
-  document.getElementById("acis").value="14:00";document.getElementById("acos").value="12:00";
+  document.getElementById("acis").value=prof.ci||"14:00";document.getElementById("acos").value=prof.co||"12:00";
   ["acie","acil","acoe","acol"].forEach(id=>document.getElementById(id).value="");
   document.getElementById("apy").value="none";document.getElementById("ame").value="";
+  document.getElementById("ame-row").style.display="none";
   document.getElementById("aerr").style.display="none";
   const pn=document.getElementById("apre");
   if(pre){pn.textContent="📅 Check-in pre-filled for "+pre;pn.style.display="block";}else pn.style.display="none";
@@ -925,16 +1069,31 @@ function saveAdd(){
   const err=document.getElementById("aerr");
   if(!name||!ci||!co){err.textContent="Please fill in guest name and both dates.";err.style.display="block";return;}
   if(co<=ci){err.textContent="Check-out must be after check-in.";err.style.display="block";return;}
-  const b={id:nid++,name,mobile:document.getElementById("am").value.trim(),email:document.getElementById("ae").value.trim(),
-    ci,co,ciS:document.getElementById("acis").value,coS:document.getElementById("acos").value,
-    ciE:document.getElementById("acie").value,ciL:document.getElementById("acil").value,
-    coE:document.getElementById("acoe").value,coL:document.getElementById("acol").value,
-    platform:document.getElementById("apl").value,pay:document.getElementById("apy").value,
-    method:document.getElementById("ame").value,notes:document.getElementById("ano").value.trim(),
-    cd:false,ur:false,at:TD};
-  const conf=dR(ci,co).find(ds=>gB(ds,null)||gBl(ds));
+  const mobile=document.getElementById("am").value.trim(),email=document.getElementById("ae").value.trim();
+  const platform=document.getElementById("apl").value,notes=document.getElementById("ano").value.trim();
+  const ciS=document.getElementById("acis").value,coS=document.getElementById("acos").value;
+  const ciE=document.getElementById("acie").value,ciL=document.getElementById("acil").value;
+  const coE=document.getElementById("acoe").value,coL=document.getElementById("acol").value;
+  if(aType==="pencil"){
+    // Hard block: overlap with confirmed booking
+    const confConflict=dR(ci,co).find(d=>getConfOn(d));
+    if(confConflict){err.textContent="Conflict — a confirmed booking covers these dates.";err.style.display="block";return;}
+    // Hard block: overlap with maintenance block
+    const blConflict=dR(ci,co).find(d=>gBl(d));
+    if(blConflict){err.textContent="Conflict — a maintenance block covers these dates.";err.style.display="block";return;}
+    // Multiple pencil bookings on same dates: allowed
+    const b={id:nid++,name,mobile,email,ci,co,ciS,coS,ciE:"",ciL:"",coE:"",coL:"",platform,pay:"none",method:"",notes,cd:false,ur:false,at:TD,type:"pencil"};
+    commitBk(b);
+    return;
+  }
+  // Confirmed path
+  const b={id:nid++,name,mobile,email,ci,co,ciS,coS,ciE,ciL,coE,coL,platform,
+    pay:document.getElementById("apy").value,method:document.getElementById("ame").value,
+    notes,cd:false,ur:false,at:TD,type:"confirmed"};
+  // Only check confirmed bookings and blocks (pencil overlaps handled below)
+  const conf=dR(ci,co).find(ds=>getConfOn(ds)||gBl(ds));
   if(conf){
-    const conflictBook=gB(conf,null);
+    const conflictBook=getConfOn(conf);
     if(conflictBook&&isUnpaid(conflictBook)){
       pendOver=conflictBook;pend=b;
       cAll();
@@ -942,7 +1101,25 @@ function saveAdd(){
       document.getElementById("ow-msg").innerHTML=`There is currently an unpaid or pending booking for these dates. Booker: <strong>${conflictBook.name}</strong>, ${contact}. Do you want to overwrite this booking?`;
       document.getElementById("ov-ow").classList.add("sh");return;
     }
-    err.textContent="Conflict on "+conf+" — already blocked or booked.";err.style.display="block";return;
+    if(conflictBook){err.textContent="Conflict on "+conf+" — already booked.";err.style.display="block";return;}
+    err.textContent="Conflict on "+conf+" — already blocked.";err.style.display="block";return;
+  }
+  // Check for displaced pencil bookings
+  const displaced=pclOnRange(ci,co);
+  if(displaced.length>0){
+    pend=b;
+    showDisplaced(displaced,"These pencil bookings will be cancelled. Please contact them.",
+      "Cancel pencil bookings and confirm","Go back",
+      ()=>{displaced.forEach(d2=>{archivePcl(d2,"booking_confirmed");bk=bk.filter(x=>x.id!==d2.id);});cOv('ov-displaced');
+        const exCoD=gCO(b.ci);
+        if(exCoD){
+          document.getElementById("twb").innerHTML=`<div class="wb"><strong>↓ ${exCoD.name}</strong> checks out on <strong>${b.ci} at ${f12(eCo(exCoD))}</strong><br><strong>↑ ${b.name}</strong> would check in at <strong>${f12(eCi(b))}</strong><br><br>Cleaner must prepare unit between these times. Confirm this is enough time.</div>`;
+          document.getElementById("twbt").innerHTML=`<button class="bxx" onclick="cOv('ov-tw');pend=null;">Cancel</button><button class="bsv" onclick="commitPend()">Proceed anyway</button>`;
+          document.getElementById("ov-tw").classList.add("sh");
+        } else {commitBk(b);pend=null;}
+      },
+      ()=>{cOv('ov-displaced');pend=null;});
+    return;
   }
   // Soft turnaround warning
   const exCo=gCO(ci);
@@ -1001,7 +1178,7 @@ function saveEdit(){
 // EXTEND
 function openExt(){
   if(!active)return;const b=active;
-  const nd=aD(b.co,1),conf=gB(nd,b.id)||gBl(nd);
+  const nd=aD(b.co,1),conf=(getConfOn(nd)&&getConfOn(nd).id!==b.id)||gBl(nd);
   const body=document.getElementById("exb"),btns=document.getElementById("exbt");
   if(conf){
     body.innerHTML=`<div class="er">Cannot extend — ${nd} is already blocked or booked.</div><p style="font-size:13px;color:#666">Current checkout: <strong>${b.co}</strong></p>`;
@@ -1025,15 +1202,26 @@ function confExt(){
   const b=active,nc=document.getElementById("exd").value;
   const err=document.getElementById("exer");
   if(!nc||nc<=b.co){err.textContent="New checkout must be after "+b.co+".";err.style.display="block";return;}
-  const conf=dR(aD(b.co,1),nc).find(ds=>gB(ds,b.id)||gBl(ds));
+  const conf=dR(aD(b.co,1),nc).find(ds=>(getConfOn(ds)&&getConfOn(ds).id!==b.id)||gBl(ds));
   if(conf){err.textContent="Conflict on "+conf+".";err.style.display="block";return;}
-  const ep=document.getElementById("expy").value==="yes";
-  const em=document.getElementById("exme").value;
-  if(b.pay==="full"&&!ep)b.pay="partial";
-  else if(b.pay==="none"&&ep)b.pay="partial";
-  if(em)b.method=em;
-  b.co=nc;b.cd=false;b.ur=false;
-  sv();cAll();renderCal();showDet(b);
+  const doExtend=()=>{
+    const ep=document.getElementById("expy").value==="yes";
+    const em=document.getElementById("exme").value;
+    if(b.pay==="full"&&!ep)b.pay="partial";
+    else if(b.pay==="none"&&ep)b.pay="partial";
+    if(em)b.method=em;
+    b.co=nc;b.cd=false;b.ur=false;
+    sv();cAll();renderCal();showDet(b);
+  };
+  const extDisplaced=pclOnRange(aD(b.co,1),nc);
+  if(extDisplaced.length>0){
+    showDisplaced(extDisplaced,"These pencil bookings overlap the extended dates. Please contact them.",
+      "Extend anyway","Go back",
+      ()=>{extDisplaced.forEach(d2=>{archivePcl(d2,"booking_confirmed");bk=bk.filter(x=>x.id!==d2.id);});cOv('ov-displaced');doExtend();},
+      ()=>{cOv('ov-displaced');});
+    return;
+  }
+  doExtend();
 }
 
 // CANCEL
@@ -1111,24 +1299,44 @@ function saveMaint(){
   if(!fr||!to){err.textContent="Please select both dates.";err.style.display="block";return;}
   if(to<fr){err.textContent="End date must be on or after start date.";err.style.display="block";return;}
   const eid=parseInt(document.getElementById("ov-mn").dataset.eid||"0");
-  const conf=dR(fr,aD(to,1)).find(ds=>gB(ds,null));
-  if(conf){err.textContent="Conflict on "+conf+" — a guest is booked.";err.style.display="block";return;}
-  if(eid){const b=bl.find(x=>x.id===eid);if(b){b.from=fr;b.to=to;b.reason=re;b.notes=no;}}
-  else bl.push({id:nid++,from:fr,to:to,reason:re,notes:no});
-  delete document.getElementById("ov-mn").dataset.eid;
-  sv();cAll();renderCal();
-  document.getElementById("dpanel").innerHTML=`<div class="ph">Block saved: ${re} · ${fr} to ${to}.</div>`;
+  const conf=dR(fr,aD(to,1)).find(ds=>getConfOn(ds));
+  if(conf){err.textContent="Conflict on "+conf+" — a confirmed guest is booked.";err.style.display="block";return;}
+  const doSaveMaint=()=>{
+    if(eid){const b=bl.find(x=>x.id===eid);if(b){b.from=fr;b.to=to;b.reason=re;b.notes=no;}}
+    else bl.push({id:nid++,from:fr,to:to,reason:re,notes:no});
+    delete document.getElementById("ov-mn").dataset.eid;
+    sv();cAll();renderCal();
+    document.getElementById("dpanel").innerHTML=`<div class="ph">Block saved: ${re} · ${fr} to ${to}.</div>`;
+  };
+  const mDisplaced=pclOnRange(fr,to);
+  if(mDisplaced.length>0){
+    showDisplaced(mDisplaced,"These pencil bookings overlap the blocked dates. Please contact them.",
+      "Block anyway","Go back",
+      ()=>{mDisplaced.forEach(d2=>{archivePcl(d2,"booking_confirmed");bk=bk.filter(x=>x.id!==d2.id);});cOv('ov-displaced');doSaveMaint();},
+      ()=>{cOv('ov-displaced');});
+    return;
+  }
+  doSaveMaint();
 }
 function delBlk(id){bl=bl.filter(b=>b.id!==id);sv();renderCal();document.getElementById("dpanel").innerHTML=`<div class="ph">Block removed.</div>`;}
 
 // ALL BOOKINGS
 function openList(){
   document.getElementById("lsq").value="";document.getElementById("lss").value="dd";
+  listFilter='all';
+  document.querySelectorAll(".lf-chip").forEach(c=>c.classList.toggle("act",c.dataset.lf==="all"));
   renderList();document.getElementById("ov-li").classList.add("sh");
+}
+function lFilt(chip){
+  listFilter=chip.dataset.lf;
+  document.querySelectorAll(".lf-chip").forEach(c=>c.classList.toggle("act",c===chip));
+  renderList();
 }
 function renderList(){
   const q=document.getElementById("lsq").value.toLowerCase(),sort=document.getElementById("lss").value;
   let list=[...bk];
+  if(listFilter==="conf")list=list.filter(b=>b.type==="confirmed"||!b.type);
+  if(listFilter==="pcl")list=list.filter(b=>b.type==="pencil");
   if(q)list=list.filter(b=>b.name.toLowerCase().includes(q)||b.platform.toLowerCase().includes(q)||(b.method||"").toLowerCase().includes(q)||(b.mobile||"").includes(q));
   if(sort==="dd")list.sort((a,b)=>b.at.localeCompare(a.at));
   else if(sort==="da")list.sort((a,b)=>a.at.localeCompare(b.at));
@@ -1138,12 +1346,12 @@ function renderList(){
   const el=document.getElementById("blist");
   if(!list.length){el.innerHTML=`<div class="el">No bookings found.</div>`;return;}
   el.innerHTML=list.map(b=>{
-    const rep=cG(b.name)>1,ni=dR(b.ci,b.co).length,isTurn=!!gCI(b.co);
+    const rep=cG(b.name)>1,ni=dR(b.ci,b.co).length,isTurn=isPencil(b)?false:!!gCI(b.co);
     return`<div class="bc2" onclick="pickBk(${b.id})">
       <div class="bc2t">
-        <div><div class="bc2n">${rep?"⭐ ":""}${b.name}${isTurn?' <span style="color:#E8A020;font-size:10px">⚡</span>':""}</div>
+        <div><div class="bc2n">${rep?"⭐ ":""}${b.name}${isTurn?' <span style="color:#E8A020;font-size:10px">⚡</span>':""}${b.type==="pencil"?'<span class="pcl-bdg">✏️ Pencil</span>':""}</div>
         <div class="bc2d">${b.ci} → ${b.co} · ${ni} night${ni!==1?"s":""}</div></div>
-        <span class="bdg ${pyC(b.pay)}" style="flex-shrink:0">${pyL(b.pay)}</span>
+        ${b.type==="pencil"?'<span class="bdg" style="background:#FEF9C3;color:#713F12;border:1px solid #FDE047;flex-shrink:0">Pencil hold</span>':`<span class="bdg ${pyC(b.pay)}" style="flex-shrink:0">${pyL(b.pay)}</span>`}
       </div>
       <div class="bc2b">
         <span class="bdg ${pC(b.platform)}">${b.platform}</span>
@@ -1156,7 +1364,8 @@ function renderList(){
 function pickBk(id){
   const b=bk.find(x=>x.id===id);if(!b)return;
   cAll();const d=new Date(b.ci);cy=d.getFullYear();cm=d.getMonth();
-  renderCal();showDet(b);
+  renderCal();
+  if(isPencil(b))showPclDet(b);else showDet(b);
 }
 
 // GUESTS
@@ -1257,7 +1466,7 @@ function gmBack(){
 // EXPORT / IMPORT
 let pendingImport=null;
 function doExport(){
-  const data={bt_b:bk,bt_bl:bl,bt_p:prof};
+  const data={bt_b:bk,bt_bl:bl,bt_p:prof,bt_bh:bh};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
   const url=URL.createObjectURL(blob);
   const a=document.createElement("a");a.href=url;a.download="booking-tracker-backup.json";
@@ -1285,7 +1494,8 @@ function readImport(input){
     pendingImport=data;
     imperr.style.display="none";
     const profTxt=data.bt_p&&!Array.isArray(data.bt_p)?" Property profile included.":"";
-    document.getElementById("impsummary").textContent="Found "+data.bt_b.length+" booking"+(data.bt_b.length!==1?"s":"")+" and "+data.bt_bl.length+" block"+(data.bt_bl.length!==1?"s":"")+"."+profTxt;
+    const histTxt=Array.isArray(data.bt_bh)&&data.bt_bh.length?" "+data.bt_bh.length+" booking history record"+(data.bt_bh.length!==1?"s":"")+".":"";
+    document.getElementById("impsummary").textContent="Found "+data.bt_b.length+" booking"+(data.bt_b.length!==1?"s":"")+" and "+data.bt_bl.length+" block"+(data.bt_bl.length!==1?"s":"")+"."+profTxt+histTxt;
     impok.style.display="block";impconfbtn.style.display="block";
     document.getElementById("ov-imp").classList.add("sh");
   };
@@ -1297,9 +1507,10 @@ function confirmImport(){
   bl=pendingImport.bt_bl;
   if(pendingImport.bt_p&&!Array.isArray(pendingImport.bt_p)&&typeof pendingImport.bt_p==="object")prof=pendingImport.bt_p;
   else prof={};
+  if(Array.isArray(pendingImport.bt_bh))bh=pendingImport.bt_bh;else bh=[];
   const ids=[...bk.map(x=>x.id),...bl.map(x=>x.id)];
   nid=ids.length?Math.max(...ids)+1:1;
-  sv();svP();cAll();renderCal();updateHeader();active=null;
+  sv();svP();svH();cAll();renderCal();updateHeader();active=null;
   document.getElementById("dpanel").innerHTML='<div class="ph">✅ Backup restored — '+bk.length+' booking'+(bk.length!==1?'s':'')+(bl.length?' and '+bl.length+' block'+(bl.length!==1?'s':''):'')+' loaded.</div>';
   pendingImport=null;
 }
@@ -1342,6 +1553,7 @@ function updateHeader(){
 
 // TAB SYSTEM
 function showTab(tab){
+  if(bk.some(b=>b.type==="pencil"))checkPencilExpiry();
   ['home','guests','reports','more'].forEach(t=>{
     document.getElementById('tab-'+t).style.display=t===tab?'block':'none';
     document.getElementById('bnt-'+t).classList.toggle('act',t===tab);
@@ -1424,8 +1636,167 @@ function saveProf(){
   setTimeout(()=>{saved.style.display="none";cOv('ov-prof');},2000);
 }
 
-// IMPORTANT NOTICES (shell — logic built in branch 3)
+// PENCIL BOOKING FUNCTIONS
+function setAType(t){
+  aType=t;
+  document.getElementById("atype-conf").classList.toggle("dn3",t==="confirmed");
+  document.getElementById("atype-pcl").classList.toggle("dn3",t==="pencil");
+  document.getElementById("apay-sec").style.display=t==="pencil"?"none":"block";
+}
+function toggleAddMethod(){
+  const v=document.getElementById("apy").value;
+  document.getElementById("ame-row").style.display=(v==="full"||v==="partial")?"block":"none";
+}
+function togglePclMethod(){
+  const v=document.getElementById("pcc-py").value;
+  document.getElementById("pcc-me-row").style.display=(v==="full"||v==="partial")?"block":"none";
+}
+function openPclPanel(ds){
+  const list=getPclOn(ds);
+  document.getElementById("pcl-panel-title").textContent="Pencil bookings for "+ds;
+  document.getElementById("pcl-list").innerHTML=list.map(b=>`
+    <div class="pcl-entry">
+      <div class="pcl-lbl">PENCIL HOLD</div>
+      <div class="pcl-entry-nm">${b.name}</div>
+      <div class="pcl-entry-dt">${b.ci} → ${b.co}</div>
+      <div class="pcl-entry-inf">${[b.mobile,b.email,b.platform].filter(Boolean).join(' · ')}</div>
+      ${b.notes?`<div style="font-size:11px;color:#555;margin-bottom:6px">${b.notes}</div>`:''}
+      <div class="pcl-entry-act">
+        <button class="btn bx" onclick="openPclConf(${b.id})">Confirm booking</button>
+        <button class="btn bc" onclick="cancelPcl(${b.id})">Cancel</button>
+      </div>
+    </div>`).join("");
+  document.getElementById("pcl-panel").classList.add("sh");
+}
+function closePclPanel(){document.getElementById("pcl-panel").classList.remove("sh");}
+function showPclDet(b){
+  if(!b)return;
+  active=b;
+  const cnt=cG(b.name);
+  document.getElementById("dpanel").innerHTML=`
+    <div class="pt">
+      <span class="pcl-lbl" style="font-size:11px">✏️ PENCIL BOOKING</span>
+      ${cnt>1?`<span class="bdg rp" style="margin-left:5px">⭐ ${cnt}× guest</span>`:''}
+    </div>
+    <div class="dr"><span class="dl">Guest</span><span class="dv">${b.name}</span></div>
+    ${b.mobile?`<div class="dr"><span class="dl">Mobile</span><span class="dv">${b.mobile}</span></div>`:''}
+    ${b.email?`<div class="dr"><span class="dl">Email</span><span class="dv">${b.email}</span></div>`:''}
+    <div class="dr"><span class="dl">Check-in</span><span class="dv">${b.ci}${b.ciS?' at '+f12(b.ciS):''}</span></div>
+    <div class="dr"><span class="dl">Check-out</span><span class="dv">${b.co}${b.coS?' at '+f12(b.coS):''}</span></div>
+    <div class="dr"><span class="dl">Nights</span><span class="dv">${dR(b.ci,b.co).length}</span></div>
+    <div class="dr"><span class="dl">Platform</span><span class="dv"><span class="bdg ${pC(b.platform)}">${b.platform}</span></span></div>
+    ${b.notes?`<div class="dr"><span class="dl">Notes</span><span class="dv">${b.notes}</span></div>`:''}
+    <div class="acb">
+      <button class="btn bx" onclick="openPclConf(${b.id})">Confirm this booking</button>
+      <button class="btn bc" onclick="cancelPcl(${b.id})">Cancel pencil booking</button>
+    </div>`;
+}
+function openPclConf(id){
+  pclConfId=id;
+  const b=bk.find(x=>x.id===id);if(!b)return;
+  document.getElementById("pcl-conf-title").textContent="Confirm booking for "+b.name+"?";
+  document.getElementById("pcc-py-part").style.display=prof.fullPay?"none":"";
+  document.getElementById("pcc-py").value="none";
+  document.getElementById("pcc-me-row").style.display="none";
+  document.getElementById("pcc-me").value="";
+  document.getElementById("pcl-conf-err").style.display="none";
+  document.getElementById("ov-pcl-conf").classList.add("sh");
+}
+function confirmPcl(){
+  const b=bk.find(x=>x.id===pclConfId);if(!b)return;
+  const pay=document.getElementById("pcc-py").value;
+  const method=document.getElementById("pcc-me").value;
+  const displaced=pclOnRange(b.ci,b.co).filter(x=>x.id!==b.id);
+  const doConfirm=()=>{
+    b.type="confirmed";b.pay=pay;b.method=method;b.cd=false;b.ur=false;
+    sv();cAll();closePclPanel();renderCal();showDet(b);
+    const prev=gCO(b.ci);if(prev)showTurn(prev,b);
+  };
+  if(displaced.length>0){
+    cOv('ov-pcl-conf');
+    showDisplaced(displaced,"Please contact these guests whose pencil bookings will be cancelled.",
+      "Acknowledge and confirm","Go back",
+      ()=>{displaced.forEach(d2=>{archivePcl(d2,"booking_confirmed");bk=bk.filter(x=>x.id!==d2.id);});cOv('ov-displaced');doConfirm();},
+      ()=>{cOv('ov-displaced');});
+    return;
+  }
+  doConfirm();
+}
+function cancelPcl(id){
+  const b=bk.find(x=>x.id===id);if(!b)return;
+  if(!confirm("Cancel this pencil booking for "+b.name+"?"))return;
+  archivePcl(b,"host_cancelled");
+  bk=bk.filter(x=>x.id!==id);
+  sv();closePclPanel();renderCal();
+  document.getElementById("dpanel").innerHTML='<div class="ph">📅 Pencil booking cancelled.</div>';
+  active=null;
+}
+function showDisplaced(list,msg,confirmLabel,cancelLabel,onConfirm,onCancel){
+  dispOnConfirm=onConfirm;dispOnCancel=onCancel;
+  document.getElementById("disp-msg").textContent=msg;
+  document.getElementById("disp-list").innerHTML=list.map(b=>`
+    <div style="background:#fafafa;border:1px solid #e8e8e8;border-radius:6px;padding:8px 10px;font-size:12px">
+      <strong>${b.name}</strong>${b.mobile?' · '+b.mobile:''}${b.email?'<br>'+b.email:''}
+    </div>`).join("");
+  document.getElementById("disp-btns").innerHTML=`
+    <button class="bxx" onclick="dispOnCancel&&dispOnCancel()">${cancelLabel}</button>
+    <button class="bdl" onclick="dispOnConfirm&&dispOnConfirm()">${confirmLabel}</button>`;
+  document.getElementById("ov-displaced").classList.add("sh");
+}
+function checkPencilExpiry(){
+  const pencils=bk.filter(b=>b.type==="pencil");
+  if(!pencils.length)return;
+  const expiryHrs=prof.pencilExpiryHrs||24;
+  const now=Date.now();
+  const expired=pencils.filter(b=>{
+    const ciDt=new Date(b.ci+"T"+(prof.ci||"14:00")+":00");
+    const expiry=ciDt.getTime()-(expiryHrs*3600000);
+    return now>expiry;
+  });
+  if(!expired.length)return;
+  expired.forEach(b=>{archivePcl(b,"expired");});
+  bk=bk.filter(b=>!(b.type==="pencil"&&expired.find(e=>e.id===b.id)));
+  pclExpired=expired;
+  sv();renderCal();showExpiryToast(expired);
+}
+function showExpiryToast(expired){
+  const msg=expired.length===1
+    ?"Pencil booking expired: "+expired[0].name+", "+expired[0].ci+" → "+expired[0].co
+    :expired.length+" pencil bookings expired";
+  document.getElementById("toast-msg").textContent=msg;
+  document.getElementById("toast-expiry").style.display="block";
+}
+function openExpiryDetails(){
+  document.getElementById("expiry-list").innerHTML=pclExpired.map(b=>`
+    <div style="background:#fafafa;border:1px solid #e8e8e8;border-radius:6px;padding:8px 10px;font-size:12px">
+      <strong>${b.name}</strong> · ${b.ci} → ${b.co}
+      ${b.mobile?'<br>'+b.mobile:''}${b.email?'<br>'+b.email:''}
+    </div>`).join("");
+  document.getElementById("ov-expiry").classList.add("sh");
+}
+function scheduleMidnightCheck(){
+  const now=new Date();
+  const midnight=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1,0,0,5);
+  const ms=midnight.getTime()-now.getTime();
+  expiryTimer=setTimeout(()=>{checkPencilExpiry();scheduleMidnightCheck();},ms);
+}
+
+// IMPORTANT NOTICES
 function openNotices(){
+  // Pencil Holds: only pencil bookings with ci within 48 hours
+  const in48=Date.now()+(48*3600*1000);
+  const nearPcl=bk.filter(b=>b.type==="pencil"&&new Date(b.ci).getTime()<=in48&&b.co>=TD)
+    .sort((a,b2)=>a.ci.localeCompare(b2.ci));
+  const pclHtml=nearPcl.length
+    ?nearPcl.map(b=>`<div class="bel-row" onclick="showPclDet(bk.find(x=>x.id===${b.id}));cOv('ov-notices')">`+
+      `<strong>${b.name}</strong> · ${b.ci} → ${b.co} · ${b.platform}</div>`).join("")
+    :`<div class="bel-none">No pencil holds expiring within 48 hours.</div>`;
+  const body=document.getElementById("notices-body");
+  body.innerHTML=`
+    <div class="bel-sec"><div class="bel-sec-hd">🧹 Cleaner Reminder</div><div class="bel-none">Nothing to show right now.</div></div>
+    <div class="bel-sec"><div class="bel-sec-hd">💸 Payment Attention</div><div class="bel-none">Nothing to show right now.</div></div>
+    <div class="bel-sec"><div class="bel-sec-hd">✏️ Pencil Holds</div>${pclHtml}</div>
+    <div class="bel-sec"><div class="bel-sec-hd">✅ Upcoming Bookings</div><div class="bel-none">Nothing to show right now.</div></div>`;
   document.getElementById("ov-notices").classList.add("sh");
 }
 
