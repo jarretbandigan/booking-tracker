@@ -2,7 +2,7 @@
 
 > This file is read automatically by Claude Code every session.
 > It contains the full context needed to work on this project.
-> Last updated: 2026-05-29 | Version: v1.4.0
+> Last updated: 2026-06-01 | Version: v1.5.0
 
 ---
 
@@ -77,7 +77,7 @@ Booking Tracker is a single-file, browser-based property booking management app 
 ```
 booking-tracker/
 │
-├── index.html      Entire application (1168 lines, ~76KB)
+├── index.html      Entire application (~1860 lines, ~118KB) — v1.5.0
 │                   Contains: HTML structure, all CSS, all JavaScript
 │                   No external dependencies. Works offline.
 │
@@ -138,10 +138,21 @@ index.html
 ```
 bt_b   Bookings array
        Fields: id, name, mobile, email, ci, co, ciS, coS, ciE, ciL,
-               coE, coL, platform, pay, method, notes, cd, ur, at
+               coE, coL, platform, pay, method, notes, cd, ur, at, type
 
 bt_bl  Blocks array
        Fields: id, from, to, reason, notes
+
+bt_p   Profile object
+       Fields: name, addr, type, bed, bath, occ, ci, co, eciAllow, eciFee,
+               lcoAllow, lcoFee, pmGC, pmMy, pmBt, pmCs, fullPay, dpPct,
+               expHrs, minNights, noSmoke, noPets, noParty, customRule,
+               hostName, hostMob, gcash, pencilExpiryHrs, recontact[]
+
+bt_bh  Booking history archive (cancelled/expired pencil bookings)
+       Fields: same as bt_b entries + cancelReason ("host_cancelled" | "booking_confirmed" | "expired")
+
+bt_bell  Bell last-seen timestamp (integer, milliseconds)
 ```
 
 ---
@@ -157,7 +168,7 @@ bt_bl  Blocks array
 - Do not treat this as a secure auth system
 - Session lives in JS memory only, clears on tab close
 
-### 4.2 Full Feature List (all verified working as of v1.4.0)
+### 4.2 Full Feature List (all verified working as of v1.5.0)
 
 **Calendar — Color System + Hover Groups**
 - **15 tile states:** pm (past empty), pbk (past ended booked), pco (past ended checkout), av (available future), av.td (today empty), bk (confirmed future), co (future checkout), yel (unpaid/pending future), yel.td (today unpaid), og.pog (ongoing past days), og.td (ongoing today), og (ongoing future paid), og.og-upd (ongoing future unpaid — ext badge), mn2 (maintenance), tr (turnaround)
@@ -229,22 +240,56 @@ bt_bl  Blocks array
 - Badge and count if guest name appears more than once
 - Red dot on calendar chip
 
-**Guest Masterlist**
-- Full guest list built dynamically from bt_b — no new storage keys
-- Search by name, mobile, or email
-- Filter chip: All / Repeat
-- Guest card shows name, stay count, next/last date, platform badges, payment summary
-- Tap card opens profile: contact info, summary stats, full stay history newest-first
-- Stay history shows dates, nights, platform, payment status, method, and notes per stay
-- "Booking amount field coming in future version" notice in profile
+**Guest Masterlist (v1.5.0 — intelligence update)**
+- Guest list built from both bt_b (live) and bt_bh (history archive)
+- Dedup key: name.toLowerCase()+'|'+mobile — handles same person across bookings
+- Filter chips: All / Confirmed / Pencil Only (hasConfirmed flag distinguishes types)
+- Guest card shows name, stay count (all sources), next/last date, platform badges, payment summary
+- Repeat star shown only for guests with more than 1 confirmed stay
+- Tap card opens profile: contact info with Copy buttons (clipboard), summary stats, full stay history
+- Stay history shows entries from both bk and bh with stayLabel() — Confirmed / Pencil / Cancelled / Expired / Cancelled by host
+- Payment badge shown only for confirmed bk entries; pencil/history entries show label only
 
-**Notification Bell (v1.3.0)**
-- 🔔 Alerts button in header opens 4-section panel
-- Section 1: Cleaner Reminder — nearest upcoming checkout with contact status
-- Section 2: Unpaid Bookings — future bookings with pay=none
-- Section 3: Pending Reservations — future bookings with method=Pending
-- Section 4: Upcoming Confirmed — future fully paid bookings sorted by check-in
-- Each row tappable: closes bell and navigates calendar to that booking
+**Important Notices (v1.5.0 — full rewrite)**
+- 🔔 bell in header opens dynamic notices panel
+- Section 1: Cleaner Reminder — all guests checking out on the nearest future checkout date; today's checkouts use amber pulse (.cu) row
+- Section 2: Pencil Holds Expiring Soon — pencil bookings with ci within 48 hours
+- Section 3: Recently Expired Pencil Bookings — bh entries with cancelReason="expired" in the last 7 days (not tappable)
+- Section 4: Upcoming Confirmed Bookings — fully paid confirmed bookings with ci >= today
+- Section 5/6: Payment sections — conditional on prof.fullPay; if true: one "Awaiting Payment" section; if false/unset: separate "Awaiting Full Payment" and "Partial Payment — Balance Due" sections
+- Re-contact Suggestions — only rendered if prof.recontact has entries; shows displaced pencil guests after a cancellation; auto-cleaned after 7 days via svP()
+- Pencil bookings excluded from all payment sections via isConf() guard
+
+**Pencil Booking Type (v1.5.0)**
+- Soft hold booking type — dotted amber tile (.dy.pcl), no cleaner flow, no payment fields
+- Auto-expiry: pencilExpiryHrs hours before ci (default 24h); expired pencils archived to bt_bh with cancelReason="expired"
+- Midnight check via scheduleMidnightCheck(); also checked on login, tab switch, renderCal
+- Expiry toast with "View Details" link; expiry details modal
+- Pencil panel: multiple pencil holds on same day shown as stacked panel with Confirm/Cancel actions
+- Confirm pencil: converts to confirmed, sets payment, cancels other pencil holds on same dates (displaced flow)
+- Cancel pencil: archived to bt_bh with cancelReason="host_cancelled"
+- Displaced flow: when confirmed booking overlaps pencil holds, all displaced pencils archived with cancelReason="booking_confirmed" and shown to host for contact
+
+**Re-contact Flow (v1.5.0)**
+- execFull() after full cancellation checks bh for displaced pencil guests (booking_confirmed) whose dates overlap the cancelled booking
+- Adds them to prof.recontact[] with storedAt timestamp
+- openNotices() cleans recontact entries older than 7 days on every open
+
+**Bottom Navigation (v1.5.0)**
+- Fixed bottom nav bar (#bnav): Home, Guests, Reports, More
+- showTab() switches tab panes and active button state
+- More tab: All Bookings, Export, Import, What's New, Sign out
+
+**Property Profile / Settings (v1.5.0)**
+- ⚙️ button in header opens full settings modal
+- Sections: Property Details, Check-in/out Times (with early/late fee toggles), Payment Policy, House Rules, Host Contact
+- Saved to bt_p via svP(); loaded on login
+- prof.fullPay controls payment section layout in Important Notices
+- prof.pencilExpiryHrs controls pencil auto-expiry duration
+
+**Notification Bell (v1.3.0 — superseded by Important Notices in v1.5.0)**
+- Legacy openBell() function retained but ov-bell modal marked dormant in HTML
+- openNotices() is the active notices function bound to the 🔔 button
 
 **Data Persistence**
 - All data saved to localStorage after every mutation
@@ -310,10 +355,20 @@ bt_bl  Blocks array
 - Legend redesign: 3 sections (tile color / payment chip / border meaning) with real chip samples
 - Responsive calendar: @media(min-width:768px) expands tiles, font sizes, legend gap, wrapper to 900px
 
-**v1.5.0: Navigation — NEXT**
-- Bottom navigation bar: Home, Guests, Reports, Settings
-- Settings tab absorbs: Export, Import, Clear Demo, What's New, Password
-- Header cleaned up
+**v1.5.0: Navigation + Pencil + Intelligence — Complete**
+- Bottom navigation bar: Home, Guests, Reports, More
+- Property profile/settings modal (⚙️) in header
+- First-time welcome nudge for new users
+- Pencil booking type: soft holds with dotted amber tiles, displaced guest flow, auto-expiry with toast + history archive (bt_bh)
+- All Bookings filter chips: All / Confirmed / Pencil
+- Smart Important Notices: real cleaner reminders (all guests on nearest checkout date), pencil expiry alerts, recently expired archive, upcoming confirmed, payment sections (conditional on fullPay policy), re-contact suggestions
+- Guest intelligence: dedup by name+mobile, Confirmed/Pencil-Only filter chips, full history from bt_b+bt_bh, stayLabel() for all entry types, Copy buttons for mobile/email
+- Cleaner flow excluded from pencil booking detail view
+- Re-contact flow: execFull() populates prof.recontact[] when cancellation frees up dates that displaced pencil holds; 7-day auto-cleanup in openNotices()
+
+**v1.6.0: Reports — NEXT**
+- Monthly income summary (Reports tab)
+- PWA installable on phone home screen
 
 **Phase 1 remaining — PENDING**
 - Monthly income summary (becomes Reports tab in v1.3.0)
@@ -346,6 +401,7 @@ bt_bl  Blocks array
 
 | Version | Date | Summary |
 |---|---|---|
+| v1.5.0 | Jun 2026 | Navigation overhaul — bottom nav bar (Home/Guests/Reports/More), tab system, property profile/settings modal (⚙️), first-time welcome nudge. Pencil booking type — soft holds with dotted amber tiles, displaced guest flow, auto-expiry with toast + history archive (bt_bh), All Bookings filter chips. Smart Important Notices — real cleaner reminders, payment attention, pencil expiry, re-contact suggestions. Guest intelligence — dedup by name+mobile, confirmed/pencil-only filter, full history from bt_b+bt_bh, copy buttons. |
 | v1.4.0 | May 2026 | Calendar UX overhaul — 5 areas, CSS+JS only, zero data changes. Area 1: new color system (white av, blue bk/co, yellow yel, green og spectrum, near-white past, chip colors cpf=#15803D/cpp=#C2410C/cpn=#991B1B/cpd=#4B5563 white text, cfaded opacity 0.5 for past paid). Area 2: hover group highlight — data-bid/data-blid on all tiles, hvOn(sel)/hvOff() 60ms debounce, .hv-on scale 1.03 blue border lift, .hv-active dims non-hovered to 0.45; turnaround outer .dy.tr gets hv-on so full tile lifts (.dy.tr.hv-on overflow:visible unclips shadow). Area 3: ← cont. / cont. → cross-month boundary labels. Area 4: legend redesign 3 sections (tile color, payment chip, border meaning) + italic note. Area 5: @media(min-width:768px) responsive — 900px wrapper, 82px tiles, 14px dn2, 11px chip. 1168 lines. |
 | v1.3.2 | May 2026 | Calendar visual polish. Unified booked+checkout tile to soft blue (#DBEAFE/#EDF4FF) — checkout amber removed, Checkout legend swatch removed. Past date hierarchy: past-empty=#EFEFEF flat, past-booked/checkout=#EDF4FF inset, past-ongoing=.og.pog #DCF0E4; all gray #BBBBBB date nums normal weight. Chips saturated white text: cpf=#1B7E35, cpp=#E65100, cpn=#C62828, cpd=#616161; .cid/.cod de-colored. Date picker min=TD in openAdd(), aci onchange updates aco.min. 1073 lines. |
 | v1.3.1 | May 2026 | Three-channel color system and 3D card depth. Channel 1 bg=type (adds .rsv pending/reserved, light purple). Channel 2 border=time (ongoing green on all days, today blue ring always wins). Channel 3 chip=payment (.cpf/.cpp/.cpn/.cpd replaces .upd dotted border). Past tiles flat/inset, today+future tiles raised. Turnaround shows independent payment chip per guest. Adds payChipClass() and dirClass() helpers. Legend chip mini-row. 1070 lines. |
@@ -354,7 +410,7 @@ bt_bl  Blocks array
 | v1.1.0 | May 2026 | Password removed from source, replaced with pre-computed SHA-256 hash. Silent save failure now shows visible error banner. Export and import JSON backup added with file validation and confirm modal. What's New modal added. |
 | v1.0.0 | May 2026 | MVP complete. Login, calendar, full booking lifecycle, cleaner flow, payment tracking, turnaround detection, localStorage persistence, all bookings list, maintenance blocks, occupancy tracker. 23 checks passing. |
 
-Next release: v1.5.0 (Navigation)
+Next release: v1.6.0 (Reports + PWA)
 
 ---
 

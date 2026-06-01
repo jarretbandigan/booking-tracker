@@ -262,6 +262,8 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
 .wlc-btns{display:flex;flex-direction:column;gap:8px}
 .wlc-primary{background:#2D5F0F;color:#fff;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:700;cursor:pointer}
 .wlc-skip{background:none;border:none;font-size:12px;color:#9CA3AF;cursor:pointer;padding:4px}
+.gm-copy{background:none;border:1px solid #ddd;border-radius:4px;padding:2px 6px;font-size:10px;cursor:pointer;color:#555;margin-left:6px;white-space:nowrap}
+.gm-copy:hover{background:#f5f5f5}
 </style>
 
 <!-- LOGIN -->
@@ -352,7 +354,8 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
         <div class="gm-ctrl"><input id="gmq" placeholder="Search name, mobile, email…" oninput="renderGM()"/></div>
         <div class="gm-chips">
           <span class="gm-chip act" data-f="all" onclick="gmFilt(this)">All</span>
-          <span class="gm-chip" data-f="rep" onclick="gmFilt(this)">⭐ Repeat</span>
+          <span class="gm-chip" data-f="conf" onclick="gmFilt(this)">Confirmed</span>
+          <span class="gm-chip" data-f="pcl" onclick="gmFilt(this)">✏️ Pencil Only</span>
         </div>
         <div class="gm-body" id="gm-list"></div>
       </div>
@@ -964,6 +967,7 @@ function renderCal(){
 }
 
 // TURNAROUND DETAIL
+// gB() and gCI() filter to isConf() — pencil bookings cannot trigger turnaround by construction
 function showTurn(oB,iB){
   active=oB;
   const cot=eCo(oB),cit=eCi(iB),cd=oB.cd,ur=oB.ur;
@@ -1005,6 +1009,8 @@ function showDet(b){
     ?`<div class="cu">⚡ <div><strong>Urgent — same-day turnaround!</strong><br>Contact cleaner immediately. ${nxIn.name} checks in at <strong>${f12(eCi(nxIn))}</strong>${lw}</div></div>`
     :cd?`<div class="rb">🧹 Cleaner confirmed for <strong>${b.co} at ${f12(cot)}</strong>${lw}</div>`
     :`<div class="cb">🧹 <div><strong>Contact cleaner</strong> for checkout on <strong>${b.co} at ${f12(cot)}</strong>${lw}</div></div>`;
+  // Cleaner flow only shown for confirmed bookings (pencil bookings have no cleaner logistics)
+  const showCleaner = b.type === "confirmed" || b.type === undefined;
   document.getElementById("dpanel").innerHTML=`
     <div class="pt">Booking details</div>
     <div class="dr"><span class="dl">Guest</span><strong class="dv">${b.name}</strong></div>
@@ -1017,11 +1023,11 @@ function showDet(b){
     <div class="dr"><span class="dl">Check-in</span><span class="dv">${b.ci} at <strong>${f12(cit)}</strong>${ciX}</span></div>
     <div class="dr"><span class="dl">Check-out</span><span class="dv">${b.co} at <strong>${f12(cot)}</strong>${coX}</span></div>
     ${b.notes?`<div class="dr"><span class="dl">Notes</span><span class="dv">${b.notes}</span></div>`:""}
-    <div class="tt">
+    ${showCleaner?`<div class="tt">
       <button class="tbtn tcl${cd?" dn3":""}" onclick="tapCl()">${cd?"✓ Cleaner contacted":"🧹 Cleaner contacted?"}</button>
       <button class="tbtn trd${ur?" dn3":""}" onclick="tapRd()">${ur?"✓ Unit ready":"✅ Unit ready?"}</button>
     </div>
-    ${clBox}
+    ${clBox}`:""}
     <div class="acb">
       <button class="btn be" onclick="openEdit()">✏️ Edit</button>
       <button class="btn bx" onclick="openExt()">📅 Extend</button>
@@ -1259,6 +1265,27 @@ function execFull(){
   bk=bk.filter(x=>x.id!==b.id);sv();cAll();renderCal();
   document.getElementById("dpanel").innerHTML=`<div class="ph">Booking for ${b.name} cancelled.</div>`;
   active=null;pfcl=null;
+  // Re-contact check: find displaced pencil guests whose dates overlap the cancelled booking
+  const cancelledDays=dR(b.ci,b.co);
+  const displaced=bh.filter(h=>
+    h.cancelReason==="booking_confirmed"&&
+    dR(h.ci,h.co).some(d=>cancelledDays.includes(d))
+  );
+  if(displaced.length>0){
+    if(!prof.recontact)prof.recontact=[];
+    displaced.forEach(h=>{
+      if(!prof.recontact.find(r=>r.bhId===h.id)){
+        prof.recontact.push({
+          bhId:h.id,name:h.name,
+          mobile:h.mobile||"",email:h.email||"",
+          ci:h.ci,co:h.co,
+          cancelledBookingId:b.id,
+          storedAt:Date.now()
+        });
+      }
+    });
+    svP();
+  }
 }
 function confPart(){
   const b=active;
@@ -1380,22 +1407,54 @@ function openGM(){
 }
 function buildGuests(){
   const map={};
-  bk.forEach(b=>{
-    const k=b.name.toLowerCase();
-    if(!map[k])map[k]={name:b.name,mobile:b.mobile||"",email:b.email||"",stays:[],platforms:new Set(),payFull:0,payPart:0,payNone:0};
+  const addEntry=(b,src)=>{
+    const k=b.name.toLowerCase()+'|'+(b.mobile||'');
+    if(!map[k])map[k]={
+      name:b.name,mobile:b.mobile||'',email:b.email||'',
+      stays:[],platforms:new Set(),
+      payFull:0,payPart:0,payNone:0,
+      hasConfirmed:false
+    };
     const g=map[k];
-    g.stays.push(b);g.platforms.add(b.platform);
-    if(b.pay==="full")g.payFull++;else if(b.pay==="partial")g.payPart++;else g.payNone++;
-    if(b.mobile)g.mobile=b.mobile;if(b.email)g.email=b.email;
-  });
+    const entry=Object.assign({},b,{_src:src});
+    g.stays.push(entry);
+    g.platforms.add(b.platform);
+    if(src==='bk'&&b.type==='confirmed'){
+      g.hasConfirmed=true;
+      if(b.pay==='full')g.payFull++;
+      else if(b.pay==='partial')g.payPart++;
+      else g.payNone++;
+    }
+    if(b.mobile)g.mobile=b.mobile;
+    if(b.email)g.email=b.email;
+  };
+  bk.forEach(b=>addEntry(b,'bk'));
+  bh.forEach(b=>addEntry(b,'bh'));
   Object.values(map).forEach(g=>{
     g.stays.sort((a,b)=>b.ci.localeCompare(a.ci));
     g.last=g.stays[0].ci;
-    const fut=[...g.stays].filter(s=>s.ci>=TD).sort((a,b)=>a.ci<b.ci?-1:1);
+    const fut=[...g.stays].filter(s=>s.ci>=TD&&s._src==='bk').sort((a,b)=>a.ci<b.ci?-1:1);
     g.upcoming=fut[0]||null;
     g.platforms=[...g.platforms];
   });
   return Object.values(map).sort((x,y)=>y.stays.length-x.stays.length||y.last.localeCompare(x.last));
+}
+function stayLabel(s){
+  if(s._src==='bh'){
+    if(s.cancelReason==='booking_confirmed')return'<span style="color:#C2410C;font-size:10px;font-weight:700">Cancelled — another booking confirmed</span>';
+    if(s.cancelReason==='expired')return'<span style="color:#6B7280;font-size:10px;font-weight:700">Expired</span>';
+    if(s.cancelReason==='host_cancelled')return'<span style="color:#6B7280;font-size:10px;font-weight:700">Cancelled by host</span>';
+  }
+  if(s.type==='pencil')return'<span style="color:#713F12;font-size:10px;font-weight:700">✏️ Pencil</span>';
+  return'<span style="color:#15803D;font-size:10px;font-weight:700">Confirmed</span>';
+}
+function cpTxt(btn,val){
+  try{
+    navigator.clipboard.writeText(val).then(()=>{
+      const orig=btn.textContent;btn.textContent="Copied";
+      setTimeout(()=>{btn.textContent=orig;},1000);
+    });
+  }catch(e){}
 }
 function gmFilt(chip){
   gmFilter=chip.dataset.f;
@@ -1406,16 +1465,17 @@ function renderGM(){
   const q=document.getElementById("gmq").value.toLowerCase();
   let guests=buildGuests();
   if(q)guests=guests.filter(g=>g.name.toLowerCase().includes(q)||(g.mobile||"").includes(q)||(g.email||"").toLowerCase().includes(q));
-  if(gmFilter==="rep")guests=guests.filter(g=>g.stays.length>1);
+  if(gmFilter==="conf")guests=guests.filter(g=>g.hasConfirmed);
+  if(gmFilter==="pcl")guests=guests.filter(g=>!g.hasConfirmed);
   const el=document.getElementById("gm-list");
   if(!guests.length){el.innerHTML=`<div class="gm-el">No guests found.</div>`;return;}
   el.innerHTML=guests.map(g=>{
-    const rep=g.stays.length>1;
+    const repConf=g.stays.filter(s=>s._src==='bk'&&s.type==='confirmed').length>1;
     const paySum=[g.payFull?g.payFull+" full":"",g.payPart?g.payPart+" partial":"",g.payNone?g.payNone+" unpaid":""].filter(Boolean).join(" · ")||"—";
     const plBadges=g.platforms.map(p=>`<span class="bdg ${pC(p)}">${p}</span>`).join("");
     const lastLabel=g.upcoming?`Next: ${g.upcoming.ci}`:`Last: ${g.last}`;
     return`<div class="gm-row" onclick="openGMProf(this.dataset.name)" data-name="${g.name.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}">
-      <div class="gm-rn">${rep?'⭐ ':''}${g.name}</div>
+      <div class="gm-rn">${repConf?'⭐ ':''}${g.name}</div>
       <div class="gm-rs">${g.stays.length} stay${g.stays.length!==1?'s':''} · ${lastLabel}${g.mobile?' · '+g.mobile:''}</div>
       <div class="gm-stat">${plBadges}<span style="font-size:11px;color:#888;margin-left:2px">${paySum}</span></div>
     </div>`;
@@ -1425,28 +1485,31 @@ function openGMProf(name){
   const guests=buildGuests();
   const g=guests.find(x=>x.name.toLowerCase()===name.toLowerCase());
   if(!g)return;
-  const rep=g.stays.length>1;
-  document.getElementById("gm-pname").innerHTML=(rep?'⭐ ':'')+g.name+(rep?` <span style="font-size:12px;font-weight:400;color:#888">(${g.stays.length} stays)</span>`:'');
+  const repConf=g.stays.filter(s=>s._src==='bk'&&s.type==='confirmed').length>1;
+  document.getElementById("gm-pname").innerHTML=(repConf?'⭐ ':'')+g.name+(g.stays.length>1?` <span style="font-size:12px;font-weight:400;color:#888">(${g.stays.length} stays)</span>`:'');
   const paySum=[g.payFull?g.payFull+" full":"",g.payPart?g.payPart+" partial":"",g.payNone?g.payNone+" unpaid":""].filter(Boolean).join(" · ")||"—";
   const plBadges=g.platforms.map(p=>`<span class="bdg ${pC(p)}">${p}</span>`).join(" ");
-  const staysHtml=g.stays.map(b=>{
-    const ni=dR(b.ci,b.co).length;
+  const staysHtml=g.stays.map(s=>{
+    const ni=dR(s.ci,s.co).length;
+    const lbl=stayLabel(s);
+    const payBadge=s._src==='bk'&&s.type==='confirmed'?`<span class="bdg ${pyC(s.pay)}">${pyL(s.pay)}</span>`:'';
     return`<div class="gm-stay">
       <div class="gm-stay-hd">
-        <div><div class="gm-stay-dt">${b.ci} → ${b.co}</div><div style="font-size:11px;color:#888">${ni} night${ni!==1?'s':''}</div></div>
-        <span class="bdg ${pyC(b.pay)}">${pyL(b.pay)}</span>
+        <div><div class="gm-stay-dt">${s.ci} → ${s.co}</div><div style="font-size:11px;color:#888">${ni} night${ni!==1?'s':''}</div></div>
+        ${payBadge}
       </div>
+      <div style="margin-bottom:3px">${lbl}</div>
       <div class="gm-stay-inf">
-        <span class="bdg ${pC(b.platform)}">${b.platform}</span>
-        ${b.method?`<span class="bdg ${mC(b.method)}">${b.method}</span>`:''}
-        ${b.notes?`<span style="font-size:11px;color:#888">${b.notes}</span>`:''}
+        <span class="bdg ${pC(s.platform)}">${s.platform}</span>
+        ${s.method&&s._src==='bk'?`<span class="bdg ${mC(s.method)}">${s.method}</span>`:''}
+        ${s.notes?`<span style="font-size:11px;color:#888">${s.notes}</span>`:''}
       </div>
     </div>`;
   }).join("");
   document.getElementById("gm-pbody").innerHTML=`
     <div class="gm-psec">Contact</div>
-    ${g.mobile?`<div class="dr"><span class="dl">Mobile</span><span class="dv" style="color:#1A56DB">${g.mobile}</span></div>`:`<div class="dr"><span class="dl">Mobile</span><span class="dv" style="color:#aaa">—</span></div>`}
-    ${g.email?`<div class="dr"><span class="dl">Email</span><span class="dv" style="color:#1A56DB">${g.email}</span></div>`:''}
+    ${g.mobile?`<div class="dr"><span class="dl">Mobile</span><span class="dv" style="color:#1A56DB">${g.mobile}<button class="gm-copy" onclick="cpTxt(this,'${g.mobile.replace(/'/g,"\\'")}')">Copy</button></span></div>`:`<div class="dr"><span class="dl">Mobile</span><span class="dv" style="color:#aaa">—</span></div>`}
+    ${g.email?`<div class="dr"><span class="dl">Email</span><span class="dv" style="color:#1A56DB">${g.email}<button class="gm-copy" onclick="cpTxt(this,'${g.email.replace(/'/g,"\\'")}')">Copy</button></span></div>`:''}
     <div class="gm-psec">Summary</div>
     <div class="dr"><span class="dl">Total stays</span><span class="dv">${g.stays.length}</span></div>
     <div class="dr"><span class="dl">Platforms</span><span class="dv">${plBadges}</span></div>
@@ -1783,20 +1846,92 @@ function scheduleMidnightCheck(){
 
 // IMPORTANT NOTICES
 function openNotices(){
-  // Pencil Holds: only pencil bookings with ci within 48 hours
+  // Clean stale recontact entries (older than 7 days)
+  const now=Date.now();
+  const weekMs=7*24*3600*1000;
+  if(prof.recontact&&prof.recontact.length){
+    const before=prof.recontact.length;
+    prof.recontact=prof.recontact.filter(r=>r.storedAt>now-weekMs);
+    if(prof.recontact.length!==before)svP();
+  }
+
+  // Section 1 — Cleaner Reminder
+  const confFuture=bk.filter(b=>isConf(b)&&b.co>=TD).sort((a,b2)=>a.co.localeCompare(b2.co));
+  const nearestCoDate=confFuture.length?confFuture[0].co:null;
+  let cleanerHtml='';
+  if(nearestCoDate){
+    const coGuests=confFuture.filter(b=>b.co===nearestCoDate);
+    const isToday=nearestCoDate===TD;
+    cleanerHtml=coGuests.map(b=>{
+      const rowCls=isToday?"cu":"bel-row";
+      const prefix=isToday?"Today — ":"";
+      return`<div class="${rowCls}" onclick="pickBk(${b.id});cOv('ov-notices')">${prefix}<strong>${b.name}</strong> checks out <strong>${b.co}</strong> at ${f12(eCo(b))||"—"}${b.cd?'<span style="color:#4A8A20;margin-left:6px">✓ Contacted</span>':'<span style="color:#E8A020;margin-left:6px">⚠ Not contacted</span>'}</div>`;
+    }).join("");
+  } else {
+    cleanerHtml=`<div class="bel-none">No upcoming checkouts</div>`;
+  }
+
+  // Section 2 — Pencil Holds Expiring Soon
   const in48=Date.now()+(48*3600*1000);
   const nearPcl=bk.filter(b=>b.type==="pencil"&&new Date(b.ci).getTime()<=in48&&b.co>=TD)
     .sort((a,b2)=>a.ci.localeCompare(b2.ci));
   const pclHtml=nearPcl.length
-    ?nearPcl.map(b=>`<div class="bel-row" onclick="showPclDet(bk.find(x=>x.id===${b.id}));cOv('ov-notices')">`+
-      `<strong>${b.name}</strong> · ${b.ci} → ${b.co} · ${b.platform}</div>`).join("")
+    ?nearPcl.map(b=>`<div class="bel-row" onclick="showPclDet(bk.find(x=>x.id===${b.id}));cOv('ov-notices')"><strong>${b.name}</strong> · ${b.ci} → ${b.co} · ${b.platform}</div>`).join("")
     :`<div class="bel-none">No pencil holds expiring within 48 hours.</div>`;
+
+  // Section 3 — Recently Expired Pencil Bookings
+  const sevenDaysAgo=new Date(TD);sevenDaysAgo.setDate(sevenDaysAgo.getDate()-7);
+  const sevenDaysAgoStr=sevenDaysAgo.toISOString().slice(0,10);
+  const recentExp=bh.filter(b=>b.cancelReason==="expired"&&new Date(b.co)>=sevenDaysAgo);
+  const expHtml=recentExp.length
+    ?recentExp.map(b=>`<div class="bel-row" style="cursor:default"><strong>${b.name}</strong> · ${b.ci} → ${b.co}${b.mobile?'<br><span style="color:#888">'+b.mobile+'</span>':''}${b.email?'<br><span style="color:#888">'+b.email+'</span>':''}</div>`).join("")
+    :`<div class="bel-none">No recent expirations</div>`;
+
+  // Section 4 — Upcoming Confirmed Bookings (fully paid)
+  const upcoming=bk.filter(b=>isConf(b)&&b.ci>=TD&&b.pay==="full").sort((a,b2)=>a.ci.localeCompare(b2.ci));
+  const upcomingHtml=upcoming.length
+    ?upcoming.map(b=>`<div class="bel-row" onclick="pickBk(${b.id});cOv('ov-notices')"><strong>${b.name}</strong> · ${b.ci} · <span class="bdg ${pC(b.platform)}">${b.platform}</span></div>`).join("")
+    :`<div class="bel-none">No upcoming confirmed bookings</div>`;
+
+  // Section 5+ — Payment sections (conditional on prof.fullPay)
+  let paymentSectionsHtml='';
+  if(prof.fullPay===true){
+    const awaitingAll=bk.filter(b=>isConf(b)&&b.pay==="none"&&b.co>=TD).sort((a,b2)=>a.ci.localeCompare(b2.ci));
+    const awaitingHtml=awaitingAll.length
+      ?awaitingAll.map(b=>`<div class="bel-row" onclick="pickBk(${b.id});cOv('ov-notices')"><strong>${b.name}</strong> · ${b.ci} → ${b.co} · <span class="bdg ${pC(b.platform)}">${b.platform}</span>${b.mobile?'<span style="color:#888;margin-left:5px">'+b.mobile+'</span>':b.email?'<span style="color:#888;margin-left:5px">'+b.email+'</span>':''}</div>`).join("")
+      :`<div class="bel-none">No unpaid bookings</div>`;
+    paymentSectionsHtml=`<div class="bel-sec"><div class="bel-sec-hd">💸 Awaiting Payment</div>${awaitingHtml}</div>`;
+  } else {
+    const awaitingFull=bk.filter(b=>isConf(b)&&b.pay==="none"&&b.co>=TD).sort((a,b2)=>a.ci.localeCompare(b2.ci));
+    const awaitingFullHtml=awaitingFull.length
+      ?awaitingFull.map(b=>`<div class="bel-row" onclick="pickBk(${b.id});cOv('ov-notices')"><strong>${b.name}</strong> · ${b.ci} → ${b.co} · <span class="bdg ${pC(b.platform)}">${b.platform}</span>${b.mobile?'<span style="color:#888;margin-left:5px">'+b.mobile+'</span>':b.email?'<span style="color:#888;margin-left:5px">'+b.email+'</span>':''}</div>`).join("")
+      :`<div class="bel-none">No unpaid bookings</div>`;
+    const awaitingPart=bk.filter(b=>isConf(b)&&b.pay==="partial"&&b.co>=TD).sort((a,b2)=>a.ci.localeCompare(b2.ci));
+    const awaitingPartHtml=awaitingPart.length
+      ?awaitingPart.map(b=>`<div class="bel-row" onclick="pickBk(${b.id});cOv('ov-notices')"><strong>${b.name}</strong> · ${b.ci} → ${b.co} · <span class="bdg ${pC(b.platform)}">${b.platform}</span>${b.mobile?'<span style="color:#888;margin-left:5px">'+b.mobile+'</span>':b.email?'<span style="color:#888;margin-left:5px">'+b.email+'</span>':''}</div>`).join("")
+      :`<div class="bel-none">No partial payments pending</div>`;
+    paymentSectionsHtml=`
+      <div class="bel-sec"><div class="bel-sec-hd">💸 Awaiting Full Payment</div>${awaitingFullHtml}</div>
+      <div class="bel-sec"><div class="bel-sec-hd">💳 Partial Payment — Balance Due</div>${awaitingPartHtml}</div>`;
+  }
+
+  // Re-contact Suggestions (only if candidates exist after cleanup)
+  const recontact=prof.recontact||[];
+  const recontactHtml=recontact.length>0
+    ?`<div class="bel-sec"><div class="bel-sec-hd">📞 Re-contact Suggestions</div>
+      <div class="bel-none" style="color:#555;margin-bottom:6px">You recently had a cancellation. These guests were displaced and may be interested:</div>
+      ${recontact.map(r=>`<div class="bel-row" style="cursor:default"><strong>${r.name}</strong>${r.mobile?' · '+r.mobile:''}${r.email?'<br><span style="color:#888">'+r.email+'</span>':''}</div>`).join("")}
+    </div>`
+    :'';
+
   const body=document.getElementById("notices-body");
   body.innerHTML=`
-    <div class="bel-sec"><div class="bel-sec-hd">🧹 Cleaner Reminder</div><div class="bel-none">Nothing to show right now.</div></div>
-    <div class="bel-sec"><div class="bel-sec-hd">💸 Payment Attention</div><div class="bel-none">Nothing to show right now.</div></div>
-    <div class="bel-sec"><div class="bel-sec-hd">✏️ Pencil Holds</div>${pclHtml}</div>
-    <div class="bel-sec"><div class="bel-sec-hd">✅ Upcoming Bookings</div><div class="bel-none">Nothing to show right now.</div></div>`;
+    <div class="bel-sec"><div class="bel-sec-hd">🧹 Cleaner Reminder</div>${cleanerHtml}</div>
+    <div class="bel-sec"><div class="bel-sec-hd">✏️ Pencil Holds Expiring Soon</div>${pclHtml}</div>
+    <div class="bel-sec"><div class="bel-sec-hd">🗂️ Recently Expired Pencil Bookings</div>${expHtml}</div>
+    <div class="bel-sec"><div class="bel-sec-hd">✅ Upcoming Confirmed Bookings</div>${upcomingHtml}</div>
+    ${paymentSectionsHtml}
+    ${recontactHtml}`;
   document.getElementById("ov-notices").classList.add("sh");
 }
 
