@@ -701,7 +701,7 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
     <p>Set up your property profile to personalise your experience. It only takes a minute.</p>
     <div class="wlc-btns">
       <button class="wlc-primary" onclick="closeWelcome();openProf()">Set up profile</button>
-      <button class="wlc-skip" onclick="closeWelcome()">Skip for now</button>
+      <button class="wlc-skip" onclick="localStorage.setItem('bt_setup_done','1');closeWelcome()">Skip for now</button>
     </div>
   </div>
 </div>
@@ -977,7 +977,7 @@ function showTurn(oB,iB){
     Cleaner must prepare unit between ${f12(cot)} and ${f12(cit)}.</div></div>
     <div class="tt">
       <button class="tbtn tcl${cd?" dn3":""}" onclick="tapCl()">${cd?"✓ Cleaner contacted":"🧹 Cleaner contacted?"}</button>
-      <button class="tbtn trd${ur?" dn3":""}" onclick="tapRd()">${ur?"✓ Unit ready":"✅ Unit ready?"}</button>
+      <button class="tbtn trd${ur?" dn3":""}" onclick="tapRd()"${!cd?' disabled style="opacity:0.45;cursor:not-allowed"':''}>${ur?"✓ Unit ready":"✅ Unit ready?"}</button>
     </div>
     <div style="margin-top:9px">
       <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#999;margin-bottom:3px">Checkout — ${oB.name}</div>
@@ -1024,7 +1024,7 @@ function showDet(b){
     ${b.notes?`<div class="dr"><span class="dl">Notes</span><span class="dv">${b.notes}</span></div>`:""}
     ${showCleaner?`<div class="tt">
       <button class="tbtn tcl${cd?" dn3":""}" onclick="tapCl()">${cd?"✓ Cleaner contacted":"🧹 Cleaner contacted?"}</button>
-      <button class="tbtn trd${ur?" dn3":""}" onclick="tapRd()">${ur?"✓ Unit ready":"✅ Unit ready?"}</button>
+      <button class="tbtn trd${ur?" dn3":""}" onclick="tapRd()"${!cd?' disabled style="opacity:0.45;cursor:not-allowed"':''}>${ur?"✓ Unit ready":"✅ Unit ready?"}</button>
     </div>
     ${clBox}`:""}
     <div class="acb">

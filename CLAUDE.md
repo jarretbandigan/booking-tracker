@@ -33,6 +33,7 @@
 - If a request is ambiguous, ask one clarifying question before proceeding.
 - If you find a bug while working on something else, flag it but do not fix it unless asked.
 - Always state which functions were changed and why at the end of a task.
+- **Verify spec logic against existing codebase patterns before implementing.** If a formula, date range calculation, or logic check in the spec conflicts with how the same operation is handled elsewhere in the codebase, or would produce incorrect results when traced through, stop and flag the discrepancy before writing any code. Propose the correct implementation with reasoning and wait for confirmation. Never silently implement a spec that you can verify is wrong.
 
 ### 1.4 Data Protection — CRITICAL
 
