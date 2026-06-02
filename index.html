@@ -186,7 +186,8 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
 .hv-on{border:3px solid #F59E0B!important;box-shadow:0 4px 12px rgba(245,158,11,0.28)!important;transform:scale(1.03);z-index:10;transition:all 0.15s ease}
 .dy.tr.hv-on{overflow:visible}
 .dy.td.hv-on{border-color:#D97706!important}
-.upd-bdg{position:absolute;top:2px;left:2px;background:#C2410C;color:#fff;font-size:8px;font-weight:700;border-radius:2px;padding:0 3px;line-height:13px;z-index:3}
+.upd-bdg{position:absolute;top:2px;right:2px;background:#C2410C;color:#fff;font-size:8px;font-weight:700;border-radius:2px;padding:0 3px;line-height:13px;z-index:3}
+.dy.td .upd-bdg{top:20px}
 .cg.hv-active .dy:not(.hv-on):not(.em){opacity:0.45;transition:all 0.15s ease}
 .lgnd{background:#fff;border-radius:7px;padding:8px 10px;border:1px solid #e8e8e8;margin-bottom:7px;display:flex;flex-direction:column;gap:6px}
 .lgnd-sec{display:flex;flex-direction:column;gap:3px}
@@ -202,6 +203,7 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
 /* v1.5.0-pencil */
 .dy.pcl{background:#FEFCE8;cursor:pointer;border:2px dotted #FDE047;box-shadow:0 2px 4px rgba(0,0,0,0.10),0 1px 2px rgba(0,0,0,0.06)}
 .dy.pcl .dn2{color:#713F12;font-weight:700}
+.dy.pcl.pcl-hv-src{border:3px solid #F59E0B!important;box-shadow:0 4px 12px rgba(245,158,11,0.28)!important;transform:scale(1.03);z-index:10;opacity:1!important;transition:all 0.15s ease}
 .pcl-more{position:absolute;bottom:2px;left:2px;background:#78716C;color:#fff;font-size:7px;font-weight:700;border-radius:3px;padding:0 4px;line-height:14px;cursor:pointer;z-index:4}
 .pcl-panel{position:fixed;bottom:56px;left:0;right:0;background:#fff;border-top:2px solid #FDE047;border-radius:12px 12px 0 0;z-index:90;max-height:60vh;overflow-y:auto;padding:14px;box-shadow:0 -4px 16px rgba(0,0,0,0.12);display:none}
 .pcl-panel.sh{display:block}
@@ -942,7 +944,7 @@ function renderCal(){
           chip.className="ch cpd "+dirClass(ds,pb);
           chip.textContent=(pb.ci===ds?"↑ ":"")+pb.name.split(" ")[0];
           chip.dataset.bid=pb.id;
-          if(!noHover){chip.addEventListener("mouseenter",()=>{hvOn("[data-bid='"+pb.id+"']");el.classList.add("hv-on");});chip.addEventListener("mouseleave",hvOff);}
+          if(!noHover){chip.addEventListener("mouseenter",()=>{hvOn("[data-bid='"+pb.id+"']");el.classList.add("pcl-hv-src");document.getElementById("cal").classList.add("hv-active");});chip.addEventListener("mouseleave",()=>{hvOff();el.classList.remove("pcl-hv-src");});}
           el.appendChild(chip);
         });
         if(pclList.length>2){
