@@ -171,12 +171,12 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
 .dy.pco{background:#F9FAFB;cursor:pointer;border-color:#E5E7EB;box-shadow:inset 0 1px 3px rgba(0,0,0,0.07)}.dy.pco:hover{border-color:#9CA3AF}
 .dy.pbk .dn2{color:#D1D5DB;font-weight:normal}.dy.pco .dn2{color:#D1D5DB;font-weight:normal}
 .ch.cfaded{opacity:0.5}
-.dy.og{background:#86EFAC;cursor:pointer;border-color:#16A34A}
+.dy.og{background:#4ADE80;cursor:pointer;border-color:#16A34A}
 .dy.og .dn2{color:#14532D;font-weight:700}
-.dy.og.pog{background:#DCFCE7;border-color:#86EFAC;box-shadow:inset 0 1px 3px rgba(0,0,0,0.07)}
+.dy.og.pog{background:#86EFAC;border-color:#4ADE80;box-shadow:inset 0 1px 3px rgba(0,0,0,0.07)}
 .dy.og.pog .dn2{color:#9CA3AF;font-weight:normal}
-.dy.og.td{background:#4ADE80;border-color:#F59E0B;box-shadow:0 0 0 3px rgba(245,158,11,0.25),0 4px 12px rgba(0,0,0,0.18)}
-.dy.og.td .dn2{color:#14532D;font-weight:700}
+.dy.og.td{background:#16A34A;border-color:#F59E0B;box-shadow:0 0 0 3px rgba(245,158,11,0.25),0 4px 12px rgba(0,0,0,0.18)}
+.dy.og.td .dn2{color:#FFFFFF;font-weight:700}
 .dy.og-upd{border-color:#C2410C}
 .cont-i{position:absolute;top:3px;left:3px;font-size:9px;color:#9CA3AF;line-height:1;pointer-events:none;z-index:1}
 .cont-o{position:absolute;bottom:3px;right:3px;font-size:9px;color:#9CA3AF;line-height:1;pointer-events:none;z-index:1}
@@ -313,10 +313,10 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
           <div class="lgi"><div class="ld" style="background:#FFFFFF;border:1px solid #D1D5DB;box-shadow:0 1px 2px rgba(0,0,0,0.08)"></div>Free</div>
           <div class="lgi"><div class="ld" style="background:#BBF7D0;border:1px solid #86EFAC"></div>Booked</div>
           <div class="lgi"><div class="ld" style="background:#FEFCE8;border:2px dotted #FDE047"></div>Pencil hold</div>
-          <div class="lgi"><div class="ld" style="background:#DCFCE7;border:1px solid #86EFAC;box-shadow:inset 0 1px 2px rgba(0,0,0,0.07)"></div>Past stay</div>
-          <div class="lgi"><div class="ld" style="background:#4ADE80;border:2px solid #F59E0B;box-shadow:0 0 0 2px rgba(245,158,11,0.22)"></div>Guest here today</div>
-          <div class="lgi"><div class="ld" style="background:#86EFAC;border:1px solid #16A34A"></div>Guest still staying</div>
-          <div class="lgi"><div class="ld" style="background:linear-gradient(180deg,#86EFAC 50%,#BBF7D0 50%);border:2px solid #E8A020"></div>Turnaround</div>
+          <div class="lgi"><div class="ld" style="background:#86EFAC;border:1px solid #4ADE80;box-shadow:inset 0 1px 2px rgba(0,0,0,0.07)"></div>Past stay</div>
+          <div class="lgi"><div class="ld" style="background:#16A34A;border:2px solid #F59E0B;box-shadow:0 0 0 2px rgba(245,158,11,0.22)"></div>Guest here today</div>
+          <div class="lgi"><div class="ld" style="background:#4ADE80;border:1px solid #16A34A"></div>Guest still staying</div>
+          <div class="lgi"><div class="ld" style="background:linear-gradient(180deg,#4ADE80 50%,#BBF7D0 50%);border:2px solid #E8A020"></div>Turnaround</div>
           <div class="lgi"><div class="ld" style="background:#F3F4F6;border:1px solid #9CA3AF"></div>Blocked</div>
           <div class="lgi"><div class="ld" style="background:#F9FAFB;border:1px solid #E5E7EB;box-shadow:inset 0 1px 2px rgba(0,0,0,0.05)"></div>Past date</div>
         </div>
@@ -867,7 +867,7 @@ function renderCal(){
       el.className="dy tr"+(isPast?" pog":"");
       el.appendChild(mkP("trbdg","↑↓"));
       const topIsOg=coB.ci<ds;
-      const topBg=topIsOg?"#86EFAC":"#BBF7D0";
+      const topBg=topIsOg?"#4ADE80":"#BBF7D0";
       const botBg="#BBF7D0";
       // top half — outgoing guest
       const tTop=document.createElement("div");
@@ -942,7 +942,7 @@ function renderCal(){
           chip.className="ch cpd "+dirClass(ds,pb);
           chip.textContent=(pb.ci===ds?"↑ ":"")+pb.name.split(" ")[0];
           chip.dataset.bid=pb.id;
-          if(!noHover){chip.addEventListener("mouseenter",()=>hvOn("[data-bid='"+pb.id+"']"));chip.addEventListener("mouseleave",hvOff);}
+          if(!noHover){chip.addEventListener("mouseenter",()=>{hvOn("[data-bid='"+pb.id+"']");el.classList.add("hv-on");});chip.addEventListener("mouseleave",hvOff);}
           el.appendChild(chip);
         });
         if(pclList.length>2){
