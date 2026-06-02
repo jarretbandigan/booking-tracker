@@ -810,7 +810,7 @@ function hvOff(){hvTimer=setTimeout(()=>{const c=document.getElementById("cal");
 // OCCUPANCY
 function updOcc(){
   const dim=new Date(cy,cm+1,0).getDate();let bkd=0;
-  for(let d=1;d<=dim;d++){const ds=cy+"-"+String(cm+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");if(gB(ds,null)||gCO(ds)||gBl(ds))bkd++;}
+  for(let d=1;d<=dim;d++){const ds=cy+"-"+String(cm+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");if(gB(ds,null)||gBl(ds))bkd++;}
   const pct=Math.round((bkd/dim)*100);
   document.getElementById("ofrac").textContent=bkd+"/"+dim;
   document.getElementById("opct").textContent=pct+"%";
