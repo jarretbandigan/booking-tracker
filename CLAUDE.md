@@ -2,7 +2,7 @@
 
 > This file is read automatically by Claude Code every session.
 > It contains the full context needed to work on this project.
-> Last updated: 2026-06-02 | Version: v1.5.1
+> Last updated: 2026-06-02 | Version: v1.5.3
 
 ---
 
@@ -77,7 +77,7 @@ Booking Tracker is a single-file, browser-based property booking management app 
 ```
 booking-tracker/
 │
-├── index.html      Entire application (~2037 lines, ~123KB) — v1.5.1
+├── index.html      Entire application (~2050 lines, ~126KB) — v1.5.3
 │                   Contains: HTML structure, all CSS, all JavaScript
 │                   No external dependencies. Works offline.
 │
@@ -168,7 +168,7 @@ bt_bell  Bell last-seen timestamp (integer, milliseconds)
 - Do not treat this as a secure auth system
 - Session lives in JS memory only, clears on tab close
 
-### 4.2 Full Feature List (all verified working as of v1.5.1)
+### 4.2 Full Feature List (all verified working as of v1.5.3)
 
 **Calendar — Color System + Hover Groups**
 - **13 tile states (v1.5.1):** pm (past empty), pbk (past ended booked), pco (past ended checkout), av (available future), av.td (today empty), bk (confirmed future — any payment status), co (future checkout), og.pog (ongoing past days), og.td (ongoing today), og (ongoing future paid), og.og-upd (ongoing future unpaid — orange border), mn2 (maintenance), tr (turnaround). Yellow tiles (yel/yel.td) removed in v1.5.1.
@@ -413,6 +413,7 @@ bt_bell  Bell last-seen timestamp (integer, milliseconds)
 
 | Version | Date | Summary |
 |---|---|---|
+| v1.5.3 | Jun 2026 | Bug fix release — 18 fixes across data integrity, pencil flow, calendar, and code hygiene. C1: saveProf() now preserves prof.recontact and prof.pencilExpiryHrs across saves. C2/M8: doLogout() clears midnight timer and resets all state globals. C3: confirmOw() checks turnaround before removing overwritten booking, preventing data loss on cancel. M1: pencil edit branch now runs conflict check. M2: openExt() uses strict mid-stay check (b2.ci<nd&&b2.co>nd) not getConfOn, so turnaround-day extensions are no longer blocked. M3: openNotices() runs checkPencilExpiry() first. M4: archivePcl() adds archivedAt timestamp; Section 3 filter uses it. M5: loadData() migrates missing at field; renderList() sort has fallback. M6: renderCal() clears hv-active before innerHTML. M7: TD is now a function (toLocaleDateString en-CA) — local time, no staleness. M8-M10: state cleanup, confirmed-only cG(), turnaround past tile uses .ptr class. L3: openBell() and ov-bell modal removed. L4-L5: nav gold, legend note corrected. L6: minNights validation in confirmed add path. L7: cancelPcl splits into cancelPcl(id)+execCancelPcl(id), no browser confirm(). L8: Section 2 pencil expiry uses local-time calculation. L9: checkPencilExpiry() has reentrancy guard. L10: renderGM/openGMProf use name+mobile for dedup-safe lookup. 2050 lines. |
 | v1.5.1 | Jun 2026 | Visual and UX cleanup — green color system replaces blue confirmed tiles; yellow unpaid tiles removed; today ring and TODAY badge changed to gold (#F59E0B); hover group changed to gold with darker amber for today-in-group; payment badge (!) on unpaid/partial future tiles when fullPay=false; pencil tile taps now show in detail panel (showPclList/showPclDet); Edit pencil flow with in-place save; closeAdd() helper; bt_setup_done moved to localStorage; profile fullPay disables dp field; openAdd co default fixed; conflict check uses gB() so turnaround-day ci no longer errors. 2037 lines. |
 | v1.5.0 | Jun 2026 | Navigation overhaul — bottom nav bar (Home/Guests/Reports/More), tab system, property profile/settings modal (⚙️), first-time welcome nudge. Pencil booking type — soft holds with dotted amber tiles, displaced guest flow, auto-expiry with toast + history archive (bt_bh), All Bookings filter chips. Smart Important Notices — real cleaner reminders, payment attention, pencil expiry, re-contact suggestions. Guest intelligence — dedup by name+mobile, confirmed/pencil-only filter, full history from bt_b+bt_bh, copy buttons. |
 | v1.4.0 | May 2026 | Calendar UX overhaul — 5 areas, CSS+JS only, zero data changes. Area 1: new color system (white av, blue bk/co, yellow yel, green og spectrum, near-white past, chip colors cpf=#15803D/cpp=#C2410C/cpn=#991B1B/cpd=#4B5563 white text, cfaded opacity 0.5 for past paid). Area 2: hover group highlight — data-bid/data-blid on all tiles, hvOn(sel)/hvOff() 60ms debounce, .hv-on scale 1.03 blue border lift, .hv-active dims non-hovered to 0.45; turnaround outer .dy.tr gets hv-on so full tile lifts (.dy.tr.hv-on overflow:visible unclips shadow). Area 3: ← cont. / cont. → cross-month boundary labels. Area 4: legend redesign 3 sections (tile color, payment chip, border meaning) + italic note. Area 5: @media(min-width:768px) responsive — 900px wrapper, 82px tiles, 14px dn2, 11px chip. 1168 lines. |

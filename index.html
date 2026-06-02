@@ -62,6 +62,8 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
 .dy.mn2{background:#F3F4F6;cursor:pointer;border-color:#9CA3AF}.dy.mn2:hover{border-color:#6B7280}
 .dy.mn2 .dn2{color:#6B7280}
 .dy.tr{background:transparent;display:flex;flex-direction:column;padding:0;overflow:hidden;cursor:default;border-color:#E8A020;animation:pb 2s infinite}
+.dy.tr.ptr{opacity:0.55;box-shadow:inset 0 1px 3px rgba(0,0,0,0.08);animation:none;border-color:#D1D5DB}
+.dy.tr.ptr .dn2{color:#D1D5DB;font-weight:400}
 @keyframes pb{0%,100%{border-color:#E8A020}50%{border-color:#C17D1A}}
 .dy.td{border-color:#F59E0B;box-shadow:0 0 0 2px #F59E0B,0 3px 8px rgba(0,0,0,0.14)}
 .dn2{font-weight:700;font-size:12px;line-height:1;margin-bottom:2px}
@@ -232,7 +234,7 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
 #bnav{position:fixed;bottom:0;left:0;right:0;height:56px;background:#fff;border-top:1px solid #e5e7eb;display:flex;z-index:50}
 .bnt{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:9px;color:#6B7280;background:none;border:none;cursor:pointer;gap:2px;padding:0}
 .bnt span{display:block;font-size:18px}
-.bnt.act{color:#1D4ED8;font-weight:700}
+.bnt.act{color:#F59E0B;font-weight:700}
 .tab-pane{padding-bottom:64px}
 .more-list{display:flex;flex-direction:column;gap:10px;padding:16px 0}
 .more-btn{width:100%;padding:14px 16px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;text-align:left;font-size:14px;cursor:pointer}
@@ -340,7 +342,7 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
           <div class="lgi"><div class="ld" style="background:transparent;border:2px solid #C2410C"></div>Ongoing, unpaid balance</div>
         </div>
       </div>
-      <div class="lgnd-note">Hover a date to highlight the full booking · ❗ = payment pending</div>
+      <div class="lgnd-note">Hover a date to highlight the full booking · ❗ = unpaid or partial balance</div>
     </div>
     <div class="cg" id="cal"></div>
     <div class="pn" id="dpanel"><div class="ph">📅 Tap any date to get started<br><span style="font-size:11px">Free dates open booking form · Booked dates show details</span></div></div>
@@ -538,32 +540,26 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
 
 <!-- WHAT'S NEW -->
 <div class="ov" id="ov-wn"><div class="md">
-  <h3>✨ What's New — v1.5.0</h3>
+  <h3>✨ What's New — v1.5.3</h3>
   <div style="font-size:13px;color:#444;line-height:1.7;margin-bottom:13px">
-    <div style="margin-bottom:6px"><strong>🧭 Bottom Navigation</strong><br>The app now has a bottom navigation bar with Home, Guests, Reports, and More tabs. The old header buttons have moved — Export, Import, and Sign out are now under More.</div>
-    <div style="margin-bottom:6px"><strong>⚙️ Property Profile</strong><br>Tap the ⚙️ button in the header to set up your property details, check-in/out times, payment policy, house rules, and host contact info. Your property name appears in the header once saved.</div>
-    <div style="margin-bottom:6px"><strong>✏️ Pencil Bookings</strong><br>Add soft holds alongside confirmed bookings. Pencil tiles show with a dotted amber border. Multiple pencil bookings can overlap the same dates. Pencil bookings auto-expire before check-in and can be confirmed or cancelled at any time. Displaced guests are tracked and you are prompted to contact them.</div>
-    <div style="margin-bottom:6px"><strong>🔔 Smart Important Notices</strong><br>The 🔔 button now shows real-time alerts: all guests checking out on the nearest date, pencil holds expiring within 48 hours, recent expirations, upcoming confirmed bookings, and payment attention sections based on your payment policy.</div>
-    <div><strong>👥 Guest History</strong><br>The Guests tab now shows your full guest history including cancelled and expired pencil bookings. Filter by Confirmed or Pencil Only. Guest profiles show every stay with its status, and you can copy mobile and email with one tap.</div>
+    <div style="margin-bottom:6px"><strong>🛡️ Data Protection Fixes</strong><br>Saving your property settings no longer wipes your re-contact list or pencil expiry config. The midnight pencil timer now clears on sign out so it cannot multiply in the background.</div>
+    <div style="margin-bottom:6px"><strong>📅 Extend Stay Fix</strong><br>Extending a stay to a date where only a checkout occurs (turnaround day) no longer incorrectly blocks the extension.</div>
+    <div style="margin-bottom:6px"><strong>✏️ Pencil Booking Fixes</strong><br>Editing a pencil booking now checks for conflicts. Cancelling a pencil booking shows an inline confirm instead of a browser pop-up. Confirming a pencil with displaced holds correctly closes all modals. The Important Notices panel now runs an expiry check before display.</div>
+    <div style="margin-bottom:6px"><strong>🗂️ Calendar & Data Fixes</strong><br>Hover highlight classes now clear correctly when navigating months. Turnaround tiles on past dates are shown as muted. Repeat guest count now only counts confirmed bookings. Guest Masterlist lookups now use name + mobile for accuracy.</div>
+    <div><strong>🔔 Notices Fix</strong><br>Pencil expiry comparison now uses local time (not UTC midnight), matching actual expiry logic. Recently expired archive filter uses timestamp instead of checkout date.</div>
   </div>
   <div style="border-top:1px solid #eee;padding-top:10px;margin-bottom:10px">
     <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#aaa;letter-spacing:.5px;margin-bottom:6px">Previous releases</div>
     <div style="font-size:12px;color:#666;line-height:1.7">
+      <div style="margin-bottom:4px"><strong>v1.5.1</strong> — Green color system, gold today ring, payment badge, pencil tile taps</div>
+      <div style="margin-bottom:4px"><strong>v1.5.0</strong> — Bottom navigation, property profile, pencil bookings, smart notices, guest history</div>
       <div style="margin-bottom:4px"><strong>v1.4.0</strong> — Calendar UX overhaul: hover groups, cross-month indicators, responsive layout</div>
       <div style="margin-bottom:4px"><strong>v1.3.0</strong> — Calendar polish, ongoing tile states, alerts bell, unpaid overwrite</div>
       <div style="margin-bottom:4px"><strong>v1.2.0</strong> — Guest Masterlist with search, filter, and full stay history</div>
-      <div style="margin-bottom:4px"><strong>v1.1.0</strong> — Security fix, save failure alerts, Export &amp; Import backup</div>
-      <div><strong>v1.0.0</strong> — MVP: calendar, bookings, cleaner flow, payment tracking</div>
+      <div><strong>v1.0.0 – v1.1.0</strong> — MVP, security fix, export &amp; import backup</div>
     </div>
   </div>
   <div class="mbb"><button class="bxx" style="flex:1" onclick="cOv('ov-wn')">Close</button></div>
-</div></div>
-
-<!-- NOTIFICATIONS BELL (dormant — superseded by ov-notices in v1.5.0) -->
-<div class="ov" id="ov-bell"><div class="md lm">
-  <h3>🔔 Alerts</h3>
-  <div id="bell-body"></div>
-  <div class="mbb" style="margin-top:9px"><button class="bxx" style="flex:1" onclick="cOv('ov-bell')">Close</button></div>
 </div></div>
 
 <!-- IMPORTANT NOTICES -->
@@ -725,11 +721,11 @@ async function doLogin(){
   if(u===CU&&h===CH){document.getElementById("ls").style.display="none";document.getElementById("as").style.display="block";document.getElementById("lerr").style.display="none";loadData();updateHeader();if(!prof.name)setTimeout(showWelcome,500);renderCal();checkPencilExpiry();scheduleMidnightCheck();}
   else{document.getElementById("lerr").style.display="block";document.getElementById("lp").value="";}
 }
-function doLogout(){document.getElementById("as").style.display="none";document.getElementById("ls").style.display="flex";document.getElementById("lu").value="";document.getElementById("lp").value="";cAll();showTab('home');}
+function doLogout(){clearTimeout(expiryTimer);expiryTimer=null;pclExpired=[];active=null;pfcl=null;pend=null;pendOver=null;pclConfId=null;editId=null;document.getElementById("as").style.display="none";document.getElementById("ls").style.display="flex";document.getElementById("lu").value="";document.getElementById("lp").value="";cAll();showTab('home');}
 
 // DATA
 const MN=["January","February","March","April","May","June","July","August","September","October","November","December"];
-const TD=new Date().toISOString().slice(0,10);
+function TD(){return new Date().toLocaleDateString('en-CA');}
 let cy=new Date().getFullYear(),cm=new Date().getMonth(),nid=10;
 let bk=[],bl=[],prof={},bellTs=0;
 
@@ -771,6 +767,7 @@ function loadData(){
   bk.forEach(b=>{
     if(b.type===undefined){b.type="confirmed";migrated=true;}
     if(b.method==="Pending"){b.method="";b.pay="none";migrated=true;}
+    if(b.at===undefined){b.at=b.ci||TD();migrated=true;}
   });
   if(migrated)sv();
   const ids=[...bk.map(x=>x.id),...bl.map(x=>x.id)];
@@ -781,11 +778,10 @@ function f12(t){if(!t)return null;const[h,m]=t.split(":").map(Number);const ap=h
 function dR(ci,co){const d=[],c=new Date(ci),e=new Date(co);while(c<e){d.push(c.toISOString().slice(0,10));c.setDate(c.getDate()+1);}return d;}
 function aD(ds,n){const d=new Date(ds);d.setDate(d.getDate()+n);return d.toISOString().slice(0,10);}
 function gB(ds,ex){return bk.find(b=>b.id!==ex&&isConf(b)&&dR(b.ci,b.co).includes(ds));}
-function gBAny(ds,ex){return bk.find(b=>b.id!==ex&&dR(b.ci,b.co).includes(ds));}
 function gCI(ds){return bk.find(b=>isConf(b)&&b.ci===ds);}
 function gCO(ds){return bk.find(b=>isConf(b)&&b.co===ds);}
 function gBl(ds){return bl.find(b=>dR(b.from,aD(b.to,1)).includes(ds));}
-function cG(n){return bk.filter(b=>b.name.toLowerCase()===n.toLowerCase()).length;}
+function cG(n){return bk.filter(b=>isConf(b)&&b.name.toLowerCase()===n.toLowerCase()).length;}
 function pC(p){return({Airbnb:"ba",Agoda:"bg",["Booking.com"]:"bb",Facebook:"bf",Direct:"bd"}[p]||"bd");}
 function pyL(p){return({full:"Fully paid",partial:"Partially paid",none:"No payment yet"}[p]);}
 function pyC(p){return({full:"pf",partial:"pp",none:"pn2"}[p]);}
@@ -802,8 +798,8 @@ function isConf(b){return b.type==="confirmed";}
 function getPclOn(ds){return bk.filter(b=>isPencil(b)&&dR(b.ci,b.co).includes(ds));}
 function getConfOn(ds){return bk.find(b=>isConf(b)&&(dR(b.ci,b.co).includes(ds)||b.co===ds));}
 function pclOnRange(ci,co){const days=dR(ci,co);return bk.filter(b=>isPencil(b)&&days.some(d=>dR(b.ci,b.co).includes(d)));}
-function archivePcl(b,reason){bh.push(Object.assign({},b,{cancelReason:reason}));svH();}
-let hvTimer;
+function archivePcl(b,reason){bh.push(Object.assign({},b,{cancelReason:reason,archivedAt:Date.now()}));svH();}
+let hvTimer,_expiryChecking=false;
 function hvOn(sel){clearTimeout(hvTimer);const c=document.getElementById("cal");c.classList.add("hv-active");c.querySelectorAll(".hv-on").forEach(t=>t.classList.remove("hv-on"));c.querySelectorAll(sel).forEach(t=>{t.classList.add("hv-on");if(t.classList.contains("tr-top")||t.classList.contains("tr-bot"))t.parentElement.classList.add("hv-on");});}
 function hvOff(){hvTimer=setTimeout(()=>{const c=document.getElementById("cal");c.classList.remove("hv-active");c.querySelectorAll(".hv-on").forEach(t=>t.classList.remove("hv-on"));},60);}
 
@@ -831,7 +827,7 @@ function renderCal(){
   if(bk.some(b=>b.type==="pencil"))checkPencilExpiry();
   updOcc();
   document.getElementById("mlbl").textContent=MN[cm]+" "+cy;
-  const cal=document.getElementById("cal");cal.innerHTML="";
+  const cal=document.getElementById("cal");cal.classList.remove("hv-active");cal.innerHTML="";
   ["Su","Mo","Tu","We","Th","Fr","Sa"].forEach(d=>{const e=document.createElement("div");e.className="dn";e.textContent=d;cal.appendChild(e);});
   const first=new Date(cy,cm,1).getDay(),days=new Date(cy,cm+1,0).getDate();
   const mStr=cy+"-"+String(cm+1).padStart(2,"0");
@@ -849,7 +845,7 @@ function renderCal(){
   };
   for(let d=1;d<=days;d++){
     const ds=mStr+"-"+String(d).padStart(2,"0");
-    const isTd=ds===TD,isPast=ds<TD;
+    const isTd=ds===TD(),isPast=ds<TD();
     const book=gB(ds,null),ciB=gCI(ds),coB=gCO(ds),blk=gBl(ds);
     const el=document.createElement("div");
     const num=()=>{const n=document.createElement("div");n.className="dn2";n.textContent=d;return n;};
@@ -866,7 +862,7 @@ function renderCal(){
 
     } else if(ciB&&coB){
       // TURNAROUND — split into top/bottom halves
-      el.className="dy tr"+(isPast?" pog":"");
+      el.className="dy tr"+(isPast?" ptr":"");
       el.appendChild(mkP("trbdg","↑↓"));
       const topIsOg=coB.ci<ds;
       const topBg=topIsOg?"#4ADE80":"#BBF7D0";
@@ -888,7 +884,7 @@ function renderCal(){
 
     } else if(coB&&!book){
       // CHECKOUT ONLY
-      const coIsOg=coB.ci<TD&&!isPast&&!isTd;
+      const coIsOg=coB.ci<TD()&&!isPast&&!isTd;
       let cls;
       if(isPast)cls="pco";
       else if(coIsOg)cls=isUnpaid(coB)?"og og-upd":"og";
@@ -906,7 +902,7 @@ function renderCal(){
 
     } else if(book){
       // BOOKING (check-in or mid-stay)
-      const isOg=book.ci<TD&&book.co>TD;
+      const isOg=book.ci<TD()&&book.co>TD();
       let cls;
       if(isOg&&isPast)cls="og pog";
       else if(isOg&&isTd)cls="og td";
@@ -1065,8 +1061,8 @@ function openAdd(pre){
   document.getElementById("atype-pcl").style.pointerEvents="";
   setAType('confirmed');
   ["an","am","ae","ano"].forEach(id=>document.getElementById(id).value="");
-  const ci=pre||TD,co=aD(pre||TD,1);
-  document.getElementById("aci").value=ci;document.getElementById("aci").min=TD;
+  const ci=pre||TD(),co=aD(pre||TD(),1);
+  document.getElementById("aci").value=ci;document.getElementById("aci").min=TD();
   document.getElementById("aco").value=co;document.getElementById("aco").min=aD(ci,1);
   document.getElementById("acis").value=prof.ci||"14:00";document.getElementById("acos").value=prof.co||"12:00";
   ["acie","acil","acoe","acol"].forEach(id=>document.getElementById(id).value="");
@@ -1085,6 +1081,10 @@ function saveAdd(){
     const err=document.getElementById("aerr");
     if(!name||!ci||!co){err.textContent="Please fill in guest name and both dates.";err.style.display="block";return;}
     if(co<=ci){err.textContent="Check-out must be after check-in.";err.style.display="block";return;}
+    const confConflict=dR(ci,co).find(d=>gB(d,editId));
+    if(confConflict){err.textContent="Conflict on "+confConflict+" — a confirmed booking covers these dates.";err.style.display="block";return;}
+    const blConflict=dR(ci,co).find(d=>gBl(d));
+    if(blConflict){err.textContent="Conflict on "+blConflict+" — a maintenance block covers these dates.";err.style.display="block";return;}
     const idx=bk.findIndex(x=>x.id===editId);
     if(idx!==-1){
       bk[idx]={...bk[idx],name,
@@ -1116,14 +1116,21 @@ function saveAdd(){
     const blConflict=dR(ci,co).find(d=>gBl(d));
     if(blConflict){err.textContent="Conflict — a maintenance block covers these dates.";err.style.display="block";return;}
     // Multiple pencil bookings on same dates: allowed
-    const b={id:nid++,name,mobile,email,ci,co,ciS,coS,ciE:"",ciL:"",coE:"",coL:"",platform,pay:"none",method:"",notes,cd:false,ur:false,at:TD,type:"pencil"};
+    const b={id:nid++,name,mobile,email,ci,co,ciS,coS,ciE:"",ciL:"",coE:"",coL:"",platform,pay:"none",method:"",notes,cd:false,ur:false,at:TD(),type:"pencil"};
     commitBk(b);
     return;
   }
-  // Confirmed path
+  // Confirmed path — minNights check
+  if(prof.minNights&&parseInt(prof.minNights)>1){
+    const nights=dR(ci,co).length;
+    if(nights<parseInt(prof.minNights)){
+      err.textContent="Minimum stay is "+prof.minNights+" night"+(parseInt(prof.minNights)!==1?"s":"")+". This booking is only "+nights+".";
+      err.style.display="block";return;
+    }
+  }
   const b={id:nid++,name,mobile,email,ci,co,ciS,coS,ciE,ciL,coE,coL,platform,
     pay:document.getElementById("apy").value,method:document.getElementById("ame").value,
-    notes,cd:false,ur:false,at:TD,type:"confirmed"};
+    notes,cd:false,ur:false,at:TD(),type:"confirmed"};
   // Only check confirmed bookings and blocks (exclude checkout date — turnaround is allowed)
   const conf=dR(ci,co).find(ds=>gB(ds,null)||gBl(ds));
   if(conf){
@@ -1169,16 +1176,19 @@ function commitPend(){if(!pend)return;commitBk(pend);pend=null;cAll();}
 function commitBk(b){bk.push(b);sv();cAll();renderCal();showDet(b);}
 function confirmOw(){
   if(!pend||!pendOver)return;
-  const b=pend;
-  bk=bk.filter(x=>x.id!==pendOver.id);
-  pendOver=null;pend=null;cAll();
+  const b=pend,ovId=pendOver.id;
+  // Check for turnaround BEFORE removing the overwritten booking
   const exCo=gCO(b.ci);
-  if(exCo){
-    pend=b;
+  if(exCo&&exCo.id!==ovId){
+    // Turnaround warning — removal only happens if user proceeds
+    cAll();pend=b;
     document.getElementById("twb").innerHTML=`<div class="wb"><strong>↓ ${exCo.name}</strong> checks out on <strong>${b.ci} at ${f12(eCo(exCo))}</strong><br><strong>↑ ${b.name}</strong> would check in at <strong>${f12(eCi(b))}</strong><br><br>Cleaner must prepare unit between these times. Confirm this is enough time.</div>`;
-    document.getElementById("twbt").innerHTML=`<button class="bxx" onclick="cOv('ov-tw');pend=null;">Cancel</button><button class="bsv" onclick="commitPend()">Proceed anyway</button>`;
+    document.getElementById("twbt").innerHTML=`<button class="bxx" onclick="cOv('ov-tw');pend=null;pendOver=null;">Cancel</button><button class="bsv" onclick="bk=bk.filter(x=>x.id!==${ovId});pendOver=null;commitPend()">Proceed anyway</button>`;
     document.getElementById("ov-tw").classList.add("sh");return;
   }
+  // No turnaround (or turnaround is the booking being overwritten) — safe to remove and commit
+  bk=bk.filter(x=>x.id!==ovId);
+  pendOver=null;pend=null;cAll();
   commitBk(b);
 }
 
@@ -1212,7 +1222,7 @@ function saveEdit(){
 // EXTEND
 function openExt(){
   if(!active)return;const b=active;
-  const nd=aD(b.co,1),conf=(getConfOn(nd)&&getConfOn(nd).id!==b.id)||gBl(nd);
+  const nd=aD(b.co,1),conf=bk.some(b2=>b2.id!==b.id&&isConf(b2)&&b2.ci<nd&&b2.co>nd)||gBl(nd);
   const body=document.getElementById("exb"),btns=document.getElementById("exbt");
   if(conf){
     body.innerHTML=`<div class="er">Cannot extend — ${nd} is already blocked or booked.</div><p style="font-size:13px;color:#666">Current checkout: <strong>${b.co}</strong></p>`;
@@ -1236,7 +1246,7 @@ function confExt(){
   const b=active,nc=document.getElementById("exd").value;
   const err=document.getElementById("exer");
   if(!nc||nc<=b.co){err.textContent="New checkout must be after "+b.co+".";err.style.display="block";return;}
-  const conf=dR(aD(b.co,1),nc).find(ds=>(getConfOn(ds)&&getConfOn(ds).id!==b.id)||gBl(ds));
+  const conf=dR(aD(b.co,1),nc).find(ds=>gB(ds,b.id)||gBl(ds));
   if(conf){err.textContent="Conflict on "+conf+".";err.style.display="block";return;}
   const doExtend=()=>{
     const ep=document.getElementById("expy").value==="yes";
@@ -1329,7 +1339,7 @@ function confPart(){
 // MAINTENANCE
 function openMaint(pre){
   document.getElementById("mnt").textContent="Block dates";
-  const f=pre||TD;
+  const f=pre||TD();
   document.getElementById("mfr").value=f;document.getElementById("mto").value=f;
   document.getElementById("mre").value="Maintenance / repairs";document.getElementById("mno").value="";
   document.getElementById("merr").style.display="none";
@@ -1393,11 +1403,11 @@ function renderList(){
   if(listFilter==="conf")list=list.filter(b=>b.type==="confirmed"||!b.type);
   if(listFilter==="pcl")list=list.filter(b=>b.type==="pencil");
   if(q)list=list.filter(b=>b.name.toLowerCase().includes(q)||b.platform.toLowerCase().includes(q)||(b.method||"").toLowerCase().includes(q)||(b.mobile||"").includes(q));
-  if(sort==="dd")list.sort((a,b)=>b.at.localeCompare(a.at));
-  else if(sort==="da")list.sort((a,b)=>a.at.localeCompare(b.at));
+  if(sort==="dd")list.sort((a,b)=>(b.at||"").localeCompare(a.at||""));
+  else if(sort==="da")list.sort((a,b)=>(a.at||"").localeCompare(b.at||""));
   else if(sort==="na")list.sort((a,b)=>a.name.localeCompare(b.name));
   else if(sort==="nd")list.sort((a,b)=>b.name.localeCompare(a.name));
-  else if(sort==="up"){list=list.filter(b=>b.ci>=TD);list.sort((a,b)=>a.ci.localeCompare(b.ci));}
+  else if(sort==="up"){list=list.filter(b=>b.ci>=TD());list.sort((a,b)=>a.ci.localeCompare(b.ci));}
   const el=document.getElementById("blist");
   if(!list.length){el.innerHTML=`<div class="el">No bookings found.</div>`;return;}
   el.innerHTML=list.map(b=>{
@@ -1461,7 +1471,7 @@ function buildGuests(){
   Object.values(map).forEach(g=>{
     g.stays.sort((a,b)=>b.ci.localeCompare(a.ci));
     g.last=g.stays[0].ci;
-    const fut=[...g.stays].filter(s=>s.ci>=TD&&s._src==='bk').sort((a,b)=>a.ci<b.ci?-1:1);
+    const fut=[...g.stays].filter(s=>s.ci>=TD()&&s._src==='bk').sort((a,b)=>a.ci<b.ci?-1:1);
     g.upcoming=fut[0]||null;
     g.platforms=[...g.platforms];
   });
@@ -1502,16 +1512,16 @@ function renderGM(){
     const paySum=[g.payFull?g.payFull+" full":"",g.payPart?g.payPart+" partial":"",g.payNone?g.payNone+" unpaid":""].filter(Boolean).join(" · ")||"—";
     const plBadges=g.platforms.map(p=>`<span class="bdg ${pC(p)}">${p}</span>`).join("");
     const lastLabel=g.upcoming?`Next: ${g.upcoming.ci}`:`Last: ${g.last}`;
-    return`<div class="gm-row" onclick="openGMProf(this.dataset.name)" data-name="${g.name.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}">
+    return`<div class="gm-row" onclick="openGMProf(this.dataset.name,this.dataset.mobile)" data-name="${g.name.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" data-mobile="${(g.mobile||'').replace(/"/g,'&quot;')}">
       <div class="gm-rn">${repConf?'⭐ ':''}${g.name}</div>
       <div class="gm-rs">${g.stays.length} stay${g.stays.length!==1?'s':''} · ${lastLabel}${g.mobile?' · '+g.mobile:''}</div>
       <div class="gm-stat">${plBadges}<span style="font-size:11px;color:#888;margin-left:2px">${paySum}</span></div>
     </div>`;
   }).join("");
 }
-function openGMProf(name){
+function openGMProf(name,mobile){
   const guests=buildGuests();
-  const g=guests.find(x=>x.name.toLowerCase()===name.toLowerCase());
+  const g=guests.find(x=>x.name.toLowerCase()===name.toLowerCase()&&(x.mobile||'')===(mobile||''));
   if(!g)return;
   const repConf=g.stays.filter(s=>s._src==='bk'&&s.type==='confirmed').length>1;
   document.getElementById("gm-pname").innerHTML=(repConf?'⭐ ':'')+g.name+(g.stays.length>1?` <span style="font-size:12px;font-weight:400;color:#888">(${g.stays.length} stays)</span>`:'');
@@ -1606,33 +1616,6 @@ function confirmImport(){
   pendingImport=null;
 }
 
-// ALERTS BELL
-function openBell(){
-  const upcoming=bk.filter(b=>b.co>=TD).sort((a,b)=>a.co.localeCompare(b.co));
-  const nextCo=upcoming[0]||null;
-  const cleanerHtml=nextCo
-    ?`<div class="bel-row" onclick="pickBk(${nextCo.id});cOv('ov-bell')"><strong>${nextCo.name}</strong> checks out <strong>${nextCo.co}</strong> at ${f12(eCo(nextCo))||"—"}${nextCo.cd?'<span style="color:#4A8A20;margin-left:6px">✓ Contacted</span>':'<span style="color:#E8A020;margin-left:6px">⚠ Not contacted</span>'}</div>`
-    :`<div class="bel-none">✓ No upcoming checkouts.</div>`;
-  const unpaid=bk.filter(b=>b.pay==="none"&&b.co>=TD).sort((a,b)=>a.ci.localeCompare(b.ci));
-  const unpaidHtml=unpaid.length
-    ?unpaid.map(b=>`<div class="bel-row" onclick="pickBk(${b.id});cOv('ov-bell')"><strong>${b.name}</strong> · ${b.ci} → ${b.co} · ${b.platform}<span style="color:#D4537E;margin-left:6px">No payment</span></div>`).join("")
-    :`<div class="bel-none">✓ None.</div>`;
-  const pendRes=bk.filter(b=>b.method==="Pending"&&b.co>=TD).sort((a,b)=>a.ci.localeCompare(b.ci));
-  const pendHtml=pendRes.length
-    ?pendRes.map(b=>`<div class="bel-row" onclick="pickBk(${b.id});cOv('ov-bell')"><strong>${b.name}</strong> · ${b.ci} → ${b.co} · ${b.platform}<span style="color:#7A4A00;margin-left:6px">Pending</span></div>`).join("")
-    :`<div class="bel-none">✓ None.</div>`;
-  const confirmed=bk.filter(b=>b.pay==="full"&&b.ci>=TD).sort((a,b)=>a.ci.localeCompare(b.ci));
-  const confHtml=confirmed.length
-    ?confirmed.map(b=>`<div class="bel-row" onclick="pickBk(${b.id});cOv('ov-bell')"><strong>${b.name}</strong> · ${b.ci} → ${b.co} · ${b.platform}<span style="color:#1E4D08;margin-left:6px">Fully paid</span></div>`).join("")
-    :`<div class="bel-none">✓ No upcoming confirmed bookings.</div>`;
-  document.getElementById("bell-body").innerHTML=`
-    <div class="bel-sec"><div class="bel-sec-hd">🧹 Cleaner Reminder</div>${cleanerHtml}</div>
-    <div class="bel-sec"><div class="bel-sec-hd">💸 Unpaid Bookings</div>${unpaidHtml}</div>
-    <div class="bel-sec"><div class="bel-sec-hd">⏳ Pending Reservations</div>${pendHtml}</div>
-    <div class="bel-sec"><div class="bel-sec-hd">✅ Upcoming Confirmed</div>${confHtml}</div>`;
-  document.getElementById("ov-bell").classList.add("sh");
-}
-
 // WHAT'S NEW
 function openWN(){document.getElementById("ov-wn").classList.add("sh");}
 
@@ -1691,6 +1674,9 @@ function openProf(){
 }
 function saveProf(){
   const wasNew=!prof.name;
+  // Preserve fields not bound to any UI input — saving the form must not wipe them
+  const existingRecontact=prof.recontact||[];
+  const existingPencilExpiryHrs=prof.pencilExpiryHrs||24;
   prof={
     name:document.getElementById("pr-name").value.trim(),
     addr:document.getElementById("pr-addr").value.trim(),
@@ -1718,7 +1704,9 @@ function saveProf(){
     customRule:document.getElementById("pr-rule").value.trim(),
     hostName:document.getElementById("pr-hname").value.trim(),
     hostMob:document.getElementById("pr-hmob").value.trim(),
-    gcash:document.getElementById("pr-gcash").value.trim()
+    gcash:document.getElementById("pr-gcash").value.trim(),
+    recontact:existingRecontact,
+    pencilExpiryHrs:existingPencilExpiryHrs
   };
   svP();
   updateHeader();
@@ -1801,7 +1789,7 @@ function editPcl(id){
   document.getElementById("am").value=b.mobile||"";
   document.getElementById("ae").value=b.email||"";
   document.getElementById("aci").value=b.ci;
-  document.getElementById("aci").min=TD;
+  document.getElementById("aci").min=TD();
   document.getElementById("aco").value=b.co;
   document.getElementById("aco").min=aD(b.ci,1);
   document.getElementById("acis").value=b.ciS||prof.ci||"14:00";
@@ -1863,10 +1851,9 @@ function confirmPcl(){
     const prev=gCO(b.ci);if(prev)showTurn(prev,b);
   };
   if(displaced.length>0){
-    cOv('ov-pcl-conf');
     showDisplaced(displaced,"Please contact these guests whose pencil bookings will be cancelled.",
       "Acknowledge and confirm","Go back",
-      ()=>{displaced.forEach(d2=>{archivePcl(d2,"booking_confirmed");bk=bk.filter(x=>x.id!==d2.id);});cOv('ov-displaced');doConfirm();},
+      ()=>{displaced.forEach(d2=>{archivePcl(d2,"booking_confirmed");bk=bk.filter(x=>x.id!==d2.id);});cOv('ov-displaced');cOv('ov-pcl-conf');doConfirm();},
       ()=>{cOv('ov-displaced');});
     return;
   }
@@ -1874,10 +1861,23 @@ function confirmPcl(){
 }
 function cancelPcl(id){
   const b=bk.find(x=>x.id===id);if(!b)return;
-  if(!confirm("Cancel this pencil booking for "+b.name+"?"))return;
+  closePclPanel();
+  document.getElementById("dpanel").innerHTML=`
+    <div class="pn">
+      <div class="pt">Cancel pencil booking?</div>
+      <div class="dr"><span class="dl">Guest</span><strong>${b.name}</strong></div>
+      <div class="dr"><span class="dl">Dates</span>${b.ci} → ${b.co}</div>
+      <div class="acb">
+        <button class="btn" onclick="showPclDet(bk.find(x=>x.id===${id}))">Keep it</button>
+        <button class="btn bc" onclick="execCancelPcl(${id})">Yes, cancel</button>
+      </div>
+    </div>`;
+}
+function execCancelPcl(id){
+  const b=bk.find(x=>x.id===id);if(!b)return;
   archivePcl(b,"host_cancelled");
   bk=bk.filter(x=>x.id!==id);
-  sv();closePclPanel();renderCal();
+  sv();renderCal();
   document.getElementById("dpanel").innerHTML='<div class="ph">📅 Pencil booking cancelled.</div>';
   active=null;
 }
@@ -1894,20 +1894,26 @@ function showDisplaced(list,msg,confirmLabel,cancelLabel,onConfirm,onCancel){
   document.getElementById("ov-displaced").classList.add("sh");
 }
 function checkPencilExpiry(){
-  const pencils=bk.filter(b=>b.type==="pencil");
-  if(!pencils.length)return;
-  const expiryHrs=prof.pencilExpiryHrs||24;
-  const now=Date.now();
-  const expired=pencils.filter(b=>{
-    const ciDt=new Date(b.ci+"T"+(prof.ci||"14:00")+":00");
-    const expiry=ciDt.getTime()-(expiryHrs*3600000);
-    return now>expiry;
-  });
-  if(!expired.length)return;
-  expired.forEach(b=>{archivePcl(b,"expired");});
-  bk=bk.filter(b=>!(b.type==="pencil"&&expired.find(e=>e.id===b.id)));
-  pclExpired=expired;
-  sv();renderCal();showExpiryToast(expired);
+  if(_expiryChecking)return;
+  _expiryChecking=true;
+  try{
+    const pencils=bk.filter(b=>b.type==="pencil");
+    if(!pencils.length)return;
+    const expiryHrs=prof.pencilExpiryHrs||24;
+    const now=Date.now();
+    const expired=pencils.filter(b=>{
+      const ciDt=new Date(b.ci+"T"+(prof.ci||"14:00")+":00");
+      const expiry=ciDt.getTime()-(expiryHrs*3600000);
+      return now>expiry;
+    });
+    if(!expired.length)return;
+    expired.forEach(b=>{archivePcl(b,"expired");});
+    bk=bk.filter(b=>!(b.type==="pencil"&&expired.find(e=>e.id===b.id)));
+    pclExpired=expired;
+    sv();renderCal();showExpiryToast(expired);
+  }finally{
+    _expiryChecking=false;
+  }
 }
 function showExpiryToast(expired){
   const msg=expired.length===1
@@ -1933,6 +1939,8 @@ function scheduleMidnightCheck(){
 
 // IMPORTANT NOTICES
 function openNotices(){
+  // M3: Run expiry check before building panel so just-expired pencils are already archived
+  checkPencilExpiry();
   // Clean stale recontact entries (older than 7 days)
   const now=Date.now();
   const weekMs=7*24*3600*1000;
@@ -1943,12 +1951,12 @@ function openNotices(){
   }
 
   // Section 1 — Cleaner Reminder
-  const confFuture=bk.filter(b=>isConf(b)&&b.co>=TD).sort((a,b2)=>a.co.localeCompare(b2.co));
+  const confFuture=bk.filter(b=>isConf(b)&&b.co>=TD()).sort((a,b2)=>a.co.localeCompare(b2.co));
   const nearestCoDate=confFuture.length?confFuture[0].co:null;
   let cleanerHtml='';
   if(nearestCoDate){
     const coGuests=confFuture.filter(b=>b.co===nearestCoDate);
-    const isToday=nearestCoDate===TD;
+    const isToday=nearestCoDate===TD();
     cleanerHtml=coGuests.map(b=>{
       const rowCls=isToday?"cu":"bel-row";
       const prefix=isToday?"Today — ":"";
@@ -1958,24 +1966,27 @@ function openNotices(){
     cleanerHtml=`<div class="bel-none">No upcoming checkouts</div>`;
   }
 
-  // Section 2 — Pencil Holds Expiring Soon
-  const in48=Date.now()+(48*3600*1000);
-  const nearPcl=bk.filter(b=>b.type==="pencil"&&new Date(b.ci).getTime()<=in48&&b.co>=TD)
-    .sort((a,b2)=>a.ci.localeCompare(b2.ci));
+  // Section 2 — Pencil Holds Expiring Soon (mirrors checkPencilExpiry logic — local time aware)
+  const expiryHrsN=prof.pencilExpiryHrs||24;
+  const in48ms=48*3600*1000;
+  const nearPcl=bk.filter(b=>{
+    if(b.type!=="pencil"||b.co<TD())return false;
+    const ciDt=new Date(b.ci+"T"+(prof.ci||"14:00")+":00");
+    const expiry=ciDt.getTime()-(expiryHrsN*3600*1000);
+    return expiry-now<=in48ms;
+  }).sort((a,b2)=>a.ci.localeCompare(b2.ci));
   const pclHtml=nearPcl.length
     ?nearPcl.map(b=>`<div class="bel-row" onclick="showPclDet(bk.find(x=>x.id===${b.id}));cOv('ov-notices')"><strong>${b.name}</strong> · ${b.ci} → ${b.co} · ${b.platform}</div>`).join("")
     :`<div class="bel-none">No pencil holds expiring within 48 hours.</div>`;
 
-  // Section 3 — Recently Expired Pencil Bookings
-  const sevenDaysAgo=new Date(TD);sevenDaysAgo.setDate(sevenDaysAgo.getDate()-7);
-  const sevenDaysAgoStr=sevenDaysAgo.toISOString().slice(0,10);
-  const recentExp=bh.filter(b=>b.cancelReason==="expired"&&new Date(b.co)>=sevenDaysAgo);
+  // Section 3 — Recently Expired Pencil Bookings (uses archivedAt timestamp; old entries without it are excluded)
+  const recentExp=bh.filter(b=>b.cancelReason==="expired"&&b.archivedAt&&b.archivedAt>now-weekMs);
   const expHtml=recentExp.length
     ?recentExp.map(b=>`<div class="bel-row" style="cursor:default"><strong>${b.name}</strong> · ${b.ci} → ${b.co}${b.mobile?'<br><span style="color:#888">'+b.mobile+'</span>':''}${b.email?'<br><span style="color:#888">'+b.email+'</span>':''}</div>`).join("")
     :`<div class="bel-none">No recent expirations</div>`;
 
   // Section 4 — Upcoming Confirmed Bookings (fully paid)
-  const upcoming=bk.filter(b=>isConf(b)&&b.ci>=TD&&b.pay==="full").sort((a,b2)=>a.ci.localeCompare(b2.ci));
+  const upcoming=bk.filter(b=>isConf(b)&&b.ci>=TD()&&b.pay==="full").sort((a,b2)=>a.ci.localeCompare(b2.ci));
   const upcomingHtml=upcoming.length
     ?upcoming.map(b=>`<div class="bel-row" onclick="pickBk(${b.id});cOv('ov-notices')"><strong>${b.name}</strong> · ${b.ci} · <span class="bdg ${pC(b.platform)}">${b.platform}</span></div>`).join("")
     :`<div class="bel-none">No upcoming confirmed bookings</div>`;
@@ -1983,17 +1994,17 @@ function openNotices(){
   // Section 5+ — Payment sections (conditional on prof.fullPay)
   let paymentSectionsHtml='';
   if(prof.fullPay===true){
-    const awaitingAll=bk.filter(b=>isConf(b)&&b.pay==="none"&&b.co>=TD).sort((a,b2)=>a.ci.localeCompare(b2.ci));
+    const awaitingAll=bk.filter(b=>isConf(b)&&b.pay==="none"&&b.co>=TD()).sort((a,b2)=>a.ci.localeCompare(b2.ci));
     const awaitingHtml=awaitingAll.length
       ?awaitingAll.map(b=>`<div class="bel-row" onclick="pickBk(${b.id});cOv('ov-notices')"><strong>${b.name}</strong> · ${b.ci} → ${b.co} · <span class="bdg ${pC(b.platform)}">${b.platform}</span>${b.mobile?'<span style="color:#888;margin-left:5px">'+b.mobile+'</span>':b.email?'<span style="color:#888;margin-left:5px">'+b.email+'</span>':''}</div>`).join("")
       :`<div class="bel-none">No unpaid bookings</div>`;
     paymentSectionsHtml=`<div class="bel-sec"><div class="bel-sec-hd">💸 Awaiting Payment</div>${awaitingHtml}</div>`;
   } else {
-    const awaitingFull=bk.filter(b=>isConf(b)&&b.pay==="none"&&b.co>=TD).sort((a,b2)=>a.ci.localeCompare(b2.ci));
+    const awaitingFull=bk.filter(b=>isConf(b)&&b.pay==="none"&&b.co>=TD()).sort((a,b2)=>a.ci.localeCompare(b2.ci));
     const awaitingFullHtml=awaitingFull.length
       ?awaitingFull.map(b=>`<div class="bel-row" onclick="pickBk(${b.id});cOv('ov-notices')"><strong>${b.name}</strong> · ${b.ci} → ${b.co} · <span class="bdg ${pC(b.platform)}">${b.platform}</span>${b.mobile?'<span style="color:#888;margin-left:5px">'+b.mobile+'</span>':b.email?'<span style="color:#888;margin-left:5px">'+b.email+'</span>':''}</div>`).join("")
       :`<div class="bel-none">No unpaid bookings</div>`;
-    const awaitingPart=bk.filter(b=>isConf(b)&&b.pay==="partial"&&b.co>=TD).sort((a,b2)=>a.ci.localeCompare(b2.ci));
+    const awaitingPart=bk.filter(b=>isConf(b)&&b.pay==="partial"&&b.co>=TD()).sort((a,b2)=>a.ci.localeCompare(b2.ci));
     const awaitingPartHtml=awaitingPart.length
       ?awaitingPart.map(b=>`<div class="bel-row" onclick="pickBk(${b.id});cOv('ov-notices')"><strong>${b.name}</strong> · ${b.ci} → ${b.co} · <span class="bdg ${pC(b.platform)}">${b.platform}</span>${b.mobile?'<span style="color:#888;margin-left:5px">'+b.mobile+'</span>':b.email?'<span style="color:#888;margin-left:5px">'+b.email+'</span>':''}</div>`).join("")
       :`<div class="bel-none">No partial payments pending</div>`;
