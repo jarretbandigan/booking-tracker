@@ -2,7 +2,7 @@
 
 > This file is read automatically by Claude Code every session.
 > It contains the full context needed to work on this project.
-> Last updated: 2026-06-01 | Version: v1.5.0
+> Last updated: 2026-06-02 | Version: v1.5.1
 
 ---
 
@@ -77,7 +77,7 @@ Booking Tracker is a single-file, browser-based property booking management app 
 ```
 booking-tracker/
 │
-├── index.html      Entire application (~1860 lines, ~118KB) — v1.5.0
+├── index.html      Entire application (~2037 lines, ~123KB) — v1.5.1
 │                   Contains: HTML structure, all CSS, all JavaScript
 │                   No external dependencies. Works offline.
 │
@@ -168,18 +168,18 @@ bt_bell  Bell last-seen timestamp (integer, milliseconds)
 - Do not treat this as a secure auth system
 - Session lives in JS memory only, clears on tab close
 
-### 4.2 Full Feature List (all verified working as of v1.5.0)
+### 4.2 Full Feature List (all verified working as of v1.5.1)
 
 **Calendar — Color System + Hover Groups**
-- **15 tile states:** pm (past empty), pbk (past ended booked), pco (past ended checkout), av (available future), av.td (today empty), bk (confirmed future), co (future checkout), yel (unpaid/pending future), yel.td (today unpaid), og.pog (ongoing past days), og.td (ongoing today), og (ongoing future paid), og.og-upd (ongoing future unpaid — ext badge), mn2 (maintenance), tr (turnaround)
-- **Channel 1 — Tile bg = type:** white #FFFFFF available; blue #DBEAFE booked/checkout; yellow #FEF9C3 unpaid/pending; #DCFCE7 past ongoing; #4ADE80 today ongoing; #86EFAC ongoing future; #F3F4F6 maintenance/past-empty; #F9FAFB past ended
-- **Channel 2 — Tile border = time:** today=#1D4ED8 blue ring (always wins, even on yel.td via 3-class specificity); ongoing=#16A34A green; ongoing unpaid/ext=#C2410C orange; turnaround=pulsing #E8A020 amber (never overridden); default transparent or light gray
+- **13 tile states (v1.5.1):** pm (past empty), pbk (past ended booked), pco (past ended checkout), av (available future), av.td (today empty), bk (confirmed future — any payment status), co (future checkout), og.pog (ongoing past days), og.td (ongoing today), og (ongoing future paid), og.og-upd (ongoing future unpaid — orange border), mn2 (maintenance), tr (turnaround). Yellow tiles (yel/yel.td) removed in v1.5.1.
+- **Channel 1 — Tile bg = type:** white #FFFFFF available; green #BBF7D0 confirmed booked/checkout (v1.5.1); #DCFCE7 past ongoing; #4ADE80 today ongoing; #86EFAC ongoing future; #F3F4F6 maintenance/past-empty; #F9FAFB past ended
+- **Channel 2 — Tile border = time:** today=#F59E0B gold ring (v1.5.1, always wins); ongoing=#16A34A green; ongoing unpaid=#C2410C orange; turnaround=pulsing #E8A020 amber (never overridden); default transparent or light gray
 - **Channel 3 — Chip bg = payment:** .cpf #15803D/white fully paid; .cpp #C2410C/white partial; .cpn #991B1B/white unpaid; .cpd #4B5563/white pending. Past fully-paid chips at opacity 0.5 (.cfaded); past unpaid/partial chips at full opacity so outstanding debt stays visible
+- **Payment badge (v1.5.1):** `.upd-bdg` "!" badge (orange, top-left) on all future confirmed unpaid/partial tiles when `prof.fullPay===false`. Replaces ext badge and yellow tile as payment attention signal.
 - **3D card depth:** today+future tiles raised (drop shadow); past empty flat (no shadow); past ended/ongoing-past inset shadow
-- **Hover group highlight (v1.4.0):** `data-bid` on every booked tile, `data-blid` on maintenance tiles. Mouseenter calls `hvOn(sel)` — all tiles with matching bid get `.hv-on` (blue border, scale 1.03, lift shadow, z-index 10); calendar grid gets `.hv-active` dimming all other tiles to opacity 0.45. `hvOff()` clears with 60ms debounce. Skipped on touch devices. **Turnaround fix:** outer `.dy.tr` also receives `.hv-on` when either half is in the group — tile lifts as one unit; `overflow:visible` on `.dy.tr.hv-on` unclips shadow and scale
+- **Hover group highlight (v1.4.0, gold in v1.5.1):** `data-bid` on every booked tile, `data-blid` on maintenance tiles. Mouseenter calls `hvOn(sel)` — all tiles with matching bid get `.hv-on` (gold #F59E0B border, scale 1.03, lift shadow, z-index 10); calendar grid gets `.hv-active` dimming all other tiles to opacity 0.45. `hvOff()` clears with 60ms debounce. Skipped on touch devices. `.dy.td.hv-on` gets darker amber #D97706. **Turnaround fix:** outer `.dy.tr` also receives `.hv-on` when either half is in the group — tile lifts as one unit; `overflow:visible` on `.dy.tr.hv-on` unclips shadow and scale
 - **Cross-month indicators (v1.4.0):** `← cont.` label on d===1 if booking started in prior month; `cont. →` label on d===days if booking ends in next month
-- **Ext badge (v1.4.0):** ongoing future tiles where booking is not fully paid show dark pill badge "ext" — proxy for extension unpaid state until `originalCo` field added in future version
-- **Split turnaround tile:** `.dy.tr` is flex-column; `.tr-top` (outgoing) and `.tr-bot` (incoming) each have `data-bid` and independent inline background reflecting their payment state (#FEF9C3 unpaid, #86EFAC ongoing, #DBEAFE confirmed)
+- **Split turnaround tile:** `.dy.tr` is flex-column; `.tr-top` (outgoing) and `.tr-bot` (incoming) each have `data-bid` and independent inline background reflecting stay type (#86EFAC ongoing, #BBF7D0 confirmed — v1.5.1)
 - **Legend (v1.4.0):** 3-section redesign — Tile color swatches, Payment chip real samples, Border meaning squares, italic hover note
 - **Responsive (v1.4.0):** `@media(min-width:768px)` — `.wp` 900px, `.dy` 82px min-height, `.dn2` 14px, `.ch` 11px, legend gap 10px
 - Click tiles to open detail panel or add booking; navigate months with arrows
@@ -355,6 +355,18 @@ bt_bell  Bell last-seen timestamp (integer, milliseconds)
 - Legend redesign: 3 sections (tile color / payment chip / border meaning) with real chip samples
 - Responsive calendar: @media(min-width:768px) expands tiles, font sizes, legend gap, wrapper to 900px
 
+**v1.5.1: Visual and UX Cleanup — Complete**
+- Color system: confirmed tiles changed from blue (#DBEAFE) to green (#BBF7D0); yellow unpaid tiles (.dy.yel) removed entirely; turnaround halves now always green
+- Today ring + TODAY badge changed from blue (#1D4ED8) to gold (#F59E0B) across .dy.td, .dy.og.td, .tp2
+- Hover group changed from blue to gold (.hv-on); .dy.td.hv-on gets darker amber #D97706
+- Payment badge: .upd-bdg "!" (orange, top-left) on future confirmed unpaid/partial tiles when prof.fullPay===false; replaces ext badge
+- Pencil tile fixes: single tap → showPclDet in dpanel; multi-pencil → showPclList in dpanel; Edit button in detail view; editPcl() pre-fills form locked to pencil type; saveAdd() edit branch updates record in-place
+- closeAdd() helper resets editId and restores type toggle state on cancel
+- Welcome modal flag moved from sessionStorage to localStorage (bt_setup_done) — persists across reloads
+- Profile fullPay checkbox disables downpayment % field on both open and live toggle
+- openAdd() co default fixed to aD(pre||TD,1) — always defaults to day after ci
+- Conflict check fixed: gB(ds,null) replaces getConfOn(ds) so checkout-on-new-ci is a turnaround, not a hard error
+
 **v1.5.0: Navigation + Pencil + Intelligence — Complete**
 - Bottom navigation bar: Home, Guests, Reports, More
 - Property profile/settings modal (⚙️) in header
@@ -401,6 +413,7 @@ bt_bell  Bell last-seen timestamp (integer, milliseconds)
 
 | Version | Date | Summary |
 |---|---|---|
+| v1.5.1 | Jun 2026 | Visual and UX cleanup — green color system replaces blue confirmed tiles; yellow unpaid tiles removed; today ring and TODAY badge changed to gold (#F59E0B); hover group changed to gold with darker amber for today-in-group; payment badge (!) on unpaid/partial future tiles when fullPay=false; pencil tile taps now show in detail panel (showPclList/showPclDet); Edit pencil flow with in-place save; closeAdd() helper; bt_setup_done moved to localStorage; profile fullPay disables dp field; openAdd co default fixed; conflict check uses gB() so turnaround-day ci no longer errors. 2037 lines. |
 | v1.5.0 | Jun 2026 | Navigation overhaul — bottom nav bar (Home/Guests/Reports/More), tab system, property profile/settings modal (⚙️), first-time welcome nudge. Pencil booking type — soft holds with dotted amber tiles, displaced guest flow, auto-expiry with toast + history archive (bt_bh), All Bookings filter chips. Smart Important Notices — real cleaner reminders, payment attention, pencil expiry, re-contact suggestions. Guest intelligence — dedup by name+mobile, confirmed/pencil-only filter, full history from bt_b+bt_bh, copy buttons. |
 | v1.4.0 | May 2026 | Calendar UX overhaul — 5 areas, CSS+JS only, zero data changes. Area 1: new color system (white av, blue bk/co, yellow yel, green og spectrum, near-white past, chip colors cpf=#15803D/cpp=#C2410C/cpn=#991B1B/cpd=#4B5563 white text, cfaded opacity 0.5 for past paid). Area 2: hover group highlight — data-bid/data-blid on all tiles, hvOn(sel)/hvOff() 60ms debounce, .hv-on scale 1.03 blue border lift, .hv-active dims non-hovered to 0.45; turnaround outer .dy.tr gets hv-on so full tile lifts (.dy.tr.hv-on overflow:visible unclips shadow). Area 3: ← cont. / cont. → cross-month boundary labels. Area 4: legend redesign 3 sections (tile color, payment chip, border meaning) + italic note. Area 5: @media(min-width:768px) responsive — 900px wrapper, 82px tiles, 14px dn2, 11px chip. 1168 lines. |
 | v1.3.2 | May 2026 | Calendar visual polish. Unified booked+checkout tile to soft blue (#DBEAFE/#EDF4FF) — checkout amber removed, Checkout legend swatch removed. Past date hierarchy: past-empty=#EFEFEF flat, past-booked/checkout=#EDF4FF inset, past-ongoing=.og.pog #DCF0E4; all gray #BBBBBB date nums normal weight. Chips saturated white text: cpf=#1B7E35, cpp=#E65100, cpn=#C62828, cpd=#616161; .cid/.cod de-colored. Date picker min=TD in openAdd(), aci onchange updates aco.min. 1073 lines. |
