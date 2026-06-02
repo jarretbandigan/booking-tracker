@@ -2,7 +2,7 @@
 
 > This file is read automatically by Claude Code every session.
 > It contains the full context needed to work on this project.
-> Last updated: 2026-06-02 | Version: v1.5.3
+> Last updated: 2026-06-02 | Version: v1.5.4
 
 ---
 
@@ -78,39 +78,49 @@ Booking Tracker is a single-file, browser-based property booking management app 
 ```
 booking-tracker/
 │
-├── index.html      Entire application (~2050 lines, ~126KB) — v1.5.3
-│                   Contains: HTML structure, all CSS, all JavaScript
+├── index.html      HTML shell (452 lines, ~27KB) — v1.5.4
+│                   Contains: HTML structure only. Links styles.css and app.js.
 │                   No external dependencies. Works offline.
+│
+├── styles.css      All CSS (257 lines, ~22KB) — extracted from index.html in v1.5.4
+│                   Loaded via <link> tag inside <head>. Cache-busted with ?v=1.5.4
+│
+├── app.js          All JavaScript (1338 lines, ~75KB) — extracted from index.html in v1.5.4
+│                   Loaded via <script src> before </body>. Cache-busted with ?v=1.5.4
 │
 └── CLAUDE.md       This file. Read by Claude Code every session.
 ```
 
-Single file architecture is intentional. Do not propose splitting unless the owner explicitly requests it. See TIER 1 Rule 1.2.
+**Note:** The app was previously a single index.html file. In v1.5.4 it was split into three files for maintainability. The `<style>` block that was inside `<body>` in v1.5.3 is now a proper `<link rel="stylesheet">` inside `<head>`. Zero logic changes in this refactor.
 
 ### 3.2 index.html Internal Structure
 
+CSS and JavaScript are now in separate files (styles.css, app.js). index.html is the HTML shell only.
+
 ```
-index.html
+index.html (452 lines)
 │
-├── style               Lines 11 to 204     All CSS (color system: bg=type, border=time, chip=payment; hover group; legend; responsive)
-├── LOGIN               Lines 206 to 216    Login screen HTML
-├── APP                 Lines 217 to 290    App shell, header, occupancy bar, legend (4-section), calendar grid, detail panel
-├── ADD                 Lines 291 to 317    Add booking modal
-├── TURNAROUND          Lines 318 to 324    Same-day turnaround warning modal
-├── OVERWRITE WARNING   Lines 325 to 331    Unpaid booking overwrite confirm modal (v1.3.0)
-├── EDIT                Lines 332 to 358    Edit booking modal
-├── EXTEND              Lines 359 to 361    Extend stay modal
-├── CANCEL              Lines 362 to 364    Cancel booking modal
-├── CANCEL CONFIRM      Lines 365 to 371    Full cancel double-confirm modal
-├── MAINTENANCE         Lines 372 to 382    Block dates modal
-├── ALL BOOKINGS        Lines 383 to 399    All bookings list modal
-├── IMPORT FILE         Lines 400 to 402    Hidden file input for import
-├── IMPORT CONFIRM      Lines 403 to 416    Import confirm modal with validation
-├── WHAT'S NEW          Lines 417 to 435    Release notes modal
-├── GUEST MASTERLIST    Lines 436 to 457    Guest Masterlist modal (list + profile views)
-├── NOTIFICATIONS BELL  Lines 458 to 464    Alerts bell modal — 4-section notification panel (v1.3.0)
+├── head                Lines 1 to 9        DOCTYPE, meta tags, title, <link rel="stylesheet" href="styles.css?v=1.5.4">
+├── LOGIN               Lines 12 to 22      Login screen HTML
+├── APP                 Lines 23 to 141     App shell, header, occupancy bar, legend, calendar grid, detail panel, bottom nav
+├── ADD                 Lines 142 to 177    Add booking modal
+├── TURNAROUND          Lines 178 to 184    Same-day turnaround warning modal
+├── OVERWRITE WARNING   Lines 185 to 191    Unpaid booking overwrite confirm modal (v1.3.0)
+├── EDIT                Lines 192 to 218    Edit booking modal
+├── EXTEND              Lines 219 to 221    Extend stay modal
+├── CANCEL              Lines 222 to 224    Cancel booking modal
+├── CANCEL CONFIRM      Lines 225 to 231    Full cancel double-confirm modal
+├── MAINTENANCE         Lines 232 to 242    Block dates modal
+├── ALL BOOKINGS        Lines 243 to 264    All bookings list modal
+├── IMPORT FILE         Lines 265 to 267    Hidden file input for import
+├── IMPORT CONFIRM      Lines 268 to 281    Import confirm modal with validation
+├── WHAT'S NEW          Lines 282 to 305    Release notes modal
+├── IMPORTANT NOTICES   Lines 306 to 317    Smart notices panel (v1.5.0)
+├── SETTINGS            Lines 318 to 384    Property profile/settings modal (v1.5.0)
+├── WELCOME             Lines 438 to 449    First-time welcome nudge modal (v1.5.0)
 │
-└── script              Lines 465 to 1168   All application logic
+└── script              Line 450            <script src="app.js?v=1.5.4"></script>
+                                            All application logic is in app.js (1338 lines)
     ├── AUTH            SHA-256 login, logout
     ├── DATA            localStorage save/load
     ├── HELPERS         fmt12, dRange, addDays, getters, class mappers, isUnpaid, payChipClass, dirClass,
@@ -169,7 +179,7 @@ bt_bell  Bell last-seen timestamp (integer, milliseconds)
 - Do not treat this as a secure auth system
 - Session lives in JS memory only, clears on tab close
 
-### 4.2 Full Feature List (all verified working as of v1.5.3)
+### 4.2 Full Feature List (all verified working as of v1.5.4)
 
 **Calendar — Color System + Hover Groups**
 - **13 tile states (v1.5.1):** pm (past empty), pbk (past ended booked), pco (past ended checkout), av (available future), av.td (today empty), bk (confirmed future — any payment status), co (future checkout), og.pog (ongoing past days), og.td (ongoing today), og (ongoing future paid), og.og-upd (ongoing future unpaid — orange border), mn2 (maintenance), tr (turnaround). Yellow tiles (yel/yel.td) removed in v1.5.1.
@@ -414,6 +424,7 @@ bt_bell  Bell last-seen timestamp (integer, milliseconds)
 
 | Version | Date | Summary |
 |---|---|---|
+| v1.5.4 | Jun 2026 | Architectural file split. index.html (452 lines) separated into styles.css (257 lines, 22KB) and app.js (1338 lines, 75KB). CSS moved from inline `<style>` in `<body>` to proper `<link rel="stylesheet">` in `<head>`. Both files cache-busted with ?v=1.5.4 query string. Zero logic changes, zero data structure changes. All 6 browser verification flows pass with zero console errors. |
 | v1.5.3 | Jun 2026 | Bug fix release — 18 fixes across data integrity, pencil flow, calendar, and code hygiene. C1: saveProf() now preserves prof.recontact and prof.pencilExpiryHrs across saves. C2/M8: doLogout() clears midnight timer and resets all state globals. C3: confirmOw() checks turnaround before removing overwritten booking, preventing data loss on cancel. M1: pencil edit branch now runs conflict check. M2: openExt() uses strict mid-stay check (b2.ci<nd&&b2.co>nd) not getConfOn, so turnaround-day extensions are no longer blocked. M3: openNotices() runs checkPencilExpiry() first. M4: archivePcl() adds archivedAt timestamp; Section 3 filter uses it. M5: loadData() migrates missing at field; renderList() sort has fallback. M6: renderCal() clears hv-active before innerHTML. M7: TD is now a function (toLocaleDateString en-CA) — local time, no staleness. M8-M10: state cleanup, confirmed-only cG(), turnaround past tile uses .ptr class. L3: openBell() and ov-bell modal removed. L4-L5: nav gold, legend note corrected. L6: minNights validation in confirmed add path. L7: cancelPcl splits into cancelPcl(id)+execCancelPcl(id), no browser confirm(). L8: Section 2 pencil expiry uses local-time calculation. L9: checkPencilExpiry() has reentrancy guard. L10: renderGM/openGMProf use name+mobile for dedup-safe lookup. 2050 lines. |
 | v1.5.1 | Jun 2026 | Visual and UX cleanup — green color system replaces blue confirmed tiles; yellow unpaid tiles removed; today ring and TODAY badge changed to gold (#F59E0B); hover group changed to gold with darker amber for today-in-group; payment badge (!) on unpaid/partial future tiles when fullPay=false; pencil tile taps now show in detail panel (showPclList/showPclDet); Edit pencil flow with in-place save; closeAdd() helper; bt_setup_done moved to localStorage; profile fullPay disables dp field; openAdd co default fixed; conflict check uses gB() so turnaround-day ci no longer errors. 2037 lines. |
 | v1.5.0 | Jun 2026 | Navigation overhaul — bottom nav bar (Home/Guests/Reports/More), tab system, property profile/settings modal (⚙️), first-time welcome nudge. Pencil booking type — soft holds with dotted amber tiles, displaced guest flow, auto-expiry with toast + history archive (bt_bh), All Bookings filter chips. Smart Important Notices — real cleaner reminders, payment attention, pencil expiry, re-contact suggestions. Guest intelligence — dedup by name+mobile, confirmed/pencil-only filter, full history from bt_b+bt_bh, copy buttons. |
