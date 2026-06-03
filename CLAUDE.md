@@ -2,7 +2,7 @@
 
 > This file is read automatically by Claude Code every session.
 > It contains the full context needed to work on this project.
-> Last updated: 2026-06-02 | Version: v1.5.5
+> Last updated: 2026-06-03 | Version: v1.5.5
 
 ---
 
@@ -18,6 +18,7 @@
 - **Branch for every new feature.** Never work directly on main. New features go on a branch named feature/short-description. Bug fixes go on fix/short-description. Only merge to main when the feature is complete and tested.
 - **State a plan before complex changes.** For anything touching more than one function or more than ~30 lines, write out the plan first and wait for confirmation before writing code. Do not just start coding.
 - **Never modify TIER 1 rules** without the owner explicitly asking you to do so.
+- **Never violate the privacy principles in Tier 1.5.** Any feature, data structure, or Supabase schema that exposes guest data across host boundaries or stores data beyond what is necessary must be flagged and stopped before implementation.
 
 ### 1.2 Code Quality Rules
 
@@ -47,6 +48,58 @@ Before any change that touches bt_b or bt_bl:
 4. Never rename or remove a localStorage key without a migration
 5. Never clear localStorage except through the explicit Clear Demo button
 6. If unsure whether a change is safe for existing data, stop and ask first
+
+---
+
+## TIER 1.5: PRIVACY PRINCIPLES
+
+These principles apply to every feature built from v1.6.0 onwards and every Supabase design decision in v1.7.0. They are non-negotiable and must be considered in every prompt, every function, and every data structure decision.
+
+### Why these exist
+
+This app is built for Filipino short-term rental hosts but it handles data belonging to two parties: the hosts who use the app and the guests who book their properties. Guests did not sign up for this platform. They shared their contact details to book a property, not to be entered into a shared database. Their privacy must be respected accordingly.
+
+### The five principles
+
+**P1: Guest data belongs to the relationship, not the platform**
+A guest's name, mobile number, email, booking history, ratings, and notes are private to the host they shared that information with. The platform is a tool for the host, not a data broker. No guest data is ever shared across hosts without explicit consent from all parties.
+
+**P2: Minimum data sharing**
+The only thing shared across hosts in future multi-user Supabase architecture is an anonymous internal guest ID used purely for system linkage. No names, no phone numbers, no emails, no booking details, no ratings ever cross host boundaries automatically. Cross-property guest matching requires explicit host confirmation.
+
+**P3: Host data is equally private**
+One host never sees another host's bookings, occupancy rates, revenue figures, guest lists, or any operational data. Each host's property data is completely siloed. Row Level Security in Supabase enforces this at the database level.
+
+**P4: AI assistance never means data exposure**
+When the AI agent is built in Phase 4, it operates on aggregated anonymous patterns only. It can surface insights like guest reputation signals without revealing which specific properties a guest stayed at, what contact details they used elsewhere, or any data belonging to another host. The AI agent has its own separate permission layer and never bypasses the privacy principles.
+
+**P5: Collect only what is necessary**
+We store only the data a host needs to manage their bookings effectively. We do not collect data speculatively for future use. Every new field added to any storage key must have a clear and immediate purpose. If the purpose is future AI analysis, that purpose must be documented explicitly in CLAUDE.md at the time the field is added.
+
+### How these apply to code decisions
+
+When building any feature that involves guest data, Claude Code must ask:
+
+- Does this feature expose one host's guest data to another host in any way?
+- Does this feature store guest data beyond what is needed for the host to manage their bookings?
+- Does this feature assume guest consent for data usage that was not given at booking time?
+- Does this Supabase table or localStorage key design allow data to leak across host boundaries?
+
+If the answer to any of these is **yes** or **maybe**, stop and flag it before writing any code.
+
+### Supabase architecture implications
+
+When v1.7.0 Supabase is built, the data architecture must enforce these principles structurally:
+
+- The shared `guests` table contains only an anonymous internal ID and system timestamps. Nothing else.
+- All guest attributes (name, mobile, email) live in `guest_property_profiles` which is scoped per host per property.
+- A guest using different phone numbers with different hosts is intentional and correct. Each host sees only the number their guest used with them.
+- Row Level Security policies must be written and verified before any data goes into Supabase. No exceptions.
+- The AI agent for cross-property intelligence is a separate service with its own permission layer. It is never part of the main app codebase.
+
+### Note for Claude Code
+
+Never propose a feature, data structure, or Supabase schema that violates these principles even if it would be technically simpler or more efficient. Privacy by design means building it right from the start, not adding privacy as a layer on top later.
 
 ---
 
