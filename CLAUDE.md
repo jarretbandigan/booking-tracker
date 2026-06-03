@@ -2,7 +2,7 @@
 
 > This file is read automatically by Claude Code every session.
 > It contains the full context needed to work on this project.
-> Last updated: 2026-06-02 | Version: v1.5.4
+> Last updated: 2026-06-02 | Version: v1.5.5
 
 ---
 
@@ -160,8 +160,13 @@ bt_p   Profile object
                expHrs, minNights, noSmoke, noPets, noParty, customRule,
                hostName, hostMob, gcash, pencilExpiryHrs, recontact[]
 
-bt_bh  Booking history archive (cancelled/expired pencil bookings)
-       Fields: same as bt_b entries + cancelReason ("host_cancelled" | "booking_confirmed" | "expired")
+bt_bh  Booking history archive (cancelled pencil bookings + cancelled confirmed bookings)
+       Fields: same as bt_b entries + cancelReason + archivedAt (timestamp)
+       cancelReason values:
+         Pencil: "host_cancelled" | "booking_confirmed" | "expired"
+         Confirmed: "confirmed_cancelled_full" | "confirmed_cancelled_partial"
+       Additional fields for confirmed_cancelled_full: cancelledBy ("host")
+       Additional fields for confirmed_cancelled_partial: originalCi, originalCo, cancelledDays (array)
 
 bt_bell  Bell last-seen timestamp (integer, milliseconds)
 ```
@@ -179,7 +184,7 @@ bt_bell  Bell last-seen timestamp (integer, milliseconds)
 - Do not treat this as a secure auth system
 - Session lives in JS memory only, clears on tab close
 
-### 4.2 Full Feature List (all verified working as of v1.5.4)
+### 4.2 Full Feature List (all verified working as of v1.5.5)
 
 **Calendar — Color System + Hover Groups**
 - **13 tile states (v1.5.1):** pm (past empty), pbk (past ended booked), pco (past ended checkout), av (available future), av.td (today empty), bk (confirmed future — any payment status), co (future checkout), og.pog (ongoing past days), og.td (ongoing today), og (ongoing future paid), og.og-upd (ongoing future unpaid — orange border), mn2 (maintenance), tr (turnaround). Yellow tiles (yel/yel.td) removed in v1.5.1.
@@ -424,6 +429,7 @@ bt_bell  Bell last-seen timestamp (integer, milliseconds)
 
 | Version | Date | Summary |
 |---|---|---|
+| v1.5.5 | Jun 2026 | Critical data protection fix. Cancelled confirmed bookings now archived to bt_bh instead of permanently deleted. execFull() archives with cancelReason="confirmed_cancelled_full" and cancelledBy="host" before removal. confPart() archives a snapshot with cancelReason="confirmed_cancelled_partial", originalCi, originalCo, cancelledDays before any trimming. archivePcl() renamed to archiveBk(b,reason,extra) to support both pencil and confirmed archiving. stayLabel() updated with all 5 cancelReason labels including new confirmed cancel types. Guest Masterlist history now shows complete booking history including cancelled confirmed stays. Export/import of bt_bh already correct — confirmed. |
 | v1.5.4 | Jun 2026 | Architectural file split. index.html (452 lines) separated into styles.css (257 lines, 22KB) and app.js (1338 lines, 75KB). CSS moved from inline `<style>` in `<body>` to proper `<link rel="stylesheet">` in `<head>`. Both files cache-busted with ?v=1.5.4 query string. Zero logic changes, zero data structure changes. All 6 browser verification flows pass with zero console errors. |
 | v1.5.3 | Jun 2026 | Bug fix release — 18 fixes across data integrity, pencil flow, calendar, and code hygiene. C1: saveProf() now preserves prof.recontact and prof.pencilExpiryHrs across saves. C2/M8: doLogout() clears midnight timer and resets all state globals. C3: confirmOw() checks turnaround before removing overwritten booking, preventing data loss on cancel. M1: pencil edit branch now runs conflict check. M2: openExt() uses strict mid-stay check (b2.ci<nd&&b2.co>nd) not getConfOn, so turnaround-day extensions are no longer blocked. M3: openNotices() runs checkPencilExpiry() first. M4: archivePcl() adds archivedAt timestamp; Section 3 filter uses it. M5: loadData() migrates missing at field; renderList() sort has fallback. M6: renderCal() clears hv-active before innerHTML. M7: TD is now a function (toLocaleDateString en-CA) — local time, no staleness. M8-M10: state cleanup, confirmed-only cG(), turnaround past tile uses .ptr class. L3: openBell() and ov-bell modal removed. L4-L5: nav gold, legend note corrected. L6: minNights validation in confirmed add path. L7: cancelPcl splits into cancelPcl(id)+execCancelPcl(id), no browser confirm(). L8: Section 2 pencil expiry uses local-time calculation. L9: checkPencilExpiry() has reentrancy guard. L10: renderGM/openGMProf use name+mobile for dedup-safe lookup. 2050 lines. |
 | v1.5.1 | Jun 2026 | Visual and UX cleanup — green color system replaces blue confirmed tiles; yellow unpaid tiles removed; today ring and TODAY badge changed to gold (#F59E0B); hover group changed to gold with darker amber for today-in-group; payment badge (!) on unpaid/partial future tiles when fullPay=false; pencil tile taps now show in detail panel (showPclList/showPclDet); Edit pencil flow with in-place save; closeAdd() helper; bt_setup_done moved to localStorage; profile fullPay disables dp field; openAdd co default fixed; conflict check uses gB() so turnaround-day ci no longer errors. 2037 lines. |

@@ -89,7 +89,7 @@ function isConf(b){return b.type==="confirmed";}
 function getPclOn(ds){return bk.filter(b=>isPencil(b)&&dR(b.ci,b.co).includes(ds));}
 function getConfOn(ds){return bk.find(b=>isConf(b)&&(dR(b.ci,b.co).includes(ds)||b.co===ds));}
 function pclOnRange(ci,co){const days=dR(ci,co);return bk.filter(b=>isPencil(b)&&days.some(d=>dR(b.ci,b.co).includes(d)));}
-function archivePcl(b,reason){bh.push(Object.assign({},b,{cancelReason:reason,archivedAt:Date.now()}));svH();}
+function archiveBk(b,reason,extra){bh.push(Object.assign({},b,{cancelReason:reason,archivedAt:Date.now()},extra||{}));svH();}
 let hvTimer,_expiryChecking=false;
 function hvOn(sel){clearTimeout(hvTimer);const c=document.getElementById("cal");c.classList.add("hv-active");c.querySelectorAll(".hv-on").forEach(t=>t.classList.remove("hv-on"));c.querySelectorAll(sel).forEach(t=>{t.classList.add("hv-on");if(t.classList.contains("tr-top")||t.classList.contains("tr-bot"))t.parentElement.classList.add("hv-on");});}
 function hvOff(){hvTimer=setTimeout(()=>{const c=document.getElementById("cal");c.classList.remove("hv-active");c.querySelectorAll(".hv-on").forEach(t=>t.classList.remove("hv-on"));},60);}
@@ -442,7 +442,7 @@ function saveAdd(){
     pend=b;
     showDisplaced(displaced,"These pencil bookings will be cancelled. Please contact them.",
       "Cancel pencil bookings and confirm","Go back",
-      ()=>{displaced.forEach(d2=>{archivePcl(d2,"booking_confirmed");bk=bk.filter(x=>x.id!==d2.id);});cOv('ov-displaced');
+      ()=>{displaced.forEach(d2=>{archiveBk(d2,"booking_confirmed");bk=bk.filter(x=>x.id!==d2.id);});cOv('ov-displaced');
         const exCoD=gCO(b.ci);
         if(exCoD){
           document.getElementById("twb").innerHTML=`<div class="wb"><strong>↓ ${exCoD.name}</strong> checks out on <strong>${b.ci} at ${f12(eCo(exCoD))}</strong><br><strong>↑ ${b.name}</strong> would check in at <strong>${f12(eCi(b))}</strong><br><br>Cleaner must prepare unit between these times. Confirm this is enough time.</div>`;
@@ -552,7 +552,7 @@ function confExt(){
   if(extDisplaced.length>0){
     showDisplaced(extDisplaced,"These pencil bookings overlap the extended dates. Please contact them.",
       "Extend anyway","Go back",
-      ()=>{extDisplaced.forEach(d2=>{archivePcl(d2,"booking_confirmed");bk=bk.filter(x=>x.id!==d2.id);});cOv('ov-displaced');doExtend();},
+      ()=>{extDisplaced.forEach(d2=>{archiveBk(d2,"booking_confirmed");bk=bk.filter(x=>x.id!==d2.id);});cOv('ov-displaced');doExtend();},
       ()=>{cOv('ov-displaced');});
     return;
   }
@@ -591,6 +591,7 @@ function reqCan(){
 }
 function execFull(){
   const b=pfcl;if(!b)return;
+  archiveBk(b,"confirmed_cancelled_full",{cancelledBy:"host"});
   bk=bk.filter(x=>x.id!==b.id);sv();cAll();renderCal();
   document.getElementById("dpanel").innerHTML=`<div class="ph">Booking for ${b.name} cancelled.</div>`;
   active=null;pfcl=null;
@@ -622,6 +623,7 @@ function confPart(){
   const pe=document.getElementById("perr");
   if(!sel.length){pe.textContent="Select at least one day.";pe.style.display="block";return;}
   const rem=dR(b.ci,b.co).filter(d=>!sel.includes(d));
+  archiveBk(b,"confirmed_cancelled_partial",{originalCi:b.ci,originalCo:b.co,cancelledDays:sel});
   if(!rem.length){bk=bk.filter(x=>x.id!==b.id);sv();cAll();renderCal();document.getElementById("dpanel").innerHTML=`<div class="ph">All days removed — booking deleted.</div>`;active=null;return;}
   const s=rem.sort();b.ci=s[0];b.co=aD(s[s.length-1],1);
   sv();cAll();renderCal();showDet(b);
@@ -668,7 +670,7 @@ function saveMaint(){
   if(mDisplaced.length>0){
     showDisplaced(mDisplaced,"These pencil bookings overlap the blocked dates. Please contact them.",
       "Block anyway","Go back",
-      ()=>{mDisplaced.forEach(d2=>{archivePcl(d2,"booking_confirmed");bk=bk.filter(x=>x.id!==d2.id);});cOv('ov-displaced');doSaveMaint();},
+      ()=>{mDisplaced.forEach(d2=>{archiveBk(d2,"booking_confirmed");bk=bk.filter(x=>x.id!==d2.id);});cOv('ov-displaced');doSaveMaint();},
       ()=>{cOv('ov-displaced');});
     return;
   }
@@ -770,9 +772,11 @@ function buildGuests(){
 }
 function stayLabel(s){
   if(s._src==='bh'){
-    if(s.cancelReason==='booking_confirmed')return'<span style="color:#C2410C;font-size:10px;font-weight:700">Cancelled — another booking confirmed</span>';
-    if(s.cancelReason==='expired')return'<span style="color:#6B7280;font-size:10px;font-weight:700">Expired</span>';
-    if(s.cancelReason==='host_cancelled')return'<span style="color:#6B7280;font-size:10px;font-weight:700">Cancelled by host</span>';
+    if(s.cancelReason==='confirmed_cancelled_full')return'<span style="color:#8B2110;font-size:10px;font-weight:700">Cancelled by host</span>';
+    if(s.cancelReason==='confirmed_cancelled_partial')return'<span style="color:#7A4A00;font-size:10px;font-weight:700">Partially cancelled</span>';
+    if(s.cancelReason==='booking_confirmed')return'<span style="color:#C2410C;font-size:10px;font-weight:700">Pencil cancelled, another booking confirmed</span>';
+    if(s.cancelReason==='expired')return'<span style="color:#6B7280;font-size:10px;font-weight:700">Pencil expired</span>';
+    if(s.cancelReason==='host_cancelled')return'<span style="color:#6B7280;font-size:10px;font-weight:700">Pencil cancelled by host</span>';
   }
   if(s.type==='pencil')return'<span style="color:#713F12;font-size:10px;font-weight:700">✏️ Pencil</span>';
   return'<span style="color:#15803D;font-size:10px;font-weight:700">Confirmed</span>';
@@ -1144,7 +1148,7 @@ function confirmPcl(){
   if(displaced.length>0){
     showDisplaced(displaced,"Please contact these guests whose pencil bookings will be cancelled.",
       "Acknowledge and confirm","Go back",
-      ()=>{displaced.forEach(d2=>{archivePcl(d2,"booking_confirmed");bk=bk.filter(x=>x.id!==d2.id);});cOv('ov-displaced');cOv('ov-pcl-conf');doConfirm();},
+      ()=>{displaced.forEach(d2=>{archiveBk(d2,"booking_confirmed");bk=bk.filter(x=>x.id!==d2.id);});cOv('ov-displaced');cOv('ov-pcl-conf');doConfirm();},
       ()=>{cOv('ov-displaced');});
     return;
   }
@@ -1166,7 +1170,7 @@ function cancelPcl(id){
 }
 function execCancelPcl(id){
   const b=bk.find(x=>x.id===id);if(!b)return;
-  archivePcl(b,"host_cancelled");
+  archiveBk(b,"host_cancelled");
   bk=bk.filter(x=>x.id!==id);
   sv();renderCal();
   document.getElementById("dpanel").innerHTML='<div class="ph">📅 Pencil booking cancelled.</div>';
@@ -1198,7 +1202,7 @@ function checkPencilExpiry(){
       return now>expiry;
     });
     if(!expired.length)return;
-    expired.forEach(b=>{archivePcl(b,"expired");});
+    expired.forEach(b=>{archiveBk(b,"expired");});
     bk=bk.filter(b=>!(b.type==="pencil"&&expired.find(e=>e.id===b.id)));
     pclExpired=expired;
     sv();renderCal();showExpiryToast(expired);
