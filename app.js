@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Jarret Bandigan. All rights reserved. Proprietary and confidential.
 // AUTH — SHA-256, pre-computed hash (plaintext password not stored in source)
 const CU="admin";
 const CH="fba447b7c72af7dbd2482b4bc07352abbb8292df3b28956d91692e65eaafde2e";

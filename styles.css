@@ -1,3 +1,4 @@
+/* Copyright (c) 2026 Jarret Bandigan. All rights reserved. Proprietary and confidential. */
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f7f8fa}
 #ls{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#1a3a0a,#2D5F0F,#4a8a20);padding:20px}
