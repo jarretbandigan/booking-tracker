@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="description" content="Booking Tracker — Property management made simple"/>
   <title>Booking Tracker</title>
-  <link rel="stylesheet" href="styles.css?v=1.5.4">
+  <link rel="stylesheet" href="styles.css?v=1.5.5">
 </head>
 <body>
 
@@ -281,23 +281,21 @@
 
 <!-- WHAT'S NEW -->
 <div class="ov" id="ov-wn"><div class="md">
-  <h3>✨ What's New — v1.5.3</h3>
+  <h3>✨ What's New — v1.5.5</h3>
   <div style="font-size:13px;color:#444;line-height:1.7;margin-bottom:13px">
-    <div style="margin-bottom:6px"><strong>🛡️ Data Protection Fixes</strong><br>Saving your property settings no longer wipes your re-contact list or pencil expiry config. The midnight pencil timer now clears on sign out so it cannot multiply in the background.</div>
-    <div style="margin-bottom:6px"><strong>📅 Extend Stay Fix</strong><br>Extending a stay to a date where only a checkout occurs (turnaround day) no longer incorrectly blocks the extension.</div>
-    <div style="margin-bottom:6px"><strong>✏️ Pencil Booking Fixes</strong><br>Editing a pencil booking now checks for conflicts. Cancelling a pencil booking shows an inline confirm instead of a browser pop-up. Confirming a pencil with displaced holds correctly closes all modals. The Important Notices panel now runs an expiry check before display.</div>
-    <div style="margin-bottom:6px"><strong>🗂️ Calendar & Data Fixes</strong><br>Hover highlight classes now clear correctly when navigating months. Turnaround tiles on past dates are shown as muted. Repeat guest count now only counts confirmed bookings. Guest Masterlist lookups now use name + mobile for accuracy.</div>
-    <div><strong>🔔 Notices Fix</strong><br>Pencil expiry comparison now uses local time (not UTC midnight), matching actual expiry logic. Recently expired archive filter uses timestamp instead of checkout date.</div>
+    <div style="margin-bottom:6px"><strong>🛡️ Critical Data Protection Fix</strong><br>Cancelled confirmed bookings are now archived to your booking history instead of being permanently deleted. Full cancellations and partial cancellations are both preserved with the complete original booking details.</div>
+    <div style="margin-bottom:6px"><strong>📋 Complete Booking History</strong><br>Your Guest Masterlist now shows the full history of every guest including cancelled confirmed stays. You can see exactly when a stay was cancelled and whether it was a full or partial cancellation.</div>
+    <div><strong>💾 Backup Includes Full History</strong><br>Export now captures all cancelled confirmed bookings alongside pencil history. Importing a backup restores your complete record.</div>
   </div>
   <div style="border-top:1px solid #eee;padding-top:10px;margin-bottom:10px">
     <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#aaa;letter-spacing:.5px;margin-bottom:6px">Previous releases</div>
     <div style="font-size:12px;color:#666;line-height:1.7">
-      <div style="margin-bottom:4px"><strong>v1.5.1</strong> — Green color system, gold today ring, payment badge, pencil tile taps</div>
-      <div style="margin-bottom:4px"><strong>v1.5.0</strong> — Bottom navigation, property profile, pencil bookings, smart notices, guest history</div>
+      <div style="margin-bottom:4px"><strong>v1.5.4</strong> — Architectural file split: styles.css and app.js extracted for maintainability</div>
+      <div style="margin-bottom:4px"><strong>v1.5.3</strong> — 18 data integrity and pencil flow fixes</div>
+      <div style="margin-bottom:4px"><strong>v1.5.0 – v1.5.1</strong> — Bottom navigation, property profile, pencil bookings, smart notices, guest history</div>
       <div style="margin-bottom:4px"><strong>v1.4.0</strong> — Calendar UX overhaul: hover groups, cross-month indicators, responsive layout</div>
       <div style="margin-bottom:4px"><strong>v1.3.0</strong> — Calendar polish, ongoing tile states, alerts bell, unpaid overwrite</div>
-      <div style="margin-bottom:4px"><strong>v1.2.0</strong> — Guest Masterlist with search, filter, and full stay history</div>
-      <div><strong>v1.0.0 – v1.1.0</strong> — MVP, security fix, export &amp; import backup</div>
+      <div><strong>v1.0.0 – v1.2.0</strong> — MVP, security fix, export &amp; import, Guest Masterlist</div>
     </div>
   </div>
   <div class="mbb"><button class="bxx" style="flex:1" onclick="cOv('ov-wn')">Close</button></div>
@@ -447,6 +445,6 @@
   </div>
 </div>
 
-<script src="app.js?v=1.5.4"></script>
+<script src="app.js?v=1.5.5"></script>
 </body>
 </html>
