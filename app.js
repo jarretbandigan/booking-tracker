@@ -94,6 +94,19 @@ function archiveBk(b,reason,extra){bh.push(Object.assign({},b,{cancelReason:reas
 let hvTimer,_expiryChecking=false;
 function hvOn(sel){clearTimeout(hvTimer);const c=document.getElementById("cal");c.classList.add("hv-active");c.querySelectorAll(".hv-on").forEach(t=>t.classList.remove("hv-on"));c.querySelectorAll(sel).forEach(t=>{t.classList.add("hv-on");if(t.classList.contains("tr-top")||t.classList.contains("tr-bot"))t.parentElement.classList.add("hv-on");});}
 function hvOff(){hvTimer=setTimeout(()=>{const c=document.getElementById("cal");c.classList.remove("hv-active");c.querySelectorAll(".hv-on").forEach(t=>t.classList.remove("hv-on"));},60);}
+function updRateCalc(ciId,coId,rateId,totalId){
+  const ci=document.getElementById(ciId)?.value;
+  const co=document.getElementById(coId)?.value;
+  const rate=parseFloat(document.getElementById(rateId)?.value)||0;
+  const el=document.getElementById(totalId);
+  if(!el)return;
+  if(!ci||!co||!rate||co<=ci){el.style.display="none";return;}
+  const nights=dR(ci,co).length;
+  if(!nights){el.style.display="none";return;}
+  const fmt=n=>Math.round(n).toLocaleString();
+  el.textContent=nights+" night"+(nights!==1?"s":"")+" × ₱"+fmt(rate)+" = ₱"+fmt(nights*rate)+" estimated total";
+  el.style.display="block";
+}
 
 // OCCUPANCY
 function updOcc(){
@@ -302,6 +315,20 @@ function showDet(b){
     :`<div class="cb">🧹 <div><strong>Contact cleaner</strong> for checkout on <strong>${b.co} at ${f12(cot)}</strong>${lw}</div></div>`;
   // Cleaner flow only shown for confirmed bookings (pencil bookings have no cleaner logistics)
   const showCleaner = b.type === "confirmed" || b.type === undefined;
+  // Rate row — only shown when ratePerNight is set
+  let rateRow="";
+  if(b.ratePerNight){
+    const fmt=n=>Math.round(n).toLocaleString();
+    const origNights=dR(b.ci,b.originalCo||b.co).length;
+    const origTotal=origNights*b.ratePerNight;
+    if(b.extensionRate&&b.originalCo){
+      const extNights=dR(b.originalCo,b.co).length;
+      const extTotal=extNights*b.extensionRate;
+      rateRow=`<div class="dr"><span class="dl">Rate</span><span class="dv" style="text-align:right"><div>Orig: ₱${fmt(b.ratePerNight)} × ${origNights}n = ₱${fmt(origTotal)}</div><div>Ext: ₱${fmt(b.extensionRate)} × ${extNights}n = ₱${fmt(extTotal)}</div><div><strong>Est. total: ₱${fmt(origTotal+extTotal)}</strong></div></span></div>`;
+    } else {
+      rateRow=`<div class="dr"><span class="dl">Rate</span><span class="dv">₱${fmt(b.ratePerNight)} × ${origNights} night${origNights!==1?"s":""} = ₱${fmt(origTotal)}</span></div>`;
+    }
+  }
   document.getElementById("dpanel").innerHTML=`
     <div class="pt">Booking details</div>
     <div class="dr"><span class="dl">Guest</span><strong class="dv">${b.name}</strong></div>
@@ -314,6 +341,7 @@ function showDet(b){
     <div class="dr"><span class="dl">Check-in</span><span class="dv">${b.ci} at <strong>${f12(cit)}</strong>${ciX}</span></div>
     <div class="dr"><span class="dl">Check-out</span><span class="dv">${b.co} at <strong>${f12(cot)}</strong>${coX}</span></div>
     ${b.notes?`<div class="dr"><span class="dl">Notes</span><span class="dv">${b.notes}</span></div>`:""}
+    ${rateRow}
     ${showCleaner?`<div class="tt">
       <button class="tbtn tcl${cd?" dn3":""}" onclick="tapCl()">${cd?"✓ Cleaner contacted":"🧹 Cleaner contacted?"}</button>
       <button class="tbtn trd${ur?" dn3":""}" onclick="tapRd()"${!cd?' disabled style="opacity:0.45;cursor:not-allowed"':''}>${ur?"✓ Unit ready":"✅ Unit ready?"}</button>
@@ -361,6 +389,8 @@ function openAdd(pre){
   document.getElementById("apy").value="none";document.getElementById("ame").value="";
   document.getElementById("ame-row").style.display="none";
   document.getElementById("aerr").style.display="none";
+  document.getElementById("a-rate").value=prof.defaultRate!=null?prof.defaultRate:"";
+  document.getElementById("a-rate-total").style.display="none";
   const pn=document.getElementById("apre");
   if(pre){pn.textContent="📅 Check-in pre-filled for "+pre;pn.style.display="block";}else pn.style.display="none";
   document.getElementById("ov-add").classList.add("sh");
@@ -385,7 +415,8 @@ function saveAdd(){
         ci,co,ciS:document.getElementById("acis").value,
         coS:document.getElementById("acos").value,
         platform:document.getElementById("apl").value,
-        notes:document.getElementById("ano").value.trim()};
+        notes:document.getElementById("ano").value.trim(),
+        ratePerNight:parseFloat(document.getElementById("a-rate").value)||null};
       sv();renderCal();cAll();
     }
     editId=null;return;
@@ -408,7 +439,7 @@ function saveAdd(){
     const blConflict=dR(ci,co).find(d=>gBl(d));
     if(blConflict){err.textContent="Conflict — a maintenance block covers these dates.";err.style.display="block";return;}
     // Multiple pencil bookings on same dates: allowed
-    const b={id:nid++,name,mobile,email,ci,co,ciS,coS,ciE:"",ciL:"",coE:"",coL:"",platform,pay:"none",method:"",notes,cd:false,ur:false,at:TD(),type:"pencil"};
+    const b={id:nid++,name,mobile,email,ci,co,ciS,coS,ciE:"",ciL:"",coE:"",coL:"",platform,pay:"none",method:"",notes,cd:false,ur:false,at:TD(),type:"pencil",ratePerNight:parseFloat(document.getElementById("a-rate").value)||null};
     commitBk(b);
     return;
   }
@@ -422,7 +453,8 @@ function saveAdd(){
   }
   const b={id:nid++,name,mobile,email,ci,co,ciS,coS,ciE,ciL,coE,coL,platform,
     pay:document.getElementById("apy").value,method:document.getElementById("ame").value,
-    notes,cd:false,ur:false,at:TD(),type:"confirmed"};
+    notes,cd:false,ur:false,at:TD(),type:"confirmed",
+    ratePerNight:parseFloat(document.getElementById("a-rate").value)||null};
   // Only check confirmed bookings and blocks (exclude checkout date — turnaround is allowed)
   const conf=dR(ci,co).find(ds=>gB(ds,null)||gBl(ds));
   if(conf){
@@ -495,6 +527,14 @@ function openEdit(){
   document.getElementById("eme2").value=b.method||"";document.getElementById("eno").value=b.notes||"";
   document.getElementById("edates").innerHTML="🔒 Dates: <strong>"+b.ci+"</strong> → <strong>"+b.co+"</strong>";
   document.getElementById("eerr").style.display="none";
+  const eRateEl=document.getElementById("e-rate"),eTotalEl=document.getElementById("e-rate-total");
+  eRateEl.value=b.ratePerNight!=null?b.ratePerNight:"";
+  if(b.ratePerNight){
+    const nights=dR(b.ci,b.co).length;
+    const fmt=n=>Math.round(n).toLocaleString();
+    eTotalEl.textContent=nights+" night"+(nights!==1?"s":"")+" × ₱"+fmt(b.ratePerNight)+" = ₱"+fmt(nights*b.ratePerNight)+" estimated total";
+    eTotalEl.style.display="block";
+  } else {eTotalEl.style.display="none";}
   document.getElementById("ov-ed").classList.add("sh");
 }
 function saveEdit(){
@@ -508,6 +548,7 @@ function saveEdit(){
   b.coE=document.getElementById("ecoe").value;b.coL=document.getElementById("ecol").value;
   b.platform=document.getElementById("epl").value;b.pay=document.getElementById("epy").value;
   b.method=document.getElementById("eme2").value;b.notes=document.getElementById("eno").value.trim();
+  b.ratePerNight=parseFloat(document.getElementById("e-rate").value)||null;
   sv();cAll();renderCal();showDet(b);
 }
 
@@ -528,6 +569,15 @@ function openExt(){
       <div><label>Extension paid?</label><select id="expy"><option value="no">Not paid${ip?" — mark partial":""}</option><option value="yes">Already paid</option></select></div>
       <div><label>Method</label><select id="exme"><option value="">— select —</option><option>GCash</option><option>Maya</option><option>Via app</option><option>Bank transfer</option><option>Cash</option></select></div>
     </div>
+    <div style="margin-top:8px">
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+        <input type="checkbox" id="ext-same-rate" checked onchange="document.getElementById('ext-rate-row').style.display=this.checked?'none':'block'"/>
+        Use same rate as original booking
+      </label>
+      <div id="ext-rate-row" style="display:none;margin-top:6px">
+        <div class="fr"><label>Extension rate per night (₱)</label><input type="number" id="ext-rate" min="0" placeholder="0" value="${b.ratePerNight||''}"/></div>
+      </div>
+    </div>
     <div id="exer" class="er" style="display:none"></div>
     <p style="font-size:11px;color:#888;margin-top:5px">🧹 Cleaner date updates automatically.</p>`;
     btns.innerHTML=`<button class="bxx" onclick="cAll()">Cancel</button><button class="bsv" onclick="confExt()">Confirm</button>`;
@@ -546,6 +596,11 @@ function confExt(){
     if(b.pay==="full"&&!ep)b.pay="partial";
     else if(b.pay==="none"&&ep)b.pay="partial";
     if(em)b.method=em;
+    const sameRate=document.getElementById("ext-same-rate").checked;
+    if(!sameRate){
+      if(!b.originalCo)b.originalCo=b.co;
+      b.extensionRate=parseFloat(document.getElementById("ext-rate").value)||null;
+    }
     b.co=nc;b.cd=false;b.ur=false;
     sv();cAll();renderCal();showDet(b);
   };
@@ -965,6 +1020,7 @@ function openProf(){
   document.getElementById("pr-hname").value=prof.hostName||"";
   document.getElementById("pr-hmob").value=prof.hostMob||"";
   document.getElementById("pr-gcash").value=prof.gcash||"";
+  document.getElementById("pr-rate").value=prof.defaultRate!=null?prof.defaultRate:"";
   document.getElementById("prof-saved").style.display="none";
   document.getElementById("ov-prof").classList.add("sh");
 }
@@ -1001,6 +1057,7 @@ function saveProf(){
     hostName:document.getElementById("pr-hname").value.trim(),
     hostMob:document.getElementById("pr-hmob").value.trim(),
     gcash:document.getElementById("pr-gcash").value.trim(),
+    defaultRate:parseFloat(document.getElementById("pr-rate").value)||null,
     recontact:existingRecontact,
     pencilExpiryHrs:existingPencilExpiryHrs
   };
