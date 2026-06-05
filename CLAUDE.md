@@ -202,7 +202,11 @@ index.html (452 lines)
 ```
 bt_b   Bookings array
        Fields: id, name, mobile, email, ci, co, ciS, coS, ciE, ciL,
-               coE, coL, platform, pay, method, notes, cd, ur, at, type
+               coE, coL, platform, pay, method, notes, cd, ur, at, type,
+               ratePerNight (number|null, optional — nightly rate in ₱),
+               extensionRate (number|null, optional — different rate for extended nights),
+               originalCo (string|null, optional — original checkout date before extension,
+                           set only when extensionRate is also set)
 
 bt_bl  Blocks array
        Fields: id, from, to, reason, notes
@@ -211,7 +215,9 @@ bt_p   Profile object
        Fields: name, addr, type, bed, bath, occ, ci, co, eciAllow, eciFee,
                lcoAllow, lcoFee, pmGC, pmMy, pmBt, pmCs, fullPay, dpPct,
                expHrs, minNights, noSmoke, noPets, noParty, customRule,
-               hostName, hostMob, gcash, pencilExpiryHrs, recontact[]
+               hostName, hostMob, gcash, pencilExpiryHrs, recontact[],
+               defaultRate (number|null, optional — default nightly rate in ₱,
+                            pre-fills rate field on new bookings)
 
 bt_bh  Booking history archive (cancelled pencil bookings + cancelled confirmed bookings)
        Fields: same as bt_b entries + cancelReason + archivedAt (timestamp)
