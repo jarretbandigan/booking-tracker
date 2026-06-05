@@ -117,7 +117,7 @@
       <div class="rpt-ph">
         <span>📊</span>
         <h3>Reports coming soon</h3>
-        <p>Monthly income summary and occupancy stats will appear here in a future update.</p>
+        <p>Monthly income summary and occupancy stats will appear here. Add a rate per night to your bookings to unlock revenue estimates.</p>
       </div>
     </div>
   </div>
@@ -153,7 +153,7 @@
   </div>
   <div class="fr"><label>Guest name</label><input id="an" placeholder="e.g. Maria Santos"/></div>
   <div class="f2"><div><label>Mobile</label><input id="am" placeholder="+63 9XX XXX XXXX"/></div><div><label>Email (optional)</label><input id="ae" placeholder="guest@email.com"/></div></div>
-  <div class="f2"><div><label>Check-in</label><input type="date" id="aci" onchange="document.getElementById('aco').min=aD(this.value,1)"/></div><div><label>Check-out</label><input type="date" id="aco"/></div></div>
+  <div class="f2"><div><label>Check-in</label><input type="date" id="aci" onchange="document.getElementById('aco').min=aD(this.value,1);updRateCalc('aci','aco','a-rate','a-rate-total')"/></div><div><label>Check-out</label><input type="date" id="aco" onchange="updRateCalc('aci','aco','a-rate','a-rate-total')"/></div></div>
   <div class="sl">Timing</div>
   <div class="tg">
     <div class="ti"><label>Std check-in</label><input type="time" id="acis" value="14:00"/></div>
@@ -169,6 +169,11 @@
     <div class="f2">
       <div><label>Status</label><select id="apy" onchange="toggleAddMethod()"><option value="full">Fully paid</option><option value="partial">Partially paid</option><option value="none" selected>No payment yet</option></select></div>
       <div id="ame-row"><label>Method</label><select id="ame"><option value="">— select —</option><option>GCash</option><option>Maya</option><option>Via app</option><option>Bank transfer</option><option>Cash</option></select></div>
+    </div>
+    <div class="fr" style="margin-top:4px">
+      <label>Rate per night (₱)</label>
+      <input type="number" id="a-rate" min="0" placeholder="0" oninput="updRateCalc('aci','aco','a-rate','a-rate-total')"/>
+      <div id="a-rate-total" style="font-size:11px;color:#2D5F0F;margin-top:3px;display:none"></div>
     </div>
   </div>
   <div class="fr"><label>Notes</label><input id="ano" placeholder="Special requests…"/></div>
@@ -211,6 +216,11 @@
   <div class="f2">
     <div><label>Status</label><select id="epy"><option value="full">Fully paid</option><option value="partial">Partially paid</option><option value="none">No payment yet</option></select></div>
     <div><label>Method</label><select id="eme2"><option value="">— select —</option><option>GCash</option><option>Maya</option><option>Via app</option><option>Bank transfer</option><option>Cash</option><option>Pending</option></select></div>
+  </div>
+  <div class="fr" style="margin-top:4px">
+    <label>Rate per night (₱)</label>
+    <input type="number" id="e-rate" min="0" placeholder="0"/>
+    <div id="e-rate-total" style="font-size:11px;color:#2D5F0F;margin-top:3px;display:none"></div>
   </div>
   <div class="fr"><label>Notes</label><input id="eno"/></div>
   <div id="eerr" class="er" style="display:none"></div>
@@ -355,6 +365,11 @@
     <div class="f2" style="margin-top:6px">
       <div><label>Min downpayment (%)</label><input type="number" id="pr-dp" min="0" max="100" placeholder="50"/></div>
       <div><label>Reservation expiry (hrs)</label><input type="number" id="pr-exp" min="1" placeholder="24"/></div>
+    </div>
+    <div class="fr" style="margin-top:6px">
+      <label>Default nightly rate (₱)</label>
+      <input type="number" id="pr-rate" min="0" placeholder="0"/>
+      <div style="font-size:11px;color:#9CA3AF;margin-top:3px">Pre-fills the rate field when adding new bookings. Optional.</div>
     </div>
   </div>
   <div class="prof-sec">
