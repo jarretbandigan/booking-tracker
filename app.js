@@ -7,6 +7,7 @@ let expiryTimer=null,pclConfId=null,pclDispAction=null,pclExpired=[],listFilter=
 let dispOnConfirm=null,dispOnCancel=null;
 let bh=[],editId=null;
 let gp=[],gpnid=1;
+let tickerTarget=null;
 async function h256(s){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,"0")).join("");}
 async function doLogin(){
   const u=document.getElementById("lu").value.trim(),p=document.getElementById("lp").value;
@@ -210,7 +211,19 @@ function archiveBk(b,reason,extra){
   }
 }
 let hvTimer,_expiryChecking=false;
-function hvOn(sel){clearTimeout(hvTimer);const c=document.getElementById("cal");c.classList.add("hv-active");c.querySelectorAll(".hv-on").forEach(t=>t.classList.remove("hv-on"));c.querySelectorAll(sel).forEach(t=>{t.classList.add("hv-on");if(t.classList.contains("tr-top")||t.classList.contains("tr-bot"))t.parentElement.classList.add("hv-on");});}
+function hvOn(sel){
+  clearTimeout(hvTimer);
+  const c=document.getElementById("cal");
+  c.classList.add("hv-active");
+  c.querySelectorAll(".hv-on").forEach(t=>t.classList.remove("hv-on"));
+  c.querySelectorAll(sel).forEach(t=>{t.classList.add("hv-on");if(t.classList.contains("tr-top")||t.classList.contains("tr-bot"))t.parentElement.classList.add("hv-on");});
+  // Click mode: install one-shot outside-click clearer
+  const cs=prof.calSettings||{};
+  if((cs.hoverMode||"hover")==="click"){
+    const clearFn=(e)=>{if(!c.contains(e.target)){hvOff();document.removeEventListener("click",clearFn);}};
+    setTimeout(()=>document.addEventListener("click",clearFn),50);
+  }
+}
 function hvOff(){hvTimer=setTimeout(()=>{const c=document.getElementById("cal");c.classList.remove("hv-active");c.querySelectorAll(".hv-on").forEach(t=>t.classList.remove("hv-on"));},60);}
 function updRateCalc(ciId,coId,rateId,totalId){
   const ci=document.getElementById(ciId)?.value;
@@ -256,15 +269,22 @@ function renderCal(){
   const mStr=cy+"-"+String(cm+1).padStart(2,"0");
   const firstDayStr=mStr+"-01";
   const lastDayStr=mStr+"-"+String(days).padStart(2,"0");
-  const noHover=window.matchMedia("(hover: none)").matches;
+  const cs=prof.calSettings||{};
+  const hoverEnabled=cs.hoverEnabled!==false;
+  const hoverMode=cs.hoverMode||"hover";
+  const noHover=!hoverEnabled||(hoverMode==="hover"&&window.matchMedia("(hover: none)").matches);
   for(let i=0;i<first;i++){const e=document.createElement("div");e.className="dy em";cal.appendChild(e);}
   const mkP=(cls,txt)=>{const p=document.createElement("span");p.className=cls;p.textContent=txt;return p;};
   const mkC=(cls,txt)=>{const c=document.createElement("span");c.className="ch "+cls;c.textContent=txt;return c;};
   const addHv=(el,id,isBlk)=>{
     if(noHover)return;
     const sel=isBlk?"[data-blid='"+id+"']":"[data-bid='"+id+"']";
-    el.addEventListener("mouseenter",()=>hvOn(sel));
-    el.addEventListener("mouseleave",hvOff);
+    if(hoverMode==="click"){
+      el.addEventListener("click",(e)=>{e.stopPropagation();if(el.classList.contains("hv-on")){clearTimeout(hvTimer);const c=document.getElementById("cal");c.classList.remove("hv-active");c.querySelectorAll(".hv-on").forEach(t=>t.classList.remove("hv-on"));}else hvOn(sel);});
+    } else {
+      el.addEventListener("mouseenter",()=>hvOn(sel));
+      el.addEventListener("mouseleave",hvOff);
+    }
   };
   for(let d=1;d<=days;d++){
     const ds=mStr+"-"+String(d).padStart(2,"0");
@@ -296,13 +316,13 @@ function renderCal(){
       tTop.appendChild(num());
       tTop.appendChild(mkC("cod "+payChipClass(coB),"↓ "+coB.name.split(" ")[0]));
       tTop.onclick=(e)=>{e.stopPropagation();showTurn(coB,ciB);};
-      if(!noHover){tTop.addEventListener("mouseenter",()=>hvOn("[data-bid='"+coB.id+"']"));tTop.addEventListener("mouseleave",hvOff);}
+      addHv(tTop,coB.id,false);
       // bottom half — incoming guest
       const tBot=document.createElement("div");
       tBot.className="tr-bot";tBot.style.background=botBg;tBot.dataset.bid=ciB.id;
       tBot.appendChild(mkC("cid "+payChipClass(ciB),"↑ "+ciB.name.split(" ")[0]));
       tBot.onclick=(e)=>{e.stopPropagation();showTurn(coB,ciB);};
-      if(!noHover){tBot.addEventListener("mouseenter",()=>hvOn("[data-bid='"+ciB.id+"']"));tBot.addEventListener("mouseleave",hvOff);}
+      addHv(tBot,ciB.id,false);
       el.appendChild(tTop);el.appendChild(tBot);
 
     } else if(coB&&!book){
@@ -363,7 +383,14 @@ function renderCal(){
           chip.className="ch cpd "+dirClass(ds,pb);
           chip.textContent=(pb.ci===ds?"↑ ":"")+pb.name.split(" ")[0];
           chip.dataset.bid=pb.id;
-          if(!noHover){chip.addEventListener("mouseenter",()=>{hvOn("[data-bid='"+pb.id+"']");el.classList.add("pcl-hv-src");document.getElementById("cal").classList.add("hv-active");});chip.addEventListener("mouseleave",()=>{hvOff();el.classList.remove("pcl-hv-src");});}
+          if(!noHover){
+            if(hoverMode==="click"){
+              chip.addEventListener("click",(e)=>{e.stopPropagation();hvOn("[data-bid='"+pb.id+"']");el.classList.add("pcl-hv-src");document.getElementById("cal").classList.add("hv-active");});
+            } else {
+              chip.addEventListener("mouseenter",()=>{hvOn("[data-bid='"+pb.id+"']");el.classList.add("pcl-hv-src");document.getElementById("cal").classList.add("hv-active");});
+              chip.addEventListener("mouseleave",()=>{hvOff();el.classList.remove("pcl-hv-src");});
+            }
+          }
           el.appendChild(chip);
         });
         if(pclList.length>2){
@@ -386,6 +413,8 @@ function renderCal(){
     }
     cal.appendChild(el);
   }
+  buildTicker();
+  buildStats();
 }
 
 // TURNAROUND DETAIL
@@ -402,6 +431,7 @@ function showTurn(oB,iB){
       <button class="tbtn tcl${cd?" dn3":""}" onclick="tapCl()">${cd?"✓ Cleaner contacted":"🧹 Cleaner contacted?"}</button>
       <button class="tbtn trd${ur?" dn3":""}" onclick="tapRd()"${!cd?' disabled style="opacity:0.45;cursor:not-allowed"':''}>${ur?"✓ Unit ready":"✅ Unit ready?"}</button>
     </div>
+    ${prof.cleanerMob?`<div style="margin-top:6px"><button class="btn" style="width:100%;border-color:#2D5F0F;color:#2D5F0F" onclick="msgCleaner(${oB.id})">📱 Message cleaner</button></div>`:""}
     <div style="margin-top:9px">
       <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#999;margin-bottom:3px">Checkout — ${oB.name}</div>
       <div class="dr"><span class="dl">Platform</span><span class="bdg ${pC(oB.platform)}">${oB.platform}</span></div>
@@ -464,7 +494,8 @@ function showDet(b){
       <button class="tbtn tcl${cd?" dn3":""}" onclick="tapCl()">${cd?"✓ Cleaner contacted":"🧹 Cleaner contacted?"}</button>
       <button class="tbtn trd${ur?" dn3":""}" onclick="tapRd()"${!cd?' disabled style="opacity:0.45;cursor:not-allowed"':''}>${ur?"✓ Unit ready":"✅ Unit ready?"}</button>
     </div>
-    ${clBox}`:""}
+    ${clBox}
+    ${prof.cleanerMob?`<div style="margin-top:6px"><button class="btn" style="width:100%;border-color:#2D5F0F;color:#2D5F0F" onclick="msgCleaner(${b.id})">📱 Message cleaner</button></div>`:""}`:""}
     <div class="acb">
       <button class="btn be" onclick="openEdit()">✏️ Edit</button>
       <button class="btn bx" onclick="openExt()">📅 Extend</button>
@@ -1131,6 +1162,104 @@ function showTab(tab){
     document.getElementById('bnt-'+t).classList.toggle('act',t===tab);
   });
   if(tab==='guests'){openGM();}
+  if(tab==='home'){buildTicker();}
+}
+
+// TICKER + STATS
+function buildTicker(){
+  const wrap=document.getElementById("ticker-wrap");if(!wrap)return;
+  const cs=prof.calSettings||{};
+  if(cs.tickerEnabled===false){wrap.style.display="none";return;}
+  const today=TD();
+  const conf=bk.filter(b=>isConf(b));
+  let events=[];
+  // P1: Turnaround today
+  const todayOut=conf.find(b=>b.co===today);
+  const todayIn=conf.find(b=>b.ci===today);
+  if(todayOut&&todayIn){
+    events.push({label:"TURNAROUND TODAY",text:todayOut.name.split(" ")[0]+" checks out "+f12(eCo(todayOut))+" · "+todayIn.name.split(" ")[0]+" checks in "+f12(eCi(todayIn)),date:today,id:todayIn.id});
+  } else {
+    // P2: Check-in today
+    const todayIns=conf.filter(b=>b.ci===today);
+    todayIns.forEach(b=>{
+      const nights=dR(b.ci,b.co).length;
+      const payTxt=b.pay==="full"?"Paid":b.pay==="partial"?"Partial balance due":"Unpaid";
+      events.push({label:"CHECK-IN TODAY",text:b.name+" · "+b.platform+" · "+f12(eCi(b))+" · "+payTxt+" · "+nights+" night"+(nights!==1?"s":""),date:today,id:b.id});
+    });
+    // P3: Checkout today, no check-in today
+    if(!todayIns.length&&todayOut){
+      events.push({label:"CHECKOUT TODAY",text:todayOut.name+" · "+todayOut.platform+" · "+f12(eCo(todayOut)),date:today,id:todayOut.id});
+    }
+  }
+  // P4: Tomorrow check-in (only if no today events)
+  if(!events.length){
+    const tmr=aD(today,1);
+    conf.filter(b=>b.ci===tmr).forEach(b=>{
+      const nights=dR(b.ci,b.co).length;
+      const payTxt=b.pay==="full"?"Paid":b.pay==="partial"?"Partial balance due":"Unpaid";
+      events.push({label:"TOMORROW",text:b.name+" · "+b.platform+" · "+f12(eCi(b))+" · "+payTxt+" · "+nights+" night"+(nights!==1?"s":""),date:tmr,id:b.id});
+    });
+  }
+  // P5: Next upcoming check-in
+  if(!events.length){
+    const upcoming=conf.filter(b=>b.ci>today).sort((a,b2)=>a.ci.localeCompare(b2.ci));
+    if(upcoming.length){
+      const b=upcoming[0];
+      const d=new Date(b.ci+"T00:00:00");
+      const dateStr=d.toLocaleDateString("en-US",{month:"short",day:"numeric"});
+      const nights=dR(b.ci,b.co).length;
+      events.push({label:"NEXT CHECK-IN",text:dateStr+" · "+b.name+" · "+b.platform+" · "+f12(eCi(b))+" · "+nights+" night"+(nights!==1?"s":""),date:b.ci,id:b.id});
+    }
+  }
+  // P6: No bookings
+  if(!events.length){events.push({label:"",text:"No upcoming check-ins  ·  Calendar is clear",date:null,id:null});}
+  tickerTarget=events[0].date?{date:events[0].date,id:events[0].id}:null;
+  const sep="     ·····     ";
+  const content=events.map(e=>(e.label?e.label+" — ":"")+e.text).join(sep);
+  const inner=document.getElementById("ticker-inner");
+  if(inner)inner.textContent=content+sep+content;
+  wrap.style.display="block";
+}
+function buildStats(){
+  const mStr=cy+"-"+String(cm+1).padStart(2,"0");
+  const days=new Date(cy,cm+1,0).getDate();
+  const conf=bk.filter(b=>isConf(b));
+  const mStart=mStr+"-01";
+  const mEnd=mStr+"-"+String(days).padStart(2,"0");
+  // Chip 1: Confirmed bookings overlapping this month
+  const bkCount=conf.filter(b=>b.ci<=mEnd&&b.co>mStart).length;
+  // Chip 2: Nights booked (days with mid-stay confirmed booking, checkout excluded via dR)
+  let nightsBooked=0;
+  for(let d=1;d<=days;d++){const ds=mStr+"-"+String(d).padStart(2,"0");if(gB(ds,null))nightsBooked++;}
+  // Chip 3: Next free date (first date after today with no mid-stay booking and no block)
+  const today=TD();let nextFree="—";let checkDate=aD(today,1);
+  for(let i=0;i<365;i++){
+    if(!gB(checkDate,null)&&!gBl(checkDate)){
+      const d=new Date(checkDate+"T00:00:00");
+      nextFree=d.toLocaleDateString("en-US",{month:"short",day:"numeric"});break;
+    }
+    checkDate=aD(checkDate,1);
+  }
+  const el1=document.getElementById("stat-bkcount");if(el1)el1.textContent=bkCount;
+  const el2=document.getElementById("stat-nights");if(el2)el2.textContent=nightsBooked;
+  const el3=document.getElementById("stat-nextfree");if(el3)el3.textContent=nextFree;
+}
+function tickerTap(){
+  if(!tickerTarget||!tickerTarget.date)return;
+  const parts=tickerTarget.date.split('-');
+  cy=parseInt(parts[0]);cm=parseInt(parts[1])-1;
+  renderCal();
+  if(tickerTarget.id){const b=bk.find(x=>isConf(x)&&x.id===tickerTarget.id);if(b)showDet(b);}
+}
+function msgCleaner(id){
+  const b=bk.find(x=>x.id===id);if(!b||!prof.cleanerMob)return;
+  const checkoutTime=f12(eCo(b))||"12:00 PM";
+  const nextCi=bk.filter(x=>isConf(x)&&x.ci>b.co).sort((a,c)=>a.ci.localeCompare(c.ci))[0];
+  const msg=encodeURIComponent(
+    "Hi! Guest "+b.name+" checks out on "+b.co+" at "+checkoutTime+"."+
+    (nextCi?" Next check-in is "+nextCi.ci+". Please have the unit ready by then.":" Please clean after checkout. Thank you!")
+  );
+  window.open("sms:"+prof.cleanerMob+"?body="+msg);
 }
 
 // PROPERTY PROFILE
@@ -1168,6 +1297,16 @@ function openProf(){
   document.getElementById("pr-hmob").value=prof.hostMob||"";
   document.getElementById("pr-gcash").value=prof.gcash||"";
   document.getElementById("pr-rate").value=prof.defaultRate!=null?prof.defaultRate:"";
+  document.getElementById("pr-cmob").value=prof.cleanerMob||"";
+  const cs=prof.calSettings||{tickerEnabled:true,hoverEnabled:true,hoverMode:"hover"};
+  document.getElementById("pr-ticker").checked=cs.tickerEnabled!==false;
+  const he=cs.hoverEnabled!==false;
+  document.getElementById("pr-hover-enabled").checked=he;
+  document.getElementById("pr-hover-on").checked=cs.hoverMode!=="click";
+  document.getElementById("pr-hover-click").checked=cs.hoverMode==="click";
+  document.getElementById("pr-hover-radios").style.opacity=he?"1":"0.4";
+  document.getElementById("pr-hover-on").disabled=!he;
+  document.getElementById("pr-hover-click").disabled=!he;
   document.getElementById("prof-saved").style.display="none";
   document.getElementById("ov-prof").classList.add("sh");
 }
@@ -1205,10 +1344,17 @@ function saveProf(){
     hostMob:document.getElementById("pr-hmob").value.trim(),
     gcash:document.getElementById("pr-gcash").value.trim(),
     defaultRate:parseFloat(document.getElementById("pr-rate").value)||null,
+    cleanerMob:document.getElementById("pr-cmob").value.trim(),
+    calSettings:{
+      tickerEnabled:document.getElementById("pr-ticker").checked,
+      hoverEnabled:document.getElementById("pr-hover-enabled").checked,
+      hoverMode:document.getElementById("pr-hover-click").checked?"click":"hover"
+    },
     recontact:existingRecontact,
     pencilExpiryHrs:existingPencilExpiryHrs
   };
   svP();
+  buildTicker();buildStats();
   updateHeader();
   if(wasNew&&prof.name)localStorage.setItem('bt_setup_done','1');
   const saved=document.getElementById("prof-saved");
