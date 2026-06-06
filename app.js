@@ -1488,18 +1488,18 @@ function buildTicker(){
   const todayOut=conf.find(b=>b.co===today);
   const todayIn=conf.find(b=>b.ci===today);
   if(todayOut&&todayIn){
-    events.push({label:"TURNAROUND TODAY",text:todayOut.name.split(" ")[0]+" checks out "+f12(eCo(todayOut))+" · "+todayIn.name.split(" ")[0]+" checks in "+f12(eCi(todayIn)),date:today,id:todayIn.id});
+    events.push({label:"TURNAROUND TODAY",text:todayOut.name.split(" ")[0]+" checks out "+(f12(eCo(todayOut))||"")+" \xb7 "+todayIn.name.split(" ")[0]+" checks in "+(f12(eCi(todayIn))||""),date:today,id:todayIn.id});
   } else {
     // P2: Check-in today
     const todayIns=conf.filter(b=>b.ci===today);
     todayIns.forEach(b=>{
       const nights=dR(b.ci,b.co).length;
-      const payTxt=b.pay==="full"?"Paid":b.pay==="partial"?"Partial balance due":"Unpaid";
-      events.push({label:"CHECK-IN TODAY",text:b.name+" · "+b.platform+" · "+f12(eCi(b))+" · "+payTxt+" · "+nights+" night"+(nights!==1?"s":""),date:today,id:b.id});
+      const payStr=b.pay==="full"?"Paid":b.pay==="partial"?"Partial balance due":b.pay==="none"?"Unpaid":"";
+      events.push({label:"CHECK-IN TODAY",text:b.name+" \xb7 "+b.platform+(f12(eCi(b))?" \xb7 "+f12(eCi(b)):"")+(payStr?" \xb7 "+payStr:"")+" \xb7 "+nights+" night"+(nights!==1?"s":""),date:today,id:b.id});
     });
     // P3: Checkout today, no check-in today
     if(!todayIns.length&&todayOut){
-      events.push({label:"CHECKOUT TODAY",text:todayOut.name+" · "+todayOut.platform+" · "+f12(eCo(todayOut)),date:today,id:todayOut.id});
+      events.push({label:"CHECKOUT TODAY",text:todayOut.name+" \xb7 "+todayOut.platform+(f12(eCo(todayOut))?" \xb7 "+f12(eCo(todayOut)):""),date:today,id:todayOut.id});
     }
   }
   // P4: Tomorrow check-in (only if no today events)
@@ -1507,8 +1507,8 @@ function buildTicker(){
     const tmr=aD(today,1);
     conf.filter(b=>b.ci===tmr).forEach(b=>{
       const nights=dR(b.ci,b.co).length;
-      const payTxt=b.pay==="full"?"Paid":b.pay==="partial"?"Partial balance due":"Unpaid";
-      events.push({label:"TOMORROW",text:b.name+" · "+b.platform+" · "+f12(eCi(b))+" · "+payTxt+" · "+nights+" night"+(nights!==1?"s":""),date:tmr,id:b.id});
+      const payStr=b.pay==="full"?"Paid":b.pay==="partial"?"Partial balance due":b.pay==="none"?"Unpaid":"";
+      events.push({label:"TOMORROW",text:b.name+" \xb7 "+b.platform+(f12(eCi(b))?" \xb7 "+f12(eCi(b)):"")+(payStr?" \xb7 "+payStr:"")+" \xb7 "+nights+" night"+(nights!==1?"s":""),date:tmr,id:b.id});
     });
   }
   // P5: Next upcoming check-in
@@ -1519,17 +1519,27 @@ function buildTicker(){
       const d=new Date(b.ci+"T00:00:00");
       const dateStr=d.toLocaleDateString("en-US",{month:"short",day:"numeric"});
       const nights=dR(b.ci,b.co).length;
-      events.push({label:"NEXT CHECK-IN",text:dateStr+" · "+b.name+" · "+b.platform+" · "+f12(eCi(b))+" · "+nights+" night"+(nights!==1?"s":""),date:b.ci,id:b.id});
+      const payStr=b.pay==="full"?"Paid":b.pay==="partial"?"Partial balance due":b.pay==="none"?"Unpaid":"";
+      events.push({label:"NEXT CHECK-IN",text:dateStr+" \xb7 "+b.name+" \xb7 "+b.platform+(f12(eCi(b))?" \xb7 "+f12(eCi(b)):"")+(payStr?" \xb7 "+payStr:"")+" \xb7 "+nights+" night"+(nights!==1?"s":""),date:b.ci,id:b.id});
     }
   }
   // P6: No bookings
-  if(!events.length){events.push({label:"",text:"No upcoming check-ins  ·  Calendar is clear",date:null,id:null});}
+  if(!events.length){events.push({label:"",text:"No upcoming check-ins  \xb7  Calendar is clear",date:null,id:null});}
   tickerTarget=events[0].date?{date:events[0].date,id:events[0].id}:null;
-  const sep="     ·····     ";
-  const content=events.map(e=>(e.label?e.label+" — ":"")+e.text).join(sep);
+  const sep="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\xb7\xb7\xb7\xb7\xb7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+  const content=events.map(e=>(e.label?`<span style="color:#F59E0B">${e.label}</span> \xb7 `:"")+e.text).join(sep);
   const inner=document.getElementById("ticker-inner");
-  if(inner)inner.textContent=content+sep+content;
+  if(inner)inner.innerHTML=content+sep+content;
   wrap.style.display="block";
+}
+function toggleLegend(){
+  const lw=document.getElementById("legend-wrap");
+  const btn=document.getElementById("legend-btn");
+  const isOpen=lw.style.display!=="none";
+  lw.style.display=isOpen?"none":"block";
+  btn.style.background=isOpen?"#fff":"#F0FDF4";
+  btn.style.borderColor=isOpen?"#D1D5DB":"#86EFAC";
+  btn.style.color=isOpen?"#6B7280":"#16A34A";
 }
 function buildStats(){
   const mStr=cy+"-"+String(cm+1).padStart(2,"0");

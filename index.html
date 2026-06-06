@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="description" content="Booking Tracker — Property management made simple"/>
   <title>Booking Tracker</title>
-  <link rel="stylesheet" href="styles.css?v=1.6.0">
+  <link rel="stylesheet" href="styles.css?v=1.6.1">
 </head>
 <body>
 
@@ -68,10 +68,12 @@
         <button class="nb" onclick="chgM(1)">&#8594;</button>
       </div>
       <div class="ta">
+        <button id="legend-btn" onclick="toggleLegend()" aria-label="Show calendar legend" style="width:28px;height:28px;border-radius:50%;border:1px solid #D1D5DB;background:#fff;font-size:13px;font-weight:700;color:#6B7280;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">?</button>
         <button class="mb" onclick="openMaint(null)">🔧 Block</button>
         <button class="ab" onclick="openAdd(null)">+ Add booking</button>
       </div>
     </div>
+    <div id="legend-wrap" style="display:none;overflow:hidden;transition:all 0.2s ease">
     <div class="lgnd" id="lgnd">
       <div class="lgnd-sec">
         <span class="lgnd-lbl">Tile color</span>
@@ -105,6 +107,7 @@
         </div>
       </div>
       <div class="lgnd-note">Hover a date to highlight the full booking · ❗ = unpaid or partial balance</div>
+    </div>
     </div>
     <div class="cg" id="cal"></div>
     <div class="pn" id="dpanel"><div class="ph">📅 Tap any date to get started<br><span style="font-size:11px">Free dates open booking form · Booked dates show details</span></div></div>
@@ -517,6 +520,6 @@
   </div>
 </div>
 
-<script src="app.js?v=1.6.0"></script>
+<script src="app.js?v=1.6.1"></script>
 </body>
 </html>
