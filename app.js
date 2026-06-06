@@ -8,6 +8,7 @@ let dispOnConfirm=null,dispOnCancel=null;
 let bh=[],editId=null;
 let gp=[],gpnid=1;
 let tickerTarget=null;
+let selectedGPId=null,pendingBookingForRepeat=null,pendingRating={};
 async function h256(s){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,"0")).join("");}
 async function doLogin(){
   const u=document.getElementById("lu").value.trim(),p=document.getElementById("lp").value;
@@ -166,6 +167,12 @@ function findGP(name,mobile){
     (normMobile===""||p.mobiles.includes(normMobile))
   )||null;
 }
+function initials(name){
+  if(!name)return"?";
+  const parts=name.trim().split(/\s+/);
+  if(parts.length===1)return parts[0].slice(0,2).toUpperCase();
+  return(parts[0][0]+parts[parts.length-1][0]).toUpperCase();
+}
 function createGP(name,mobile,email){
   const profile={
     id:gpnid++,
@@ -237,6 +244,72 @@ function updRateCalc(ciId,coId,rateId,totalId){
   const fmt=n=>Math.round(n).toLocaleString();
   el.textContent=nights+" night"+(nights!==1?"s":"")+" × ₱"+fmt(rate)+" = ₱"+fmt(nights*rate)+" estimated total";
   el.style.display="block";
+}
+
+// GUEST PROFILE SEARCH / BLACKLIST CHECK
+function searchGP(){
+  const q=document.getElementById("an").value.trim().toLowerCase();
+  const sug=document.getElementById("gp-suggest");
+  if(q.length<3){sug.style.display="none";return;}
+  const matches=gp.filter(p=>p.name.toLowerCase().includes(q)).slice(0,3);
+  if(!matches.length){sug.style.display="none";return;}
+  sug.innerHTML=matches.map(p=>{
+    const mob=p.mobiles[0]||"";
+    const confCount=p.linkedBookingIds.filter(id=>bk.find(b=>b.id===id&&isConf(b))).length;
+    const blBadge=p.isBlacklisted?`<span class="bl-bdg" style="margin-left:4px">Blacklisted</span>`:"";
+    const cntBadge=confCount>0?`<span style="font-size:10px;background:#DCFCE7;color:#15803D;padding:2px 6px;border-radius:8px;margin-left:4px">${confCount} stay${confCount!==1?"s":""}</span>`:"";
+    return`<div class="gp-sugg-row" onclick="selectGP(${p.id})">
+      <div class="gp-avatar">${initials(p.name)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:13px">${p.name}${blBadge}${cntBadge}</div>
+        ${mob?`<div style="font-size:11px;color:#888">${mob}</div>`:""}
+      </div>
+    </div>`;
+  }).join("");
+  sug.style.display="block";
+  setTimeout(()=>{
+    const fn=(e)=>{
+      if(!document.getElementById("an").contains(e.target)&&!sug.contains(e.target)){
+        sug.style.display="none";document.removeEventListener("click",fn);
+      }
+    };
+    document.addEventListener("click",fn);
+  },50);
+}
+function selectGP(profileId){
+  const profile=getGP(profileId);if(!profile)return;
+  document.getElementById("an").value=profile.name;
+  document.getElementById("am").value=profile.mobiles[0]||"";
+  document.getElementById("ae").value=profile.email||"";
+  selectedGPId=profileId;
+  document.getElementById("gp-suggest").style.display="none";
+  checkBlacklistInForm();
+}
+function checkBlacklistInForm(){
+  const name=document.getElementById("an").value.trim();
+  const mobile=document.getElementById("am").value.trim();
+  let warn=document.getElementById("bl-warn-add");
+  if(name.length<3){if(warn)warn.style.display="none";return;}
+  const profile=selectedGPId?getGP(selectedGPId):findGP(name,mobile);
+  if(profile&&profile.isBlacklisted){
+    if(!warn){
+      warn=document.createElement("div");
+      warn.id="bl-warn-add";
+      warn.style.cssText="background:#FEF2F2;border:1px solid #FCA5A5;border-radius:8px;padding:12px;margin-bottom:10px;";
+      const mbb=document.querySelector("#ov-add .mbb");
+      if(mbb)mbb.parentElement.insertBefore(warn,mbb);
+    }
+    const dateStr=profile.blacklistDate?new Date(profile.blacklistDate).toLocaleDateString("en-PH",{year:"numeric",month:"long",day:"numeric"}):"unknown date";
+    warn.innerHTML=`<div style="color:#991B1B;font-weight:700;margin-bottom:5px">&#x1F6AB; ${profile.name} is blacklisted</div>
+      <div style="font-size:12px;color:#7F1D1D;margin-bottom:8px">Date: ${dateStr}${profile.blacklistReason?'<br>Reason: '+profile.blacklistReason:''}</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn bc" style="flex:1" onclick="document.getElementById('bl-warn-add').style.display='none'">Proceed anyway</button>
+        <button class="btn bxx" style="flex:1" onclick="closeAdd()">Cancel</button>
+      </div>`;
+    warn.style.display="block";
+  } else {
+    if(warn)warn.style.display="none";
+  }
 }
 
 // OCCUPANCY
@@ -463,6 +536,7 @@ function showDet(b){
     :`<div class="cb">🧹 <div><strong>Contact cleaner</strong> for checkout on <strong>${b.co} at ${f12(cot)}</strong>${lw}</div></div>`;
   // Cleaner flow only shown for confirmed bookings (pencil bookings have no cleaner logistics)
   const showCleaner = b.type === "confirmed" || b.type === undefined;
+  const ratingHtml=buildRatingHtml(b,false);
   // Rate row — only shown when ratePerNight is set
   let rateRow="";
   if(b.ratePerNight){
@@ -490,6 +564,7 @@ function showDet(b){
     <div class="dr"><span class="dl">Check-out</span><span class="dv">${b.co} at <strong>${f12(cot)}</strong>${coX}</span></div>
     ${b.notes?`<div class="dr"><span class="dl">Notes</span><span class="dv">${b.notes}</span></div>`:""}
     ${rateRow}
+    ${ratingHtml}
     ${showCleaner?`<div class="tt">
       <button class="tbtn tcl${cd?" dn3":""}" onclick="tapCl()">${cd?"✓ Cleaner contacted":"🧹 Cleaner contacted?"}</button>
       <button class="tbtn trd${ur?" dn3":""}" onclick="tapRd()"${!cd?' disabled style="opacity:0.45;cursor:not-allowed"':''}>${ur?"✓ Unit ready":"✅ Unit ready?"}</button>
@@ -517,6 +592,99 @@ function showBlk(bl2){
     </div>`;
 }
 
+// RATING
+const RATE_TAGS=['Clean','Quiet','Friendly','Communicative','Late checkout','Damaged property','Would host again','Would not host again','Left a mess','Noisy'];
+const RATE_CONFLICTS={'Would host again':'Would not host again','Would not host again':'Would host again','Clean':'Left a mess','Left a mess':'Clean','Quiet':'Noisy','Noisy':'Quiet'};
+function buildRatingHtml(b,inProfile){
+  if(b.type==='pencil')return'';
+  if(b.co>=TD())return'';
+  const rid=b.id;
+  const starSvg=(n,filled)=>`<svg onclick="setRatingStar(${rid},${n})" width="28" height="28" viewBox="0 0 24 24" style="cursor:pointer;flex-shrink:0" data-star="${n}"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="${filled?'#F59E0B':'none'}" stroke="${filled?'#F59E0B':'#D1D5DB'}" stroke-width="2"/></svg>`;
+  if(b.rating){
+    const stars=[1,2,3,4,5].map(n=>`<span style="color:${n<=b.rating?'#F59E0B':'#D1D5DB'};font-size:20px">&#9733;</span>`).join('');
+    const tagChips=(b.tags||[]).map(t=>`<span class="gp-tag-chip act">${t}</span>`).join('');
+    return`<div style="margin-top:8px;padding-top:8px;border-top:1px solid #f0f0f0">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#999;margin-bottom:5px">Your review</div>
+      <div>${stars}</div>
+      ${tagChips?`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:5px">${tagChips}</div>`:''}
+      ${b.reviewNotes?`<div style="font-size:11px;color:#555;margin-top:5px;font-style:italic">${b.reviewNotes}</div>`:''}
+      <button class="btn" style="font-size:11px;padding:3px 10px;margin-top:6px" onclick="editRating(${rid},${inProfile})">Edit review</button>
+    </div>`;
+  }
+  const pendingStars=pendingRating[rid]||0;
+  const starsHtml=[1,2,3,4,5].map(n=>starSvg(n,n<=pendingStars)).join('');
+  const pendingTagsArr=pendingRating[rid+'t']||[];
+  const tagChips=RATE_TAGS.map(t=>`<span class="gp-tag-chip${pendingTagsArr.includes(t)?' act':''}" data-tag="${t}" onclick="toggleRatingTag('${t.replace(/'/g,"\\'")}',${rid})">${t}</span>`).join('');
+  const pendingNotes=pendingRating[rid+'n']||'';
+  return`<div style="margin-top:8px;padding-top:8px;border-top:1px solid #f0f0f0">
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#999;margin-bottom:5px">Rate your guest</div>
+    <div id="stars-${rid}" style="display:flex;gap:3px;margin-bottom:8px">${starsHtml}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px" id="tags-${rid}">${tagChips}</div>
+    <textarea id="rnotes-${rid}" placeholder="Private notes about this guest" style="width:100%;box-sizing:border-box;border:1px solid #D1D5DB;border-radius:6px;padding:7px;font-size:12px;font-family:inherit;resize:vertical;min-height:50px">${pendingNotes}</textarea>
+    <div id="raterr-${rid}" style="display:none;color:#DC2626;font-size:12px;margin-top:4px">Please select a star rating.</div>
+    <button class="btn bsv" style="width:100%;margin-top:6px" onclick="saveRating(${rid},${inProfile})">Save rating</button>
+  </div>`;
+}
+function setRatingStar(bookingId,stars){
+  pendingRating[bookingId]=stars;
+  const container=document.getElementById('stars-'+bookingId);if(!container)return;
+  container.querySelectorAll('svg').forEach(svg=>{
+    const n=parseInt(svg.dataset.star),filled=n<=stars;
+    const path=svg.querySelector('path');
+    if(path){path.setAttribute('fill',filled?'#F59E0B':'none');path.setAttribute('stroke',filled?'#F59E0B':'#D1D5DB');}
+  });
+}
+function toggleRatingTag(tagName,bookingId){
+  const container=document.getElementById('tags-'+bookingId);if(!container)return;
+  if(!pendingRating[bookingId+'t'])pendingRating[bookingId+'t']=[];
+  const arr=pendingRating[bookingId+'t'];
+  const idx=arr.indexOf(tagName);
+  if(idx===-1){
+    arr.push(tagName);
+    const conflict=RATE_CONFLICTS[tagName];
+    if(conflict){const ci=arr.indexOf(conflict);if(ci!==-1)arr.splice(ci,1);}
+  } else {arr.splice(idx,1);}
+  container.querySelectorAll('.gp-tag-chip').forEach(chip=>{chip.classList.toggle('act',arr.includes(chip.dataset.tag));});
+}
+function saveRating(bookingId,inProfile){
+  const stars=pendingRating[bookingId]||0;
+  if(!stars){const errEl=document.getElementById('raterr-'+bookingId);if(errEl)errEl.style.display='block';return;}
+  const tags=pendingRating[bookingId+'t']||[];
+  const notesEl=document.getElementById('rnotes-'+bookingId);
+  const reviewNotes=notesEl?notesEl.value.trim():'';
+  let b=bk.find(x=>x.id===bookingId),inBk=true;
+  if(!b){b=bh.find(x=>x.id===bookingId);inBk=false;}
+  if(!b)return;
+  b.rating=stars;b.tags=tags;b.reviewNotes=reviewNotes;
+  if(inBk)sv();else svH();
+  delete pendingRating[bookingId];delete pendingRating[bookingId+'t'];delete pendingRating[bookingId+'n'];
+  const profile=b.guestProfileId?getGP(b.guestProfileId):null;
+  if(profile){
+    const allLinked=[
+      ...profile.linkedBookingIds.map(id=>bk.find(x=>x.id===id)),
+      ...profile.linkedHistoryIds.map(id=>bh.find(x=>x.id===id))
+    ].filter(x=>x&&x.rating&&isConf(x));
+    profile.averageRating=allLinked.length?allLinked.reduce((s,x)=>s+x.rating,0)/allLinked.length:null;
+    profile.tags=[...new Set(allLinked.flatMap(x=>x.tags||[]))];
+    svGP();
+  }
+  if(inProfile){const profId=profile?profile.id:(b.guestProfileId||null);if(profId)openGMProf(profId);}
+  else showDet(b);
+}
+function editRating(bookingId,inProfile){
+  let b=bk.find(x=>x.id===bookingId);
+  if(!b)b=bh.find(x=>x.id===bookingId);
+  if(!b)return;
+  pendingRating[bookingId]=b.rating||0;
+  pendingRating[bookingId+'t']=[...(b.tags||[])];
+  pendingRating[bookingId+'n']=b.reviewNotes||'';
+  const savedRating=b.rating;
+  b.rating=undefined;
+  if(inProfile){const profile=b.guestProfileId?getGP(b.guestProfileId):null;if(profile)openGMProf(profile.id);}
+  else showDet(b);
+  b.rating=savedRating;
+}
+
 function tapCl(){if(!active)return;active.cd=!active.cd;if(!active.cd)active.ur=false;sv();renderCal();showDet(active);}
 function tapRd(){if(!active)return;if(!active.cd){alert("Please confirm cleaner has been contacted first.");return;}active.ur=!active.ur;sv();renderCal();showDet(active);}
 function chgM(d){cm+=d;if(cm>11){cm=0;cy++;}if(cm<0){cm=11;cy--;}renderCal();}
@@ -524,6 +692,9 @@ function chgM(d){cm+=d;if(cm>11){cm=0;cy++;}if(cm<0){cm=11;cy--;}renderCal();}
 // ADD
 function openAdd(pre){
   editId=null;
+  selectedGPId=null;
+  document.getElementById("gp-suggest").style.display="none";
+  const blWarn=document.getElementById("bl-warn-add");if(blWarn)blWarn.style.display="none";
   document.getElementById("atype-conf").style.opacity="";
   document.getElementById("atype-conf").style.pointerEvents="";
   document.getElementById("atype-pcl").style.opacity="";
@@ -643,6 +814,15 @@ function saveAdd(){
     document.getElementById("twbt").innerHTML=`<button class="bxx" onclick="cOv('ov-tw');pend=null;">Cancel</button><button class="bsv" onclick="commitPend()">Proceed anyway</button>`;
     document.getElementById("ov-tw").classList.add("sh");return;
   }
+  const rgProfile=selectedGPId?getGP(selectedGPId):findGP(name,mobile);
+  if(rgProfile&&rgProfile.hasConfirmed&&b.type==="confirmed"){
+    pendingBookingForRepeat=b;
+    showRepeatGuest(rgProfile,b,
+      ()=>{commitBk(pendingBookingForRepeat);pendingBookingForRepeat=null;},
+      ()=>{selectedGPId=null;commitBk(pendingBookingForRepeat);pendingBookingForRepeat=null;}
+    );
+    return;
+  }
   commitBk(b);
 }
 function commitPend(){if(!pend)return;commitBk(pend);pend=null;cAll();}
@@ -672,6 +852,34 @@ function confirmOw(){
   bk=bk.filter(x=>x.id!==ovId);
   pendOver=null;pend=null;cAll();
   commitBk(b);
+}
+
+function showRepeatGuest(profile,b,onSame,onDiff){
+  const linkedBk=profile.linkedBookingIds.map(id=>bk.find(x=>x.id===id)).filter(Boolean);
+  const linkedBh=profile.linkedHistoryIds.map(id=>bh.find(x=>x.id===id)).filter(Boolean);
+  const allStays=[...linkedBk,...linkedBh].sort((a,x)=>x.ci.localeCompare(a.ci));
+  const lastStay=allStays[0]||null;
+  const avgStars=profile.averageRating;
+  const starsHtml=avgStars?`<div style="color:#F59E0B;font-size:16px;margin:4px 0">${"★".repeat(Math.round(avgStars))}${"☆".repeat(5-Math.round(avgStars))} <span style="font-size:12px;color:#555">${avgStars.toFixed(1)}</span></div>`:"";
+  const lastStayHtml=lastStay?`<div style="font-size:12px;color:#555;margin-bottom:4px">Last stay: <strong>${lastStay.ci} → ${lastStay.co}</strong> \xb7 <span class="bdg ${pC(lastStay.platform)}">${lastStay.platform}</span>${lastStay.pay?` \xb7 <span class="bdg ${pyC(lastStay.pay)}">${pyL(lastStay.pay)}</span>`:""}</div>`:"";
+  const mobileDiff=b.mobile&&!profile.mobiles.includes(b.mobile)?`<div style="color:#B45309;font-size:12px;background:#FFFBEB;border:1px solid #FDE68A;padding:6px 10px;border-radius:6px;margin-bottom:8px">⚠ Different number from last time. Previous: ${profile.mobiles[0]||"—"}</div>`:"";
+  const notesHtml=profile.notes?`<div style="font-size:12px;color:#555;font-style:italic;margin-bottom:4px">"${profile.notes}"</div>`:"";
+  document.getElementById("rg-content").innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div class="gp-avatar" style="width:42px;height:42px;font-size:15px">${initials(profile.name)}</div>
+      <div><div style="font-weight:700;font-size:14px">${profile.name}</div>${starsHtml}</div>
+    </div>
+    ${lastStayHtml}${notesHtml}${mobileDiff}`;
+  document.getElementById("rg-same").onclick=()=>{
+    b.guestProfileId=profile.id;
+    if(b.mobile&&!profile.mobiles.includes(b.mobile))profile.mobiles.push(b.mobile);
+    updateGPConfirmed(profile.id);svGP();
+    cOv("ov-repeat-guest");onSame();
+  };
+  document.getElementById("rg-diff").onclick=()=>{
+    selectedGPId=null;cOv("ov-repeat-guest");onDiff();
+  };
+  document.getElementById("ov-repeat-guest").classList.add("sh");
 }
 
 // EDIT
@@ -961,38 +1169,34 @@ function openGM(){
   renderGM();
 }
 function buildGuests(){
-  const map={};
-  const addEntry=(b,src)=>{
-    const k=b.name.toLowerCase()+'|'+(b.mobile||'');
-    if(!map[k])map[k]={
-      name:b.name,mobile:b.mobile||'',email:b.email||'',
-      stays:[],platforms:new Set(),
-      payFull:0,payPart:0,payNone:0,
-      hasConfirmed:false
+  return gp.map(profile=>{
+    const liveBkEntries=profile.linkedBookingIds.map(id=>bk.find(b=>b.id===id)).filter(Boolean);
+    const histEntries=profile.linkedHistoryIds.map(id=>bh.find(b=>b.id===id)).filter(Boolean);
+    const allStays=[
+      ...liveBkEntries.map(b=>Object.assign({},b,{_src:'bk'})),
+      ...histEntries.map(b=>Object.assign({},b,{_src:'bh'}))
+    ].sort((a,b2)=>b2.ci.localeCompare(a.ci));
+    const confStays=liveBkEntries.filter(b=>isConf(b));
+    const platforms=[...new Set(allStays.map(s=>s.platform).filter(Boolean))];
+    let payFull=0,payPart=0,payNone=0;
+    confStays.forEach(b=>{if(b.pay==='full')payFull++;else if(b.pay==='partial')payPart++;else payNone++;});
+    const sortedFut=liveBkEntries.filter(b=>b.ci>=TD()).sort((a,b2)=>a.ci.localeCompare(b2.ci));
+    const upcoming=sortedFut[0]||null;
+    const last=allStays[0]?.ci||null;
+    return{
+      ...profile,
+      stays:allStays,platforms,
+      payFull,payPart,payNone,
+      upcoming,last,
+      mobile:profile.mobiles[0]||'',
+      email:profile.email||''
     };
-    const g=map[k];
-    const entry=Object.assign({},b,{_src:src});
-    g.stays.push(entry);
-    g.platforms.add(b.platform);
-    if(src==='bk'&&b.type==='confirmed'){
-      g.hasConfirmed=true;
-      if(b.pay==='full')g.payFull++;
-      else if(b.pay==='partial')g.payPart++;
-      else g.payNone++;
-    }
-    if(b.mobile)g.mobile=b.mobile;
-    if(b.email)g.email=b.email;
-  };
-  bk.forEach(b=>addEntry(b,'bk'));
-  bh.forEach(b=>addEntry(b,'bh'));
-  Object.values(map).forEach(g=>{
-    g.stays.sort((a,b)=>b.ci.localeCompare(a.ci));
-    g.last=g.stays[0].ci;
-    const fut=[...g.stays].filter(s=>s.ci>=TD()&&s._src==='bk').sort((a,b)=>a.ci<b.ci?-1:1);
-    g.upcoming=fut[0]||null;
-    g.platforms=[...g.platforms];
+  })
+  .filter(g=>g.stays.length>0)
+  .sort((a,b)=>{
+    if(a.isBlacklisted!==b.isBlacklisted)return a.isBlacklisted?1:-1;
+    return b.stays.length-a.stays.length||(b.last||'').localeCompare(a.last||'');
   });
-  return Object.values(map).sort((x,y)=>y.stays.length-x.stays.length||y.last.localeCompare(x.last));
 }
 function stayLabel(s){
   if(s._src==='bh'){
@@ -1020,36 +1224,65 @@ function gmFilt(chip){
 }
 function renderGM(){
   const q=document.getElementById("gmq").value.toLowerCase();
-  let guests=buildGuests();
-  if(q)guests=guests.filter(g=>g.name.toLowerCase().includes(q)||(g.mobile||"").includes(q)||(g.email||"").toLowerCase().includes(q));
+  const allGuests=buildGuests();
+  let guests=[...allGuests];
+  if(q)guests=guests.filter(g=>g.name.toLowerCase().includes(q)||(g.mobiles||[]).some(m=>m.includes(q))||(g.email||'').toLowerCase().includes(q));
   if(gmFilter==="conf")guests=guests.filter(g=>g.hasConfirmed);
   if(gmFilter==="pcl")guests=guests.filter(g=>!g.hasConfirmed);
+  if(gmFilter==="bl")guests=guests.filter(g=>g.isBlacklisted===true);
+  if(gmFilter==="unrated")guests=guests.filter(g=>g.hasConfirmed&&!g.averageRating);
+  // Merge suggestion banner — same normalized name, different mobiles
+  const nameMap={};
+  allGuests.forEach(g=>{const k=g.name.toLowerCase().trim();if(!nameMap[k])nameMap[k]=[];nameMap[k].push(g);});
+  const dupePairs=[];
+  Object.values(nameMap).forEach(arr=>{if(arr.length>1)dupePairs.push([arr[0],arr[1]]);});
+  const mergeBanner=dupePairs.length?`<div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:10px 12px;margin-bottom:10px">
+    <div style="font-weight:700;font-size:12px;margin-bottom:4px">&#x26A0; Possible duplicate profiles</div>
+    ${dupePairs.map(([a,b2])=>`<div style="font-size:12px;color:#555;margin-bottom:4px"><strong>${a.name}</strong> — ${a.mobiles[0]||'no mobile'} vs ${b2.mobiles[0]||'no mobile'} <button class="btn bsv" style="font-size:11px;padding:2px 8px;margin-left:6px" onclick="mergeProfiles(${a.id},${b2.id})">Merge</button></div>`).join('')}
+  </div>`:'';
   const el=document.getElementById("gm-list");
-  if(!guests.length){el.innerHTML=`<div class="gm-el">No guests found.</div>`;return;}
-  el.innerHTML=guests.map(g=>{
-    const repConf=g.stays.filter(s=>s._src==='bk'&&s.type==='confirmed').length>1;
-    const paySum=[g.payFull?g.payFull+" full":"",g.payPart?g.payPart+" partial":"",g.payNone?g.payNone+" unpaid":""].filter(Boolean).join(" · ")||"—";
+  if(!guests.length){el.innerHTML=mergeBanner+`<div class="gm-el">No guests found.</div>`;return;}
+  el.innerHTML=mergeBanner+guests.map(g=>{
+    const starsHtml=g.averageRating?`<span style="color:#F59E0B;font-size:11px">${"★".repeat(Math.round(g.averageRating))}${"☆".repeat(5-Math.round(g.averageRating))}</span> <span style="font-size:11px;color:#888">${g.averageRating.toFixed(1)}</span>`:"";
+    const blBadge=g.isBlacklisted?`<span class="bl-bdg" style="margin-left:5px">Blacklisted</span>`:"";
+    const pclBadge=!g.hasConfirmed?`<span style="font-size:10px;background:#FEF9C3;color:#713F12;padding:1px 5px;border-radius:4px;margin-left:5px">Pencil only</span>`:"";
+    const lastLabel=g.upcoming?`Next: ${g.upcoming.ci}`:(g.last?`Last: ${g.last}`:"");
     const plBadges=g.platforms.map(p=>`<span class="bdg ${pC(p)}">${p}</span>`).join("");
-    const lastLabel=g.upcoming?`Next: ${g.upcoming.ci}`:`Last: ${g.last}`;
-    return`<div class="gm-row" onclick="openGMProf(this.dataset.name,this.dataset.mobile)" data-name="${g.name.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" data-mobile="${(g.mobile||'').replace(/"/g,'&quot;')}">
-      <div class="gm-rn">${repConf?'⭐ ':''}${g.name}</div>
-      <div class="gm-rs">${g.stays.length} stay${g.stays.length!==1?'s':''} · ${lastLabel}${g.mobile?' · '+g.mobile:''}</div>
-      <div class="gm-stat">${plBadges}<span style="font-size:11px;color:#888;margin-left:2px">${paySum}</span></div>
+    return`<div class="gm-row" onclick="openGMProf(${g.id})">
+      <div style="display:flex;align-items:center;gap:9px">
+        <div class="gp-avatar">${initials(g.name)}</div>
+        <div style="flex:1;min-width:0">
+          <div class="gm-rn">${g.name}${blBadge}${pclBadge}</div>
+          <div class="gm-rs">${g.stays.length} stay${g.stays.length!==1?'s':''}${lastLabel?' \xb7 '+lastLabel:''}${g.mobile?' \xb7 '+g.mobile:''}</div>
+          <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-top:2px">${plBadges}${starsHtml?`<span style="margin-left:2px">${starsHtml}</span>`:''}</div>
+        </div>
+      </div>
     </div>`;
   }).join("");
 }
-function openGMProf(name,mobile){
-  const guests=buildGuests();
-  const g=guests.find(x=>x.name.toLowerCase()===name.toLowerCase()&&(x.mobile||'')===(mobile||''));
-  if(!g)return;
-  const repConf=g.stays.filter(s=>s._src==='bk'&&s.type==='confirmed').length>1;
-  document.getElementById("gm-pname").innerHTML=(repConf?'⭐ ':'')+g.name+(g.stays.length>1?` <span style="font-size:12px;font-weight:400;color:#888">(${g.stays.length} stays)</span>`:'');
-  const paySum=[g.payFull?g.payFull+" full":"",g.payPart?g.payPart+" partial":"",g.payNone?g.payNone+" unpaid":""].filter(Boolean).join(" · ")||"—";
-  const plBadges=g.platforms.map(p=>`<span class="bdg ${pC(p)}">${p}</span>`).join(" ");
-  const staysHtml=g.stays.map(s=>{
+function openGMProf(profileId){
+  const profile=getGP(profileId);if(!profile)return;
+  const liveBkEntries=profile.linkedBookingIds.map(id=>bk.find(b=>b.id===id)).filter(Boolean);
+  const histEntries=profile.linkedHistoryIds.map(id=>bh.find(b=>b.id===id)).filter(Boolean);
+  const allStays=[
+    ...liveBkEntries.map(b=>Object.assign({},b,{_src:'bk'})),
+    ...histEntries.map(b=>Object.assign({},b,{_src:'bh'}))
+  ].sort((a,b2)=>b2.ci.localeCompare(a.ci));
+  const repConf=liveBkEntries.filter(b=>isConf(b)).length>1;
+  const payFull=liveBkEntries.filter(b=>isConf(b)&&b.pay==='full').length;
+  const payPart=liveBkEntries.filter(b=>isConf(b)&&b.pay==='partial').length;
+  const payNone=liveBkEntries.filter(b=>isConf(b)&&b.pay==='none').length;
+  const paySum=[payFull?payFull+' full':'',payPart?payPart+' partial':'',payNone?payNone+' unpaid':''].filter(Boolean).join(' \xb7 ')||'—';
+  const platforms=[...new Set(allStays.map(s=>s.platform).filter(Boolean))];
+  const plBadges=platforms.map(p=>`<span class="bdg ${pC(p)}">${p}</span>`).join(" ");
+  const starsHtml=profile.averageRating?`<div style="color:#F59E0B;font-size:16px;margin-bottom:4px">${"★".repeat(Math.round(profile.averageRating))}${"☆".repeat(5-Math.round(profile.averageRating))} <span style="font-size:12px;color:#555">${profile.averageRating.toFixed(1)}</span></div>`:"";
+  const blHdrBadge=profile.isBlacklisted?` <span class="bl-bdg">Blacklisted</span>`:"";
+  document.getElementById("gm-pname").innerHTML=(repConf?'⭐ ':'')+profile.name+blHdrBadge+(allStays.length>1?` <span style="font-size:12px;font-weight:400;color:#888">(${allStays.length} stays)</span>`:'');
+  const staysHtml=allStays.map(s=>{
     const ni=dR(s.ci,s.co).length;
     const lbl=stayLabel(s);
     const payBadge=s._src==='bk'&&s.type==='confirmed'?`<span class="bdg ${pyC(s.pay)}">${pyL(s.pay)}</span>`:'';
+    const ratingSection=buildRatingHtml(s,true);
     return`<div class="gm-stay">
       <div class="gm-stay-hd">
         <div><div class="gm-stay-dt">${s.ci} → ${s.co}</div><div style="font-size:11px;color:#888">${ni} night${ni!==1?'s':''}</div></div>
@@ -1061,19 +1294,30 @@ function openGMProf(name,mobile){
         ${s.method&&s._src==='bk'?`<span class="bdg ${mC(s.method)}">${s.method}</span>`:''}
         ${s.notes?`<span style="font-size:11px;color:#888">${s.notes}</span>`:''}
       </div>
+      ${ratingSection}
     </div>`;
   }).join("");
+  const blSection=profile.isBlacklisted
+    ?`<div style="background:#FEF2F2;border:1px solid #FCA5A5;border-radius:8px;padding:12px;margin-top:12px">
+        <div style="color:#991B1B;font-weight:700;margin-bottom:4px">&#x1F6AB; Blacklisted</div>
+        ${profile.blacklistDate?`<div style="font-size:12px;color:#7F1D1D;margin-bottom:4px">Date: ${new Date(profile.blacklistDate).toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric'})}</div>`:''}
+        ${profile.blacklistReason?`<div style="font-size:12px;color:#7F1D1D;margin-bottom:8px">Reason: ${profile.blacklistReason}</div>`:''}
+        <button class="btn" onclick="removeBlacklist(${profileId})">Remove from blacklist</button>
+      </div>`
+    :`<div style="margin-top:12px"><button class="btn bc" onclick="showBlacklistPanel(${profileId})">&#x1F6AB; Blacklist guest</button></div>`;
   document.getElementById("gm-pbody").innerHTML=`
     <div class="gm-psec">Contact</div>
-    ${g.mobile?`<div class="dr"><span class="dl">Mobile</span><span class="dv" style="color:#1A56DB">${g.mobile}<button class="gm-copy" onclick="cpTxt(this,'${g.mobile.replace(/'/g,"\\'")}')">Copy</button></span></div>`:`<div class="dr"><span class="dl">Mobile</span><span class="dv" style="color:#aaa">—</span></div>`}
-    ${g.email?`<div class="dr"><span class="dl">Email</span><span class="dv" style="color:#1A56DB">${g.email}<button class="gm-copy" onclick="cpTxt(this,'${g.email.replace(/'/g,"\\'")}')">Copy</button></span></div>`:''}
+    ${profile.mobiles.length?profile.mobiles.map(m=>`<div class="dr"><span class="dl">Mobile</span><span class="dv" style="color:#1A56DB">${m}<button class="gm-copy" onclick="cpTxt(this,'${m.replace(/'/g,"\\'")}')">Copy</button></span></div>`).join(''):`<div class="dr"><span class="dl">Mobile</span><span class="dv" style="color:#aaa">—</span></div>`}
+    ${profile.email?`<div class="dr"><span class="dl">Email</span><span class="dv" style="color:#1A56DB">${profile.email}<button class="gm-copy" onclick="cpTxt(this,'${profile.email.replace(/'/g,"\\'")}')">Copy</button></span></div>`:''}
     <div class="gm-psec">Summary</div>
-    <div class="dr"><span class="dl">Total stays</span><span class="dv">${g.stays.length}</span></div>
+    <div class="dr"><span class="dl">Total stays</span><span class="dv">${allStays.length}</span></div>
     <div class="dr"><span class="dl">Platforms</span><span class="dv">${plBadges}</span></div>
     <div class="dr"><span class="dl">Payment summary</span><span class="dv">${paySum}</span></div>
+    ${starsHtml?`<div class="dr"><span class="dl">Avg rating</span><span class="dv">${starsHtml}</span></div>`:''}
+    ${profile.notes?`<div class="dr"><span class="dl">Notes</span><span class="dv">${profile.notes}</span></div>`:''}
     <div class="gm-psec">Stay history</div>
     ${staysHtml}
-    <p style="font-size:11px;color:#aaa;margin-top:9px;text-align:center">A booking amount field will be added in a future version to enable full spend tracking.</p>`;
+    ${blSection}`;
   document.getElementById("gm-lv").style.display="none";
   document.getElementById("gm-pv").style.display="block";
 }
@@ -1081,6 +1325,73 @@ function gmBack(){
   document.getElementById("gm-lv").style.display="block";
   document.getElementById("gm-pv").style.display="none";
   renderGM();
+}
+function showBlacklistPanel(profileId){
+  const profile=getGP(profileId);if(!profile)return;
+  const reasons=['Damaged property','Did not pay','Disrespectful','Excessive noise','Brought unauthorized guests','Other'];
+  const pbody=document.getElementById("gm-pbody");if(!pbody)return;
+  pbody.innerHTML=`
+    <div style="margin-top:10px">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#999;margin-bottom:8px">&#x1F6AB; Blacklist ${profile.name}</div>
+      <div style="font-size:12px;color:#555;margin-bottom:8px">Select reason:</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px" id="bl-reasons">
+        ${reasons.map(r=>`<span class="gp-tag-chip" data-reason="${r}" onclick="this.parentElement.querySelectorAll('.gp-tag-chip').forEach(c=>c.classList.remove('act'));this.classList.add('act');">${r}</span>`).join('')}
+      </div>
+      <textarea id="bl-notes" placeholder="Additional details (optional)" style="width:100%;box-sizing:border-box;border:1px solid #D1D5DB;border-radius:6px;padding:7px;font-size:12px;font-family:inherit;resize:vertical;min-height:50px;margin-bottom:8px"></textarea>
+      <div style="display:flex;gap:8px">
+        <button class="btn bc" style="flex:1" onclick="confirmBlacklist(${profileId})">Confirm blacklist</button>
+        <button class="btn bxx" style="flex:1" onclick="openGMProf(${profileId})">Cancel</button>
+      </div>
+    </div>`;
+}
+function confirmBlacklist(profileId){
+  const profile=getGP(profileId);if(!profile)return;
+  const activeChip=document.querySelector('#bl-reasons .gp-tag-chip.act');
+  const reason=activeChip?activeChip.dataset.reason:'';
+  const notes=(document.getElementById('bl-notes')?.value||'').trim();
+  profile.isBlacklisted=true;
+  profile.blacklistReason=[reason,notes].filter(Boolean).join(' — ');
+  profile.blacklistDate=Date.now();
+  svGP();openGMProf(profileId);renderGM();
+}
+function removeBlacklist(profileId){
+  const profile=getGP(profileId);if(!profile)return;
+  const pbody=document.getElementById("gm-pbody");if(!pbody)return;
+  const confirmDiv=document.createElement('div');
+  confirmDiv.style.cssText='background:#FEF9C3;border:1px solid #FDE68A;border-radius:8px;padding:12px;margin-top:10px';
+  confirmDiv.innerHTML=`<div style="font-size:13px;margin-bottom:8px">Remove ${profile.name} from blacklist?</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn bc" style="flex:1" onclick="execRemoveBlacklist(${profileId})">Yes, remove</button>
+      <button class="btn bxx" style="flex:1" onclick="openGMProf(${profileId})">Cancel</button>
+    </div>`;
+  pbody.appendChild(confirmDiv);
+}
+function execRemoveBlacklist(profileId){
+  const profile=getGP(profileId);if(!profile)return;
+  profile.isBlacklisted=false;profile.blacklistReason='';profile.blacklistDate=null;
+  svGP();openGMProf(profileId);renderGM();
+}
+function mergeProfiles(primaryId,secondaryId){
+  const primary=getGP(primaryId),secondary=getGP(secondaryId);
+  if(!primary||!secondary||primaryId===secondaryId)return;
+  secondary.mobiles.forEach(m=>{if(!primary.mobiles.includes(m))primary.mobiles.push(m);});
+  secondary.linkedBookingIds.forEach(id=>{if(!primary.linkedBookingIds.includes(id))primary.linkedBookingIds.push(id);});
+  secondary.linkedHistoryIds.forEach(id=>{if(!primary.linkedHistoryIds.includes(id))primary.linkedHistoryIds.push(id);});
+  if(!primary.mergedProfileIds.includes(secondaryId))primary.mergedProfileIds.push(secondaryId);
+  bk.forEach(b=>{if(b.guestProfileId===secondaryId)b.guestProfileId=primaryId;});
+  bh.forEach(b=>{if(b.guestProfileId===secondaryId)b.guestProfileId=primaryId;});
+  gp=gp.filter(p=>p.id!==secondaryId);
+  if(!primary.isBlacklisted&&secondary.isBlacklisted){
+    primary.isBlacklisted=true;primary.blacklistReason=secondary.blacklistReason;primary.blacklistDate=secondary.blacklistDate;
+  }
+  if(!primary.hasConfirmed&&secondary.hasConfirmed)primary.hasConfirmed=true;
+  const ratedStays=[
+    ...primary.linkedBookingIds.map(id=>bk.find(x=>x.id===id)),
+    ...primary.linkedHistoryIds.map(id=>bh.find(x=>x.id===id))
+  ].filter(x=>x&&x.rating&&isConf(x));
+  primary.averageRating=ratedStays.length?ratedStays.reduce((sum,x)=>sum+x.rating,0)/ratedStays.length:null;
+  primary.tags=[...new Set(ratedStays.flatMap(x=>x.tags||[]))];
+  sv();svH();svGP();renderGM();
 }
 
 // EXPORT / IMPORT
@@ -1469,6 +1780,9 @@ function showPclList(ds){
 }
 function closeAdd(){
   editId=null;
+  selectedGPId=null;
+  document.getElementById("gp-suggest").style.display="none";
+  const blWarn=document.getElementById("bl-warn-add");if(blWarn)blWarn.style.display="none";
   document.getElementById("atype-conf").style.opacity="";
   document.getElementById("atype-conf").style.pointerEvents="";
   document.getElementById("atype-pcl").style.opacity="";
@@ -1669,6 +1983,20 @@ function openNotices(){
     </div>`
     :'';
 
+  // Guests to rate
+  const toRate=bk.filter(b=>isConf(b)&&b.co<TD()&&!b.rating)
+    .sort((a,b2)=>b2.co.localeCompare(a.co)).slice(0,5);
+  const toRateHtml=toRate.length
+    ?toRate.map(b=>{
+      const d=new Date(b.co+'T00:00:00');
+      const coFmt=d.toLocaleDateString('en-PH',{month:'short',day:'numeric'});
+      return`<div class="bel-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <div><strong>${b.name}</strong> <span style="color:#888;font-size:11px">checked out ${coFmt}</span> <span class="bdg ${pC(b.platform)}">${b.platform}</span></div>
+        <button class="btn bsv" style="font-size:11px;padding:3px 10px;flex-shrink:0" onclick="cOv('ov-notices');pickBk(${b.id})">Rate now</button>
+      </div>`;
+    }).join('')
+    :`<div class="bel-none">All caught up. No guests to rate.</div>`;
+
   const body=document.getElementById("notices-body");
   body.innerHTML=`
     <div class="bel-sec"><div class="bel-sec-hd">🧹 Cleaner Reminder</div>${cleanerHtml}</div>
@@ -1676,7 +2004,8 @@ function openNotices(){
     <div class="bel-sec"><div class="bel-sec-hd">🗂️ Recently Expired Pencil Bookings</div>${expHtml}</div>
     <div class="bel-sec"><div class="bel-sec-hd">✅ Upcoming Confirmed Bookings</div>${upcomingHtml}</div>
     ${paymentSectionsHtml}
-    ${recontactHtml}`;
+    ${recontactHtml}
+    <div class="bel-sec"><div class="bel-sec-hd">&#x2B50; Guests to Rate</div>${toRateHtml}</div>`;
   document.getElementById("ov-notices").classList.add("sh");
 }
 

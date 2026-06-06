@@ -2,7 +2,7 @@
 
 > This file is read automatically by Claude Code every session.
 > It contains the full context needed to work on this project.
-> Last updated: 2026-06-03 | Version: v1.5.5
+> Last updated: 2026-06-07 | Version: v1.6.0-A2 (in progress)
 
 ---
 
@@ -206,7 +206,11 @@ bt_b   Bookings array
                ratePerNight (number|null, optional — nightly rate in ₱),
                extensionRate (number|null, optional — different rate for extended nights),
                originalCo (string|null, optional — original checkout date before extension,
-                           set only when extensionRate is also set)
+                           set only when extensionRate is also set),
+               guestProfileId (number|undefined — links to bt_gp profile id),
+               rating (number|undefined — 1–5 star rating, set after guest checks out),
+               tags (string[]|undefined — selected review tags, set with rating),
+               reviewNotes (string|undefined — private host notes, set with rating)
 
 bt_bl  Blocks array
        Fields: id, from, to, reason, notes
@@ -237,8 +241,9 @@ bt_gp  Guest profiles array (v1.6.0-A1b)
          id (Number), createdAt (Number)
        Fields mapping to Supabase guest_property_profiles table (private per host):
          name (String), mobiles (Array), email (String),
-         isBlacklisted (Boolean), blacklistReason (String), blacklistDate (null),
-         averageRating (null), tags (Array), notes (String), hasConfirmed (Boolean)
+         isBlacklisted (Boolean), blacklistReason (String), blacklistDate (Number|null — Date.now() timestamp),
+         averageRating (Number|null — mean of all rated confirmed stays across bk+bh),
+         tags (String[] — union of all tags from rated stays), notes (String), hasConfirmed (Boolean)
        Relationship tracking (localStorage only — becomes joins in Supabase):
          linkedBookingIds (Array), linkedHistoryIds (Array), mergedProfileIds (Array)
        Sync points:
@@ -250,6 +255,13 @@ bt_gp  Guest profiles array (v1.6.0-A1b)
 
 bt_gpnid  Next guest profile ID counter (integer string)
           Loaded on login, safety-recalculated to max(stored, max profile id + 1)
+
+Module-level variables added in v1.6.0-A2:
+  selectedGPId           — integer|null — profileId of the gp profile selected via searchGP() dropdown;
+                           cleared in openAdd(), closeAdd(), and on "different person" in repeat guest modal
+  pendingBookingForRepeat — object|null — holds the uncommitted booking while repeat guest modal is open
+  pendingRating          — object — keyed by bookingId; stores pending star count (number),
+                           pending tags (array, key = bookingId+'t'), pending notes (string, key = bookingId+'n')
 
 bt_bell  Bell last-seen timestamp (integer, milliseconds)
 ```
@@ -339,15 +351,40 @@ bt_bell  Bell last-seen timestamp (integer, milliseconds)
 - Badge and count if guest name appears more than once
 - Red dot on calendar chip
 
-**Guest Masterlist (v1.5.0 — intelligence update)**
-- Guest list built from both bt_b (live) and bt_bh (history archive)
-- Dedup key: name.toLowerCase()+'|'+mobile — handles same person across bookings
-- Filter chips: All / Confirmed / Pencil Only (hasConfirmed flag distinguishes types)
-- Guest card shows name, stay count (all sources), next/last date, platform badges, payment summary
-- Repeat star shown only for guests with more than 1 confirmed stay
-- Tap card opens profile: contact info with Copy buttons (clipboard), summary stats, full stay history
-- Stay history shows entries from both bk and bh with stayLabel() — Confirmed / Pencil / Cancelled / Expired / Cancelled by host
-- Payment badge shown only for confirmed bk entries; pencil/history entries show label only
+**Guest Masterlist (v1.6.0-A2 — rebuilt from bt_gp)**
+- Guest list reads from gp[] array (bt_gp). buildGuests() looks up linked bk/bh entries via profile.linkedBookingIds and profile.linkedHistoryIds
+- Sort: non-blacklisted by stay count descending; blacklisted profiles at bottom
+- Filter chips: All / Confirmed / Pencil Only / 🚫 Blacklisted / ⭐ Unrated
+- Guest card shows initials avatar, name, stay count, next/last date, platform badges, average rating stars, Blacklisted badge, Pencil only badge
+- Merge suggestion banner shown when two profiles share same normalized name but different mobiles; Merge button calls mergeProfiles(id1,id2)
+- Tap card calls openGMProf(profileId) — takes integer id, NOT name+mobile
+- Profile view shows all linked stays from bk+bh with stayLabel(), rating section per stay (buildRatingHtml), blacklist panel
+- Blacklist feature: showBlacklistPanel(id) → confirmBlacklist(id); removeBlacklist(id) → execRemoveBlacklist(id)
+- Rating accessible from profile view (inProfile=true) and from booking detail panel (inProfile=false)
+
+**Guest name search dropdown (v1.6.0-A2)**
+- Typing 3+ chars in #an triggers searchGP() — matches gp[] by name, shows up to 3 rows with avatar+name+mobile+stay count+blacklist badge
+- selectGP(profileId) fills name/mobile/email fields and sets selectedGPId; calls checkBlacklistInForm()
+- checkBlacklistInForm() called on #am oninput and after selectGP; shows red #bl-warn-add warning if profile isBlacklisted
+- selectedGPId cleared on openAdd(), closeAdd(), and "different person" repeat guest path
+
+**Repeat guest detection (v1.6.0-A2)**
+- Triggered in saveAdd() confirmed direct path if rgProfile.hasConfirmed is true
+- showRepeatGuest() opens #ov-repeat-guest modal showing last stay, avg rating, notes, mobile diff warning
+- "Same person" links booking to existing profile; "Different person" commits a new separate profile
+- Pencil bookings never trigger repeat guest modal
+
+**Rating and review system (v1.6.0-A2)**
+- buildRatingHtml(b, inProfile) injected into showDet() and openGMProf() stay history
+- Only visible for past confirmed bookings (b.co < TD() and b.type !== 'pencil')
+- Star tap calls setRatingStar(bookingId, n); tag tap calls toggleRatingTag(tagName, bookingId)
+- Conflicting tag pairs auto-deselect: Would host again ↔ Would not host again, Clean ↔ Left a mess, Quiet ↔ Noisy
+- saveRating() writes rating/tags/reviewNotes to bk or bh entry, recalculates profile.averageRating and profile.tags
+- editRating() temporarily clears b.rating to force rate UI re-render, pre-fills pendingRating state
+
+**Important Notices — Guests to Rate section (v1.6.0-A2)**
+- New section at bottom: past confirmed bookings with no rating, sorted by most recent checkout, max 5
+- "Rate now" navigates calendar to booking and opens detail panel
 
 **Important Notices (v1.5.0 — full rewrite)**
 - 🔔 bell in header opens dynamic notices panel
