@@ -217,7 +217,12 @@ bt_p   Profile object
                expHrs, minNights, noSmoke, noPets, noParty, customRule,
                hostName, hostMob, gcash, pencilExpiryHrs, recontact[],
                defaultRate (number|null, optional — default nightly rate in ₱,
-                            pre-fills rate field on new bookings)
+                            pre-fills rate field on new bookings),
+               cleanerMob (string, optional — cleaner phone number for one-tap SMS),
+               calSettings (object, optional — calendar display preferences):
+                 tickerEnabled (boolean, default true — show next check-in ticker banner)
+                 hoverEnabled (boolean, default true — enable booking group highlight)
+                 hoverMode (string "hover"|"click", default "hover" — highlight trigger mode)
 
 bt_bh  Booking history archive (cancelled pencil bookings + cancelled confirmed bookings)
        Fields: same as bt_b entries + cancelReason + archivedAt (timestamp)

@@ -31,8 +31,28 @@
     </div>
   </div>
   <div id="tab-home" class="tab-pane">
+  <div id="ticker-wrap" onclick="tickerTap()" style="display:none">
+    <div id="ticker-inner"></div>
+  </div>
   <div class="wp">
     <div id="sverr" class="er" style="display:none;margin-bottom:9px">⚠️ Auto-save failed — your last change was not stored. Try again or export a backup.</div>
+    <div id="stats-chips" style="display:flex;gap:8px;margin-bottom:9px">
+      <div style="flex:1;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:8px;text-align:center">
+        <div style="color:#2D5F0F;font-size:16px;margin-bottom:2px;line-height:1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D5F0F" stroke-width="2" stroke-linecap="round"><rect x="4" y="5" width="16" height="16" rx="2"/><line x1="16" y1="3" x2="16" y2="7"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="4" y1="11" x2="20" y2="11"/></svg></div>
+        <div id="stat-bkcount" style="font-size:18px;font-weight:700;color:#1a1a1a">—</div>
+        <div style="font-size:11px;color:#9CA3AF">This month</div>
+      </div>
+      <div style="flex:1;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:8px;text-align:center">
+        <div style="color:#2D5F0F;font-size:16px;margin-bottom:2px;line-height:1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D5F0F" stroke-width="2" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg></div>
+        <div id="stat-nights" style="font-size:18px;font-weight:700;color:#1a1a1a">—</div>
+        <div style="font-size:11px;color:#9CA3AF">Nights booked</div>
+      </div>
+      <div style="flex:1;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:8px;text-align:center">
+        <div style="color:#2D5F0F;font-size:16px;margin-bottom:2px;line-height:1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D5F0F" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><polyline points="9 12 11 14 15 10"/></svg></div>
+        <div id="stat-nextfree" style="font-size:18px;font-weight:700;color:#1a1a1a">—</div>
+        <div style="font-size:11px;color:#9CA3AF">Next free</div>
+      </div>
+    </div>
     <div class="ob">
       <span class="ol">Occupancy</span>
       <span class="of" id="ofrac">0/31</span>
@@ -392,6 +412,27 @@
       <div><label>Mobile</label><input id="pr-hmob" placeholder="+63 9XX XXX XXXX"/></div>
       <div><label>GCash number</label><input id="pr-gcash" placeholder="+63 9XX XXX XXXX"/></div>
     </div>
+    <div class="fr" style="margin-top:4px">
+      <label>Cleaner mobile number</label>
+      <input type="tel" id="pr-cmob" placeholder="+63 9XX XXX XXXX"/>
+      <div style="font-size:11px;color:#9CA3AF;margin-top:3px">Used for the one-tap message cleaner button</div>
+    </div>
+  </div>
+  <div class="prof-sec">
+    <div class="prof-sec-hd">Calendar Settings</div>
+    <div class="prof-toggle">
+      <input type="checkbox" id="pr-ticker" checked/>
+      <label for="pr-ticker">Show next check-in ticker banner</label>
+    </div>
+    <div class="prof-toggle" style="margin-top:6px">
+      <input type="checkbox" id="pr-hover-enabled" checked onchange="document.getElementById('pr-hover-radios').style.opacity=this.checked?'1':'0.4';document.getElementById('pr-hover-on').disabled=!this.checked;document.getElementById('pr-hover-click').disabled=!this.checked"/>
+      <label for="pr-hover-enabled">Enable booking group highlight</label>
+    </div>
+    <div id="pr-hover-radios" style="margin-left:16px;margin-top:5px;display:flex;flex-direction:column;gap:4px;font-size:13px">
+      <label style="display:flex;align-items:center;gap:6px"><input type="radio" name="pr-hover-mode" id="pr-hover-on" value="hover" checked/> Highlight on hover (desktop)</label>
+      <label style="display:flex;align-items:center;gap:6px"><input type="radio" name="pr-hover-mode" id="pr-hover-click" value="click"/> Highlight on tap (mobile friendly)</label>
+    </div>
+    <div style="font-size:11px;color:#9CA3AF;margin-top:8px;font-style:italic">Full tile color customization coming soon</div>
   </div>
   <div id="prof-saved" class="prof-saved">✓ Settings saved</div>
   <div class="mbb"><button class="bxx" onclick="cOv('ov-prof')">Cancel</button><button class="bsv" onclick="saveProf()">Save settings</button></div>
