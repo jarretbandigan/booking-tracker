@@ -6,6 +6,7 @@ let pend=null,pendOver=null,pfcl=null,active=null;
 let expiryTimer=null,pclConfId=null,pclDispAction=null,pclExpired=[],listFilter='all',aType='confirmed';
 let dispOnConfirm=null,dispOnCancel=null;
 let bh=[],editId=null;
+let gp=[],gpnid=1;
 async function h256(s){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,"0")).join("");}
 async function doLogin(){
   const u=document.getElementById("lu").value.trim(),p=document.getElementById("lp").value;
@@ -45,6 +46,14 @@ function svH(){
     document.getElementById("sverr").style.display="block";
   }
 }
+function svGP(){
+  try{
+    localStorage.setItem("bt_gp",JSON.stringify(gp));
+    localStorage.setItem("bt_gpnid",gpnid.toString());
+  }catch(e){
+    document.getElementById("sverr").style.display="block";
+  }
+}
 function loadData(){
   try{
     const b=localStorage.getItem("bt_b"),l=localStorage.getItem("bt_bl");
@@ -54,6 +63,9 @@ function loadData(){
     const bell=localStorage.getItem("bt_bell");bellTs=bell?parseInt(bell):0;
     const h=localStorage.getItem("bt_bh");bh=h?JSON.parse(h):[];
   }catch(e){bk=[];bl=[];prof={};bellTs=0;bh=[];}
+  try{const gpRaw=localStorage.getItem("bt_gp");gp=gpRaw?JSON.parse(gpRaw):[];}catch(e){gp=[];}
+  try{const gpnRaw=localStorage.getItem("bt_gpnid");gpnid=gpnRaw?parseInt(gpnRaw):1;}catch(e){gpnid=1;}
+  if(gp.length)gpnid=Math.max(gpnid,...gp.map(p=>p.id+1)); // safety recalc — mirrors nid pattern
   // Migration: add type field, normalise Pending payment method
   let migrated=false;
   bk.forEach(b=>{
@@ -64,6 +76,60 @@ function loadData(){
   if(migrated)sv();
   const ids=[...bk.map(x=>x.id),...bl.map(x=>x.id)];
   nid=ids.length?Math.max(...ids)+1:10;
+  migrateToGP();
+}
+function migrateToGP(){
+  if(gp.length>0)return;
+  if(bk.length===0&&bh.length===0)return;
+  let migrated=false;
+  const allEntries=[
+    ...bk.map(b=>({...b,_src:"bt_b"})),
+    ...bh.map(b=>({...b,_src:"bt_bh"}))
+  ];
+  allEntries.forEach(entry=>{
+    if(!entry.name)return;
+    const normName=entry.name.toLowerCase().trim();
+    const normMobile=(entry.mobile||"").trim();
+    let profile=gp.find(p=>
+      p.name.toLowerCase().trim()===normName&&
+      (normMobile===""||p.mobiles.includes(normMobile))
+    );
+    if(!profile){
+      profile={
+        id:gpnid++,
+        createdAt:Date.now(),
+        name:entry.name.trim(),
+        mobiles:normMobile?[normMobile]:[],
+        email:entry.email||"",
+        isBlacklisted:false,
+        blacklistReason:"",
+        blacklistDate:null,
+        averageRating:null,
+        tags:[],
+        notes:"",
+        hasConfirmed:false,
+        linkedBookingIds:[],
+        linkedHistoryIds:[],
+        mergedProfileIds:[]
+      };
+      gp.push(profile);
+    }
+    if(normMobile&&!profile.mobiles.includes(normMobile))profile.mobiles.push(normMobile);
+    if(entry._src==="bt_b"){
+      if(!profile.linkedBookingIds.includes(entry.id))profile.linkedBookingIds.push(entry.id);
+      const idx=bk.findIndex(b=>b.id===entry.id);
+      if(idx!==-1&&bk[idx].guestProfileId===undefined){bk[idx].guestProfileId=profile.id;migrated=true;}
+      if(entry.type==="confirmed")profile.hasConfirmed=true;
+    }
+    if(entry._src==="bt_bh"){
+      if(!profile.linkedHistoryIds.includes(entry.id))profile.linkedHistoryIds.push(entry.id);
+      const idx=bh.findIndex(b=>b.id===entry.id);
+      if(idx!==-1&&bh[idx].guestProfileId===undefined){bh[idx].guestProfileId=profile.id;migrated=true;}
+      if(entry.type==="confirmed")profile.hasConfirmed=true;
+    }
+  });
+  svGP();
+  if(migrated){sv();svH();}
 }
 // HELPERS
 function f12(t){if(!t)return null;const[h,m]=t.split(":").map(Number);const ap=h>=12?"PM":"AM";const h12=h%12||12;return h12+":"+(m<10?"0"+m:m)+" "+ap;}
@@ -90,7 +156,59 @@ function isConf(b){return b.type==="confirmed";}
 function getPclOn(ds){return bk.filter(b=>isPencil(b)&&dR(b.ci,b.co).includes(ds));}
 function getConfOn(ds){return bk.find(b=>isConf(b)&&(dR(b.ci,b.co).includes(ds)||b.co===ds));}
 function pclOnRange(ci,co){const days=dR(ci,co);return bk.filter(b=>isPencil(b)&&days.some(d=>dR(b.ci,b.co).includes(d)));}
-function archiveBk(b,reason,extra){bh.push(Object.assign({},b,{cancelReason:reason,archivedAt:Date.now()},extra||{}));svH();}
+function getGP(id){return gp.find(p=>p.id===id)||null;}
+function findGP(name,mobile){
+  const normName=(name||"").toLowerCase().trim();
+  const normMobile=(mobile||"").trim();
+  return gp.find(p=>
+    p.name.toLowerCase().trim()===normName&&
+    (normMobile===""||p.mobiles.includes(normMobile))
+  )||null;
+}
+function createGP(name,mobile,email){
+  const profile={
+    id:gpnid++,
+    createdAt:Date.now(),
+    name:(name||"").trim(),
+    mobiles:mobile?[(mobile||"").trim()]:[],
+    email:(email||"").trim(),
+    isBlacklisted:false,
+    blacklistReason:"",
+    blacklistDate:null,
+    averageRating:null,
+    tags:[],
+    notes:"",
+    hasConfirmed:false,
+    linkedBookingIds:[],
+    linkedHistoryIds:[],
+    mergedProfileIds:[]
+  };
+  gp.push(profile);
+  svGP();
+  return profile;
+}
+function linkBkToGP(profileId,bookingId,isHistory){
+  const profile=getGP(profileId);if(!profile)return;
+  if(isHistory){if(!profile.linkedHistoryIds.includes(bookingId))profile.linkedHistoryIds.push(bookingId);}
+  else{if(!profile.linkedBookingIds.includes(bookingId))profile.linkedBookingIds.push(bookingId);}
+  svGP();
+}
+function updateGPConfirmed(profileId){
+  const profile=getGP(profileId);if(!profile)return;
+  profile.hasConfirmed=true;svGP();
+}
+function archiveBk(b,reason,extra){
+  bh.push(Object.assign({},b,{cancelReason:reason,archivedAt:Date.now()},extra||{}));
+  svH();
+  if(b&&b.guestProfileId){
+    const gpProfile=getGP(b.guestProfileId);
+    if(gpProfile){
+      gpProfile.linkedBookingIds=gpProfile.linkedBookingIds.filter(id=>id!==b.id);
+      if(!gpProfile.linkedHistoryIds.includes(b.id))gpProfile.linkedHistoryIds.push(b.id);
+      svGP();
+    }
+  }
+}
 let hvTimer,_expiryChecking=false;
 function hvOn(sel){clearTimeout(hvTimer);const c=document.getElementById("cal");c.classList.add("hv-active");c.querySelectorAll(".hv-on").forEach(t=>t.classList.remove("hv-on"));c.querySelectorAll(sel).forEach(t=>{t.classList.add("hv-on");if(t.classList.contains("tr-top")||t.classList.contains("tr-bot"))t.parentElement.classList.add("hv-on");});}
 function hvOff(){hvTimer=setTimeout(()=>{const c=document.getElementById("cal");c.classList.remove("hv-active");c.querySelectorAll(".hv-on").forEach(t=>t.classList.remove("hv-on"));},60);}
@@ -497,7 +615,16 @@ function saveAdd(){
   commitBk(b);
 }
 function commitPend(){if(!pend)return;commitBk(pend);pend=null;cAll();}
-function commitBk(b){bk.push(b);sv();cAll();renderCal();showDet(b);}
+function commitBk(b){
+  bk.push(b);
+  let gpProfile=findGP(b.name,b.mobile);
+  if(!gpProfile)gpProfile=createGP(b.name,b.mobile,b.email);
+  b.guestProfileId=gpProfile.id;
+  if(b.mobile&&!gpProfile.mobiles.includes(b.mobile))gpProfile.mobiles.push(b.mobile);
+  linkBkToGP(gpProfile.id,b.id,false);
+  if(b.type==="confirmed")updateGPConfirmed(gpProfile.id);
+  sv();svGP();cAll();renderCal();showDet(b);
+}
 function confirmOw(){
   if(!pend||!pendOver)return;
   const b=pend,ovId=pendOver.id;
@@ -549,7 +676,17 @@ function saveEdit(){
   b.platform=document.getElementById("epl").value;b.pay=document.getElementById("epy").value;
   b.method=document.getElementById("eme2").value;b.notes=document.getElementById("eno").value.trim();
   b.ratePerNight=parseFloat(document.getElementById("e-rate").value)||null;
-  sv();cAll();renderCal();showDet(b);
+  sv();
+  if(active&&active.guestProfileId){
+    const gpProfile=getGP(active.guestProfileId);
+    if(gpProfile){
+      gpProfile.name=active.name;
+      if(active.mobile&&!gpProfile.mobiles.includes(active.mobile))gpProfile.mobiles.push(active.mobile);
+      if(active.email)gpProfile.email=active.email;
+      svGP();
+    }
+  }
+  cAll();renderCal();showDet(b);
 }
 
 // EXTEND
@@ -918,7 +1055,7 @@ function gmBack(){
 // EXPORT / IMPORT
 let pendingImport=null;
 function doExport(){
-  const data={bt_b:bk,bt_bl:bl,bt_p:prof,bt_bh:bh};
+  const data={bt_b:bk,bt_bl:bl,bt_p:prof,bt_bh:bh,bt_gp:gp,bt_gpnid:gpnid};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
   const url=URL.createObjectURL(blob);
   const a=document.createElement("a");a.href=url;a.download="booking-tracker-backup.json";
@@ -943,6 +1080,11 @@ function readImport(input){
       impok.style.display="none";impconfbtn.style.display="none";
       document.getElementById("ov-imp").classList.add("sh");return;
     }
+    if(data.bt_gp!==undefined&&!Array.isArray(data.bt_gp)){
+      imperr.textContent="Invalid backup — bt_gp must be an array.";imperr.style.display="block";
+      impok.style.display="none";impconfbtn.style.display="none";
+      document.getElementById("ov-imp").classList.add("sh");return;
+    }
     pendingImport=data;
     imperr.style.display="none";
     const profTxt=data.bt_p&&!Array.isArray(data.bt_p)?" Property profile included.":"";
@@ -960,9 +1102,14 @@ function confirmImport(){
   if(pendingImport.bt_p&&!Array.isArray(pendingImport.bt_p)&&typeof pendingImport.bt_p==="object")prof=pendingImport.bt_p;
   else prof={};
   if(Array.isArray(pendingImport.bt_bh))bh=pendingImport.bt_bh;else bh=[];
+  if(Array.isArray(pendingImport.bt_gp))gp=pendingImport.bt_gp;else gp=[];
+  gpnid=pendingImport.bt_gpnid||1;
+  if(gp.length)gpnid=Math.max(gpnid,...gp.map(p=>p.id+1));
+  svGP();
+  if(gp.length===0)migrateToGP(); // rebuild from imported bt_b/bt_bh if old backup has no bt_gp
   const ids=[...bk.map(x=>x.id),...bl.map(x=>x.id)];
   nid=ids.length?Math.max(...ids)+1:1;
-  sv();svP();svH();cAll();renderCal();updateHeader();active=null;
+  sv();svP();svH();svGP();cAll();renderCal();updateHeader();active=null;
   document.getElementById("dpanel").innerHTML='<div class="ph">✅ Backup restored — '+bk.length+' booking'+(bk.length!==1?'s':'')+(bl.length?' and '+bl.length+' block'+(bl.length!==1?'s':''):'')+' loaded.</div>';
   pendingImport=null;
 }
@@ -1200,6 +1347,7 @@ function confirmPcl(){
   const displaced=pclOnRange(b.ci,b.co).filter(x=>x.id!==b.id);
   const doConfirm=()=>{
     b.type="confirmed";b.pay=pay;b.method=method;b.cd=false;b.ur=false;
+    if(b.guestProfileId)updateGPConfirmed(b.guestProfileId);
     sv();cAll();closePclPanel();renderCal();showDet(b);
     const prev=gCO(b.ci);if(prev)showTurn(prev,b);
   };
