@@ -119,6 +119,8 @@
           <span class="gm-chip act" data-f="all" onclick="gmFilt(this)">All</span>
           <span class="gm-chip" data-f="conf" onclick="gmFilt(this)">Confirmed</span>
           <span class="gm-chip" data-f="pcl" onclick="gmFilt(this)">✏️ Pencil Only</span>
+          <span class="gm-chip" data-f="bl" onclick="gmFilt(this)">🚫 Blacklisted</span>
+          <span class="gm-chip" data-f="unrated" onclick="gmFilt(this)">⭐ Unrated</span>
         </div>
         <div class="gm-body" id="gm-list"></div>
       </div>
@@ -171,8 +173,10 @@
       <button type="button" id="atype-pcl" class="tbtn tcl" onclick="setAType('pencil')" style="flex:1;min-width:0">✏️ Pencil</button>
     </div>
   </div>
-  <div class="fr"><label>Guest name</label><input id="an" placeholder="e.g. Maria Santos"/></div>
-  <div class="f2"><div><label>Mobile</label><input id="am" placeholder="+63 9XX XXX XXXX"/></div><div><label>Email (optional)</label><input id="ae" placeholder="guest@email.com"/></div></div>
+  <div class="fr"><label>Guest name</label><input id="an" placeholder="e.g. Maria Santos" oninput="searchGP()" autocomplete="off"/>
+    <div id="gp-suggest" style="display:none;position:relative;z-index:10;background:#fff;border:1px solid #D1D5DB;border-radius:8px;margin-top:2px;overflow:hidden"></div>
+  </div>
+  <div class="f2"><div><label>Mobile</label><input id="am" placeholder="+63 9XX XXX XXXX" oninput="checkBlacklistInForm()"/></div><div><label>Email (optional)</label><input id="ae" placeholder="guest@email.com"/></div></div>
   <div class="f2"><div><label>Check-in</label><input type="date" id="aci" onchange="document.getElementById('aco').min=aD(this.value,1);updRateCalc('aci','aco','a-rate','a-rate-total')"/></div><div><label>Check-out</label><input type="date" id="aco" onchange="updRateCalc('aci','aco','a-rate','a-rate-total')"/></div></div>
   <div class="sl">Timing</div>
   <div class="tg">
@@ -213,6 +217,17 @@
   <h3>⚠️ Unpaid booking exists</h3>
   <div class="wb" id="ow-msg" style="margin-bottom:12px"></div>
   <div class="mbb"><button class="bxx" onclick="cAll();pend=null;pendOver=null;">Cancel</button><button class="bdl" onclick="confirmOw()">Confirm Overwrite</button></div>
+</div></div>
+
+<!-- REPEAT GUEST -->
+<div class="ov" id="ov-repeat-guest"><div class="oc">
+  <div class="oh">⭐ Repeat guest detected</div>
+  <div id="rg-content"></div>
+  <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px">
+    <button class="btn bx" id="rg-same">Same person — link this booking</button>
+    <button class="btn" id="rg-diff">Different person — keep separate</button>
+    <button class="btn bc" onclick="cOv('ov-repeat-guest')">Cancel — go back to form</button>
+  </div>
 </div></div>
 
 <!-- EDIT -->
