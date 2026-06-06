@@ -227,6 +227,25 @@ bt_bh  Booking history archive (cancelled pencil bookings + cancelled confirmed 
        Additional fields for confirmed_cancelled_full: cancelledBy ("host")
        Additional fields for confirmed_cancelled_partial: originalCi, originalCo, cancelledDays (array)
 
+bt_gp  Guest profiles array (v1.6.0-A1b)
+       Fields mapping to Supabase guests table (shared, anonymous):
+         id (Number), createdAt (Number)
+       Fields mapping to Supabase guest_property_profiles table (private per host):
+         name (String), mobiles (Array), email (String),
+         isBlacklisted (Boolean), blacklistReason (String), blacklistDate (null),
+         averageRating (null), tags (Array), notes (String), hasConfirmed (Boolean)
+       Relationship tracking (localStorage only — becomes joins in Supabase):
+         linkedBookingIds (Array), linkedHistoryIds (Array), mergedProfileIds (Array)
+       Sync points:
+         commitBk() — creates/links profile on every new booking (all creation paths)
+         archiveBk() — moves bookingId from linkedBookingIds to linkedHistoryIds
+         saveEdit()  — propagates name/mobile/email changes to profile
+         confirmPcl() — sets hasConfirmed=true when pencil converts to confirmed
+         migrateToGP() — one-time migration on first load when gp is empty
+
+bt_gpnid  Next guest profile ID counter (integer string)
+          Loaded on login, safety-recalculated to max(stored, max profile id + 1)
+
 bt_bell  Bell last-seen timestamp (integer, milliseconds)
 ```
 
