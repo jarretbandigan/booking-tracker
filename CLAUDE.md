@@ -2,7 +2,7 @@
 
 > This file is read automatically by Claude Code every session.
 > It contains the full context needed to work on this project.
-> Last updated: 2026-06-07 | Version: v1.6.0-A2 (in progress)
+> Last updated: 2026-06-07 | Version: v1.6.0-D (in progress)
 
 ---
 
@@ -267,7 +267,8 @@ Module-level variables added in v1.6.0-A2:
   pendingRating          — object — keyed by bookingId; stores pending star count (number),
                            pending tags (array, key = bookingId+'t'), pending notes (string, key = bookingId+'n')
 
-bt_bell  Bell last-seen timestamp (integer, milliseconds)
+bt_bell       Bell last-seen timestamp (integer, milliseconds)
+bt_last_export UI state only — timestamp (ms) of last doExport() call. Not user data, not included in export. Read directly from localStorage when needed; no module-level variable.
 ```
 
 ---
@@ -390,14 +391,20 @@ bt_bell  Bell last-seen timestamp (integer, milliseconds)
 - New section at bottom: past confirmed bookings with no rating, sorted by most recent checkout, max 5
 - "Rate now" navigates calendar to booking and opens detail panel
 
-**Important Notices (v1.5.0 — full rewrite)**
+**Important Notices (v1.6.0-D — enhanced)**
 - 🔔 bell in header opens dynamic notices panel
-- Section 1: Cleaner Reminder — all guests checking out on the nearest future checkout date; today's checkouts use amber pulse (.cu) row
-- Section 2: Pencil Holds Expiring Soon — pencil bookings with ci within 48 hours
-- Section 3: Recently Expired Pencil Bookings — bh entries with cancelReason="expired" in the last 7 days (not tappable)
-- Section 4: Upcoming Confirmed Bookings — fully paid confirmed bookings with ci >= today
-- Section 5/6: Payment sections — conditional on prof.fullPay; if true: one "Awaiting Payment" section; if false/unset: separate "Awaiting Full Payment" and "Partial Payment — Balance Due" sections
-- Re-contact Suggestions — only rendered if prof.recontact has entries; shows displaced pencil guests after a cancellation; auto-cleaned after 7 days via svP()
+- Section order (v1.6.0-D):
+  1. 🚫 Blacklisted Guest Alert — upcoming confirmed bookings where guestProfileId links to an isBlacklisted profile; hidden when empty
+  2. 🧹 Cleaner Reminder — all guests checking out on the nearest future checkout date; today's checkouts use amber pulse (.cu) row
+  3. 📅 Checking Out Tomorrow — all confirmed bookings where b.co === aD(TD(),1); shows checkout time and cleaner contact status; amber warning if not contacted
+  4. ✏️ Pencil Holds Expiring Soon — pencil bookings with ci within 48 hours
+  5. ⭐ Guests to Rate — past confirmed bookings with no rating, max 5, Rate now button
+  6. 🗂️ Recently Expired Pencil Bookings — bh entries with cancelReason="expired" in the last 7 days (not tappable)
+  7. ✅ Upcoming Confirmed Bookings — fully paid confirmed bookings with ci >= today
+  8. 💸 Payment sections — conditional on prof.fullPay
+  9. ⚠ Possible Duplicate Guests — bt_gp pairs with same normalized name but different mobiles; hidden when empty; Review button opens Guests tab
+  10. 📞 Re-contact Suggestions — only rendered if prof.recontact has entries; auto-cleaned after 7 days
+  11. 💾 Data Backup — always shown; reads bt_last_export; amber if never exported or >7 days ago, green if within 7 days
 - Pencil bookings excluded from all payment sections via isConf() guard
 
 **Pencil Booking Type (v1.5.0)**

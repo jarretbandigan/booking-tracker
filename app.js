@@ -1408,6 +1408,7 @@ function doExport(){
   const url=URL.createObjectURL(blob);
   const a=document.createElement("a");a.href=url;a.download="booking-tracker-backup.json";
   document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+  localStorage.setItem('bt_last_export',Date.now().toString());
 }
 function triggerImport(){document.getElementById("imp-file").value="";document.getElementById("imp-file").click();}
 function readImport(input){
@@ -2135,15 +2136,72 @@ function openNotices(){
     }).join('')
     :`<div class="bel-none">All caught up. No guests to rate.</div>`;
 
+  // Checking out tomorrow
+  const tmr=aD(TD(),1);
+  const tmrBks=bk.filter(b=>isConf(b)&&b.co===tmr).sort((a,b2)=>a.name.localeCompare(b2.name));
+  const tmrHtml=tmrBks.length
+    ?tmrBks.map(b=>{
+      const coTime=f12(b.coE||b.coS||null)||"12:00 PM";
+      const clStatus=b.cd
+        ?'<span style="color:#4A8A20;margin-left:6px">✓ Cleaner contacted</span>'
+        :'<span style="color:#B45309;margin-left:6px">⚠ Cleaner not yet contacted</span>';
+      return`<div class="bel-row" onclick="cOv('ov-notices');pickBk(${b.id})"><strong>${b.name}</strong> at ${coTime}${clStatus}</div>`;
+    }).join('')
+    :`<div class="bel-none">No checkouts tomorrow.</div>`;
+
+  // Blacklisted guest alert (upcoming confirmed bookings only)
+  const blAlertBks=bk.filter(b=>isConf(b)&&b.ci>=TD()).filter(b=>{
+    const p=b.guestProfileId?getGP(b.guestProfileId):null;
+    return p&&p.isBlacklisted;
+  }).sort((a,b2)=>a.ci.localeCompare(b2.ci));
+  const blAlertHtml=blAlertBks.length
+    ?`<div class="bel-sec" style="border-left:3px solid #FCA5A5;padding-left:8px"><div class="bel-sec-hd">&#x1F6AB; Blacklisted Guest Alert</div>${blAlertBks.map(b=>{
+        const p=getGP(b.guestProfileId);
+        const ciDate=new Date(b.ci+'T00:00:00').toLocaleDateString('en-PH',{month:'short',day:'numeric'});
+        return`<div class="bel-row" style="background:#FEF2F2;border-color:#FCA5A5" onclick="cOv('ov-notices');pickBk(${b.id})"><span style="background:#FEE2E2;color:#991B1B;font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;margin-right:6px">BLACKLISTED</span><strong>${b.name}</strong> · Check-in ${ciDate}${p&&p.blacklistReason?'<br><span style="font-size:11px;color:#7F1D1D">'+p.blacklistReason+'</span>':''}</div>`;
+      }).join('')}</div>`
+    :'';
+
+  // Possible duplicate guest profiles (same normalized name, different mobiles)
+  const gpNameMap={};
+  gp.forEach(p=>{const k=p.name.toLowerCase().trim();if(!gpNameMap[k])gpNameMap[k]=[];gpNameMap[k].push(p);});
+  const gpDupePairs=[];
+  Object.values(gpNameMap).forEach(arr=>{if(arr.length>1)gpDupePairs.push([arr[0],arr[1]]);});
+  const dupesHtml=gpDupePairs.length
+    ?`<div class="bel-sec" style="background:#FFFBEB;border-radius:7px;padding:8px 10px;border:1px solid #FDE68A"><div class="bel-sec-hd">&#x26A0; Possible Duplicate Guests</div>${gpDupePairs.map(([a,b2])=>`<div class="bel-row" style="background:transparent;border-color:#FDE68A;display:flex;justify-content:space-between;align-items:center;gap:8px"><div style="font-size:12px"><strong>${a.name}</strong> — ${a.mobiles[0]||'no mobile'} vs ${b2.mobiles[0]||'no mobile'}</div><button class="btn" style="font-size:11px;padding:3px 9px;flex-shrink:0" onclick="cOv('ov-notices');showTab('guests')">Review</button></div>`).join('')}</div>`
+    :'';
+
+  // Data backup reminder
+  const lastExport=parseInt(localStorage.getItem('bt_last_export')||'0');
+  const exportBtn=`<button class="btn bsv" style="font-size:12px;margin-top:8px;width:100%" onclick="doExport()">Export now</button>`;
+  let backupHtml='';
+  if(!lastExport){
+    backupHtml=`<div class="bel-sec"><div class="bel-sec-hd">&#x1F4BE; Data Backup</div><div class="bel-row" style="background:#FFFBEB;border-color:#FDE68A;color:#713F12">&#x26A0; You have never exported a backup. Your data is only on this device.${exportBtn}</div></div>`;
+  } else {
+    const expDate=new Date(lastExport);
+    const expDateStr=expDate.toLocaleDateString('en-PH',{month:'long',day:'numeric',year:'numeric'});
+    const expTimeStr=expDate.toLocaleTimeString('en-PH',{hour:'2-digit',minute:'2-digit'});
+    const daysSince=Math.floor((now-lastExport)/(24*3600*1000));
+    if(now-lastExport>7*24*3600*1000){
+      backupHtml=`<div class="bel-sec"><div class="bel-sec-hd">&#x1F4BE; Data Backup</div><div class="bel-row" style="background:#FFFBEB;border-color:#FDE68A;color:#713F12">Last backup: ${expDateStr} at ${expTimeStr}. It has been <strong>${daysSince} day${daysSince!==1?'s':''}</strong> since your last backup.${exportBtn}</div></div>`;
+    } else {
+      backupHtml=`<div class="bel-sec"><div class="bel-sec-hd">&#x1F4BE; Data Backup</div><div class="bel-row" style="background:#F0FDF4;border-color:#86EFAC;color:#166534">&#x2713; Last backup: ${expDateStr} at ${expTimeStr}. Your data is backed up.${exportBtn}</div></div>`;
+    }
+  }
+
   const body=document.getElementById("notices-body");
   body.innerHTML=`
+    ${blAlertHtml}
     <div class="bel-sec"><div class="bel-sec-hd">🧹 Cleaner Reminder</div>${cleanerHtml}</div>
+    <div class="bel-sec"><div class="bel-sec-hd">📅 Checking Out Tomorrow</div>${tmrHtml}</div>
     <div class="bel-sec"><div class="bel-sec-hd">✏️ Pencil Holds Expiring Soon</div>${pclHtml}</div>
+    <div class="bel-sec"><div class="bel-sec-hd">&#x2B50; Guests to Rate</div>${toRateHtml}</div>
     <div class="bel-sec"><div class="bel-sec-hd">🗂️ Recently Expired Pencil Bookings</div>${expHtml}</div>
     <div class="bel-sec"><div class="bel-sec-hd">✅ Upcoming Confirmed Bookings</div>${upcomingHtml}</div>
     ${paymentSectionsHtml}
+    ${dupesHtml}
     ${recontactHtml}
-    <div class="bel-sec"><div class="bel-sec-hd">&#x2B50; Guests to Rate</div>${toRateHtml}</div>`;
+    ${backupHtml}`;
   document.getElementById("ov-notices").classList.add("sh");
 }
 
