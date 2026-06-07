@@ -9,6 +9,7 @@ let bh=[],editId=null;
 let gp=[],gpnid=1;
 let tickerTarget=null;
 let selectedGPId=null,pendingBookingForRepeat=null,pendingRating={};
+let repMonth=null,repView="bookings";
 async function h256(s){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,"0")).join("");}
 async function doLogin(){
   const u=document.getElementById("lu").value.trim(),p=document.getElementById("lp").value;
@@ -216,6 +217,7 @@ function archiveBk(b,reason,extra){
       svGP();
     }
   }
+  if(document.getElementById('tab-reports')&&document.getElementById('tab-reports').style.display!=='none')buildRep();
 }
 let hvTimer,_expiryChecking=false;
 function hvOn(sel){
@@ -835,6 +837,7 @@ function commitBk(b){
   linkBkToGP(gpProfile.id,b.id,false);
   if(b.type==="confirmed")updateGPConfirmed(gpProfile.id);
   sv();svGP();cAll();renderCal();showDet(b);
+  if(document.getElementById('tab-reports')&&document.getElementById('tab-reports').style.display!=='none')buildRep();
 }
 function confirmOw(){
   if(!pend||!pendOver)return;
@@ -926,6 +929,7 @@ function saveEdit(){
     }
   }
   cAll();renderCal();showDet(b);
+  if(document.getElementById('tab-reports')&&document.getElementById('tab-reports').style.display!=='none')buildRep();
 }
 
 // EXTEND
@@ -1027,6 +1031,7 @@ function execFull(){
   bk=bk.filter(x=>x.id!==b.id);sv();cAll();renderCal();
   document.getElementById("dpanel").innerHTML=`<div class="ph">Booking for ${b.name} cancelled.</div>`;
   active=null;pfcl=null;
+  if(document.getElementById('tab-reports')&&document.getElementById('tab-reports').style.display!=='none')buildRep();
   // Re-contact check: find displaced pencil guests whose dates overlap the cancelled booking
   const cancelledDays=dR(b.ci,b.co);
   const displaced=bh.filter(h=>
@@ -1059,6 +1064,7 @@ function confPart(){
   if(!rem.length){bk=bk.filter(x=>x.id!==b.id);sv();cAll();renderCal();document.getElementById("dpanel").innerHTML=`<div class="ph">All days removed — booking deleted.</div>`;active=null;return;}
   const s=rem.sort();b.ci=s[0];b.co=aD(s[s.length-1],1);
   sv();cAll();renderCal();showDet(b);
+  if(document.getElementById('tab-reports')&&document.getElementById('tab-reports').style.display!=='none')buildRep();
 }
 
 // MAINTENANCE
@@ -1454,6 +1460,127 @@ function confirmImport(){
   sv();svP();svH();svGP();cAll();renderCal();updateHeader();active=null;
   document.getElementById("dpanel").innerHTML='<div class="ph">✅ Backup restored — '+bk.length+' booking'+(bk.length!==1?'s':'')+(bl.length?' and '+bl.length+' block'+(bl.length!==1?'s':''):'')+' loaded.</div>';
   pendingImport=null;
+  if(document.getElementById('tab-reports')&&document.getElementById('tab-reports').style.display!=='none')buildRep();
+}
+
+// REPORTS
+function getRepData(){
+  const allConfirmed=[
+    ...bk.filter(b=>isConf(b)),
+    ...bh.filter(b=>b.cancelReason==="confirmed_cancelled_full"||b.cancelReason==="confirmed_cancelled_partial")
+  ];
+  if(repMonth==="all")return allConfirmed;
+  const target=repMonth||(TD().slice(0,7));
+  return allConfirmed.filter(b=>b.ci&&b.ci.slice(0,7)===target);
+}
+function buildRepMonthSel(){
+  const sel=document.getElementById("rep-month-sel");if(!sel)return;
+  const allConfirmed=[
+    ...bk.filter(b=>isConf(b)),
+    ...bh.filter(b=>b.cancelReason==="confirmed_cancelled_full"||b.cancelReason==="confirmed_cancelled_partial")
+  ];
+  const months=[...new Set(allConfirmed.map(b=>b.ci?b.ci.slice(0,7):null).filter(Boolean))].sort().reverse();
+  const currentYM=TD().slice(0,7);
+  const allMonths=months.includes(currentYM)?months:[currentYM,...months];
+  sel.innerHTML=allMonths.map(ym=>{
+    const d=new Date(ym+"-01T00:00:00");
+    const label=d.toLocaleDateString("en-US",{month:"long",year:"numeric"});
+    return`<option value="${ym}"${ym===(repMonth||currentYM)?" selected":""}>${label}</option>`;
+  }).join("")+`<option value="all"${repMonth==="all"?" selected":""}>All time</option>`;
+  // Sync repMonth to whatever the selector actually landed on (guards against stale state)
+  const actualVal=sel.value;
+  repMonth=actualVal===currentYM?null:actualVal;
+}
+function repMonthChange(){
+  const sel=document.getElementById("rep-month-sel");
+  repMonth=sel.value===TD().slice(0,7)?null:sel.value;
+  buildRep();
+}
+function repViewChange(view){
+  repView=view;
+  const bkBtn=document.getElementById("rep-view-bk");
+  const ntBtn=document.getElementById("rep-view-nt");
+  if(bkBtn)bkBtn.style.fontWeight=view==="bookings"?"700":"400";
+  if(ntBtn)ntBtn.style.fontWeight=view==="nights"?"700":"400";
+  buildRep();
+}
+function buildRep(){
+  const data=getRepData();
+  const graph=document.getElementById("rep-graph");
+  const summary=document.getElementById("rep-summary");
+  const empty=document.getElementById("rep-empty");
+  const revNote=document.getElementById("rep-rev-note");
+  if(!graph)return;
+  if(data.length===0){
+    graph.innerHTML="";graph.style.display="none";
+    empty.style.display="block";
+    summary.innerHTML="";revNote.style.display="none";
+    // Sync button bold states even on empty
+    const bkBtn=document.getElementById("rep-view-bk");
+    const ntBtn=document.getElementById("rep-view-nt");
+    if(bkBtn)bkBtn.style.fontWeight=repView==="bookings"?"700":"400";
+    if(ntBtn)ntBtn.style.fontWeight=repView==="nights"?"700":"400";
+    return;
+  }
+  empty.style.display="none";graph.style.display="block";
+  // Group by platform
+  const platforms={};
+  data.forEach(b=>{
+    const pl=b.platform||"Unknown";
+    if(!platforms[pl])platforms[pl]={bookings:0,nights:0,revenue:0,hasRate:false};
+    platforms[pl].bookings++;
+    const nights=dR(b.ci,b.co).length;
+    platforms[pl].nights+=nights;
+    if(b.ratePerNight){
+      platforms[pl].revenue+=b.ratePerNight*nights;
+      platforms[pl].hasRate=true;
+      if(b.extensionRate&&b.originalCo){
+        const extNights=dR(b.originalCo,b.co).length;
+        platforms[pl].revenue+=b.extensionRate*extNights;
+        platforms[pl].nights+=extNights;
+      }
+    }
+  });
+  const sorted=Object.entries(platforms).sort((a,b2)=>repView==="nights"?b2[1].nights-a[1].nights:b2[1].bookings-a[1].bookings);
+  const maxVal=Math.max(...sorted.map(([,v])=>repView==="nights"?v.nights:v.bookings));
+  graph.innerHTML=`
+    <div style="display:flex;align-items:flex-end;gap:10px;height:160px;padding:0 4px;border-bottom:1px solid #E5E7EB">
+      ${sorted.map(([platform,vals])=>{
+        const val=repView==="nights"?vals.nights:vals.bookings;
+        const pct=maxVal>0?Math.round((val/maxVal)*100):0;
+        return`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%">
+          <div style="font-size:11px;font-weight:700;color:#374151;margin-bottom:3px">${val}</div>
+          <div style="width:100%;background:#16A34A;border-radius:4px 4px 0 0;height:${pct}%;min-height:${val>0?"4px":"0"};transition:height 0.3s ease"></div>
+        </div>`;
+      }).join("")}
+    </div>
+    <div style="display:flex;gap:10px;padding:6px 4px 0">
+      ${sorted.map(([platform])=>`<div style="flex:1;text-align:center;font-size:10px;color:#6B7280;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${platform}</div>`).join("")}
+    </div>`;
+  // Summary line
+  const totalBookings=data.length;
+  const totalNights=data.reduce((sum,b)=>sum+dR(b.ci,b.co).length,0);
+  const hasAnyRate=data.some(b=>b.ratePerNight);
+  const totalRevenue=data.reduce((sum,b)=>{
+    if(!b.ratePerNight)return sum;
+    const nights=dR(b.ci,b.co).length;
+    let rev=b.ratePerNight*nights;
+    if(b.extensionRate&&b.originalCo)rev+=b.extensionRate*dR(b.originalCo,b.co).length;
+    return sum+rev;
+  },0);
+  const periodLabel=repMonth==="all"?"All time":(()=>{
+    const ym=repMonth||TD().slice(0,7);
+    const d=new Date(ym+"-01T00:00:00");
+    return d.toLocaleDateString("en-US",{month:"long",year:"numeric"});
+  })();
+  summary.innerHTML=`<strong>${periodLabel}</strong> \xb7 ${totalBookings} booking${totalBookings!==1?"s":""} \xb7 ${totalNights} night${totalNights!==1?"s":""}${hasAnyRate?` \xb7 Est. revenue <strong>₱${Math.round(totalRevenue).toLocaleString()}</strong>`:""}`;
+  revNote.style.display=hasAnyRate?"none":"block";
+  if(!hasAnyRate)revNote.textContent="Add a rate per night to your bookings to see estimated revenue.";
+  // Sync button bold states
+  const bkBtn=document.getElementById("rep-view-bk");
+  const ntBtn=document.getElementById("rep-view-nt");
+  if(bkBtn)bkBtn.style.fontWeight=repView==="bookings"?"700":"400";
+  if(ntBtn)ntBtn.style.fontWeight=repView==="nights"?"700":"400";
 }
 
 // WHAT'S NEW
@@ -1474,6 +1601,7 @@ function showTab(tab){
   });
   if(tab==='guests'){openGM();}
   if(tab==='home'){buildTicker();}
+  if(tab==='reports'){buildRepMonthSel();buildRep();}
 }
 
 // TICKER + STATS
