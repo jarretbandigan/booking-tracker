@@ -2,7 +2,7 @@
 
 > This file is read automatically by Claude Code every session.
 > It contains the full context needed to work on this project.
-> Last updated: 2026-06-07 | Version: v1.6.0-D (in progress)
+> Last updated: 2026-06-07 | Version: v1.6.0
 
 ---
 
@@ -525,8 +525,9 @@ bt_last_export UI state only — timestamp (ms) of last doExport() call. Not use
 - Cleaner flow excluded from pencil booking detail view
 - Re-contact flow: execFull() populates prof.recontact[] when cancellation frees up dates that displaced pencil holds; 7-day auto-cleanup in openNotices()
 
-**v1.6.0: Reports — NEXT**
-- Monthly income summary (Reports tab)
+**v1.7.0: Multi-device sync — NEXT**
+- Cloud sync via Supabase free tier
+- Real authentication replacing SHA-256 soft gate
 - PWA installable on phone home screen
 
 **Phase 1 remaining — PENDING**
@@ -560,6 +561,7 @@ bt_last_export UI state only — timestamp (ms) of last doExport() call. Not use
 
 | Version | Date | Summary |
 |---|---|---|
+| v1.6.0 | Jun 2026 | Six-branch release. Branch A1: rate per night field on bookings and extension rate support, nightly rate pre-fill from property profile, estimated total display in add/edit forms. Branch A2: guest profiles system (bt_gp) built from bt_b+bt_bh migration, guest name search dropdown with blacklist warning in add form, repeat guest detection modal, 5-star rating and tag review system, blacklist feature with reason chips, guest masterlist rebuilt from bt_gp, merge duplicate profiles, filter chips including Blacklisted and Unrated. Branch B: next check-in ticker banner scrolling from right edge with gold urgency labels, quick stats chips (bookings this month, nights booked, next free date), cleaner mobile number setting for one-tap SMS, hover mode and ticker enabled/disabled settings. Branch C: Reports tab replacing coming soon placeholder — bar graph by platform, month selector, bookings/nights toggle, estimated revenue, all-time view including confirmed-cancelled bookings. Branch D: Important Notices enhancements — Blacklisted Guest Alert section at top, Checkout Tomorrow reminder with cleaner status, Guests to Rate section moved to correct position, Possible Duplicate Guests passive notification, Data Backup reminder with last-export timestamp. Ticker fixes: direction right-to-left, null-safe payment strings. Legend collapse via ? button. Cache bust at v1.6.1. |
 | v1.5.5 | Jun 2026 | Critical data protection fix. Cancelled confirmed bookings now archived to bt_bh instead of permanently deleted. execFull() archives with cancelReason="confirmed_cancelled_full" and cancelledBy="host" before removal. confPart() archives a snapshot with cancelReason="confirmed_cancelled_partial", originalCi, originalCo, cancelledDays before any trimming. archivePcl() renamed to archiveBk(b,reason,extra) to support both pencil and confirmed archiving. stayLabel() updated with all 5 cancelReason labels including new confirmed cancel types. Guest Masterlist history now shows complete booking history including cancelled confirmed stays. Export/import of bt_bh already correct — confirmed. |
 | v1.5.4 | Jun 2026 | Architectural file split. index.html (452 lines) separated into styles.css (257 lines, 22KB) and app.js (1338 lines, 75KB). CSS moved from inline `<style>` in `<body>` to proper `<link rel="stylesheet">` in `<head>`. Both files cache-busted with ?v=1.5.4 query string. Zero logic changes, zero data structure changes. All 6 browser verification flows pass with zero console errors. |
 | v1.5.3 | Jun 2026 | Bug fix release — 18 fixes across data integrity, pencil flow, calendar, and code hygiene. C1: saveProf() now preserves prof.recontact and prof.pencilExpiryHrs across saves. C2/M8: doLogout() clears midnight timer and resets all state globals. C3: confirmOw() checks turnaround before removing overwritten booking, preventing data loss on cancel. M1: pencil edit branch now runs conflict check. M2: openExt() uses strict mid-stay check (b2.ci<nd&&b2.co>nd) not getConfOn, so turnaround-day extensions are no longer blocked. M3: openNotices() runs checkPencilExpiry() first. M4: archivePcl() adds archivedAt timestamp; Section 3 filter uses it. M5: loadData() migrates missing at field; renderList() sort has fallback. M6: renderCal() clears hv-active before innerHTML. M7: TD is now a function (toLocaleDateString en-CA) — local time, no staleness. M8-M10: state cleanup, confirmed-only cG(), turnaround past tile uses .ptr class. L3: openBell() and ov-bell modal removed. L4-L5: nav gold, legend note corrected. L6: minNights validation in confirmed add path. L7: cancelPcl splits into cancelPcl(id)+execCancelPcl(id), no browser confirm(). L8: Section 2 pencil expiry uses local-time calculation. L9: checkPencilExpiry() has reentrancy guard. L10: renderGM/openGMProf use name+mobile for dedup-safe lookup. 2050 lines. |
