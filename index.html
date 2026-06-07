@@ -139,11 +139,17 @@
   </div>
   <div id="tab-reports" class="tab-pane" style="display:none">
     <div class="wp">
-      <div class="rpt-ph">
-        <span>📊</span>
-        <h3>Reports coming soon</h3>
-        <p>Monthly income summary and occupancy stats will appear here. Add a rate per night to your bookings to unlock revenue estimates.</p>
+      <div id="rep-filter-row" style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <select id="rep-month-sel" onchange="repMonthChange()" style="flex:1;min-width:120px"></select>
+        <div style="display:flex;gap:6px">
+          <button id="rep-view-bk" class="btn" onclick="repViewChange('bookings')" style="font-size:12px;padding:5px 10px">Bookings</button>
+          <button id="rep-view-nt" class="btn" onclick="repViewChange('nights')" style="font-size:12px;padding:5px 10px">Nights</button>
+        </div>
       </div>
+      <div id="rep-summary" style="margin-bottom:14px;font-size:13px;color:#374151"></div>
+      <div id="rep-graph" style="margin-bottom:16px"></div>
+      <div id="rep-empty" style="display:none;text-align:center;padding:32px 0;color:#9CA3AF;font-size:13px">No bookings found for this period.</div>
+      <div id="rep-rev-note" style="display:none;font-size:11px;color:#9CA3AF;margin-top:8px;font-style:italic"></div>
     </div>
   </div>
   <div id="tab-more" class="tab-pane" style="display:none">

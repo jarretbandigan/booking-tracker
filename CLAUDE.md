@@ -256,6 +256,10 @@ bt_gp  Guest profiles array (v1.6.0-A1b)
 bt_gpnid  Next guest profile ID counter (integer string)
           Loaded on login, safety-recalculated to max(stored, max profile id + 1)
 
+Module-level variables added in v1.6.0-C:
+  repMonth (string|null) — null = current month, "YYYY-MM" = specific month, "all" = all time
+  repView  (string)      — "bookings" or "nights"; controls bar graph metric
+
 Module-level variables added in v1.6.0-A2:
   selectedGPId           — integer|null — profileId of the gp profile selected via searchGP() dropdown;
                            cleared in openAdd(), closeAdd(), and on "different person" in repeat guest modal
