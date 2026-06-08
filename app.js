@@ -1658,8 +1658,19 @@ function buildTicker(){
   const sep="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\xb7\xb7\xb7\xb7\xb7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
   const content=events.map(e=>(e.label?`<span style="color:#F59E0B">${e.label}</span> \xb7 `:"")+e.text).join(sep);
   const inner=document.getElementById("ticker-inner");
-  if(inner)inner.innerHTML=content+sep+content;
+  if(inner){inner.innerHTML=content+sep+content;inner.classList.remove("paused");}
+  const pauseBtn=document.getElementById("ticker-pause-btn");
+  if(pauseBtn){pauseBtn.textContent="⏸";pauseBtn.setAttribute("aria-label","Pause ticker");}
   wrap.style.display="block";
+}
+function toggleTickerPause(){
+  const inner=document.getElementById("ticker-inner");
+  const btn=document.getElementById("ticker-pause-btn");
+  if(!inner||!btn)return;
+  const isPaused=inner.classList.contains("paused");
+  inner.classList.toggle("paused",!isPaused);
+  btn.textContent=isPaused?"⏸":"▶";
+  btn.setAttribute("aria-label",isPaused?"Pause ticker":"Resume ticker");
 }
 function toggleLegend(){
   const lw=document.getElementById("legend-wrap");
