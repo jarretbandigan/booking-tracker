@@ -33,6 +33,7 @@
   <div id="tab-home" class="tab-pane">
   <div id="ticker-wrap" onclick="tickerTap()" style="display:none">
     <div id="ticker-inner"></div>
+    <button id="ticker-pause-btn" onclick="event.stopPropagation();toggleTickerPause()" aria-label="Pause ticker" style="position:absolute;right:0;top:0;height:44px;width:44px;background:rgba(0,0,0,0.35);border:none;color:#fff;font-size:15px;cursor:pointer;z-index:3;display:flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation">⏸</button>
   </div>
   <div class="wp">
     <div id="sverr" class="er" style="display:none;margin-bottom:9px">⚠️ Auto-save failed — your last change was not stored. Try again or export a backup.</div>
