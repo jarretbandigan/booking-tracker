@@ -262,9 +262,9 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;font-size:14px;background:#f
 @keyframes ticker-scroll{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
 #ticker-inner.paused{animation-play-state:paused}
 /* Dachshund mascot */
-@keyframes dog-walk-bob{0%,100%{transform:scaleX(-1) translateY(0)}50%{transform:scaleX(-1) translateY(-2px)}}
-.ticker-dog{animation:dog-walk-bob 0.45s ease-in-out infinite}
-#ticker-inner.paused .ticker-dog{animation-play-state:paused}
+@keyframes dog-walk-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+.ticker-dog-img{height:34px;width:auto;flex-shrink:0;margin-right:10px;display:inline-block;vertical-align:middle;animation:dog-walk-bob 0.45s ease-in-out infinite}
+#ticker-inner.paused .ticker-dog-img{animation-play-state:paused}
 #legend-wrap{transition:all 0.2s ease}
 .oc{background:#fff;border-radius:11px;padding:15px;width:330px;max-width:96vw;border:1px solid #ddd;margin-bottom:38px}
 .oh{font-size:14px;font-weight:700;margin-bottom:11px}
