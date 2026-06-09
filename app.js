@@ -176,6 +176,15 @@ function initials(name){
   if(parts.length===1)return parts[0].slice(0,2).toUpperCase();
   return(parts[0][0]+parts[parts.length-1][0]).toUpperCase();
 }
+function esc(s){
+  if(s==null)return"";
+  return String(s)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#39;");
+}
 function createGP(name,mobile,email){
   const profile={
     id:gpnid++,
@@ -263,10 +272,10 @@ function searchGP(){
     const blBadge=p.isBlacklisted?`<span class="bl-bdg" style="margin-left:4px">Blacklisted</span>`:"";
     const cntBadge=confCount>0?`<span style="font-size:10px;background:#DCFCE7;color:#15803D;padding:2px 6px;border-radius:8px;margin-left:4px">${confCount} stay${confCount!==1?"s":""}</span>`:"";
     return`<div class="gp-sugg-row" onclick="selectGP(${p.id})">
-      <div class="gp-avatar">${initials(p.name)}</div>
+      <div class="gp-avatar">${esc(initials(p.name))}</div>
       <div style="flex:1;min-width:0">
-        <div style="font-weight:600;font-size:13px">${p.name}${blBadge}${cntBadge}</div>
-        ${mob?`<div style="font-size:11px;color:#888">${mob}</div>`:""}
+        <div style="font-weight:600;font-size:13px">${esc(p.name)}${blBadge}${cntBadge}</div>
+        ${mob?`<div style="font-size:11px;color:#888">${esc(mob)}</div>`:""}
       </div>
     </div>`;
   }).join("");
@@ -304,8 +313,8 @@ function checkBlacklistInForm(){
       if(mbb)mbb.parentElement.insertBefore(warn,mbb);
     }
     const dateStr=profile.blacklistDate?new Date(profile.blacklistDate).toLocaleDateString("en-PH",{year:"numeric",month:"long",day:"numeric"}):"unknown date";
-    warn.innerHTML=`<div style="color:#991B1B;font-weight:700;margin-bottom:5px">&#x1F6AB; ${profile.name} is blacklisted</div>
-      <div style="font-size:12px;color:#7F1D1D;margin-bottom:8px">Date: ${dateStr}${profile.blacklistReason?'<br>Reason: '+profile.blacklistReason:''}</div>
+    warn.innerHTML=`<div style="color:#991B1B;font-weight:700;margin-bottom:5px">&#x1F6AB; ${esc(profile.name)} is blacklisted</div>
+      <div style="font-size:12px;color:#7F1D1D;margin-bottom:8px">Date: ${dateStr}${profile.blacklistReason?'<br>Reason: '+esc(profile.blacklistReason):''}</div>
       <div style="display:flex;gap:8px">
         <button class="btn bc" style="flex:1" onclick="document.getElementById('bl-warn-add').style.display='none'">Proceed anyway</button>
         <button class="btn bxx" style="flex:1" onclick="closeAdd()">Cancel</button>
@@ -502,7 +511,7 @@ function showTurn(oB,iB){
   document.getElementById("dpanel").innerHTML=`
     <div class="pt">⚡ Turnaround day</div>
     <div class="cu">⚡ <div><strong>Urgent — same-day turnaround</strong><br>
-    <strong>↓ ${oB.name}</strong> out at ${f12(cot)} · <strong>↑ ${iB.name}</strong> in at ${f12(cit)}<br>
+    <strong>↓ ${esc(oB.name)}</strong> out at ${f12(cot)} · <strong>↑ ${esc(iB.name)}</strong> in at ${f12(cit)}<br>
     Cleaner must prepare unit between ${f12(cot)} and ${f12(cit)}.</div></div>
     <div class="tt">
       <button class="tbtn tcl${cd?" dn3":""}" onclick="tapCl()">${cd?"✓ Cleaner contacted":"🧹 Cleaner contacted?"}</button>
@@ -510,14 +519,14 @@ function showTurn(oB,iB){
     </div>
     ${prof.cleanerMob?`<div style="margin-top:6px"><button class="btn" style="width:100%;border-color:#2D5F0F;color:#2D5F0F" onclick="msgCleaner(${oB.id})">📱 Message cleaner</button></div>`:""}
     <div style="margin-top:9px">
-      <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#999;margin-bottom:3px">Checkout — ${oB.name}</div>
-      <div class="dr"><span class="dl">Platform</span><span class="bdg ${pC(oB.platform)}">${oB.platform}</span></div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#999;margin-bottom:3px">Checkout — ${esc(oB.name)}</div>
+      <div class="dr"><span class="dl">Platform</span><span class="bdg ${pC(oB.platform)}">${esc(oB.platform)}</span></div>
       <div class="dr"><span class="dl">Payment</span><span class="bdg ${pyC(oB.pay)}">${pyL(oB.pay)}</span></div>
-      <div class="dr"><span class="dl">Mobile</span><span class="dv" style="color:#1A56DB">${oB.mobile||"—"}</span></div>
-      <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#999;margin:6px 0 3px">Check-in — ${iB.name}</div>
-      <div class="dr"><span class="dl">Platform</span><span class="bdg ${pC(iB.platform)}">${iB.platform}</span></div>
+      <div class="dr"><span class="dl">Mobile</span><span class="dv" style="color:#1A56DB">${esc(oB.mobile||"—")}</span></div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#999;margin:6px 0 3px">Check-in — ${esc(iB.name)}</div>
+      <div class="dr"><span class="dl">Platform</span><span class="bdg ${pC(iB.platform)}">${esc(iB.platform)}</span></div>
       <div class="dr"><span class="dl">Payment</span><span class="bdg ${pyC(iB.pay)}">${pyL(iB.pay)}</span></div>
-      <div class="dr"><span class="dl">Mobile</span><span class="dv" style="color:#1A56DB">${iB.mobile||"—"}</span></div>
+      <div class="dr"><span class="dl">Mobile</span><span class="dv" style="color:#1A56DB">${esc(iB.mobile||"—")}</span></div>
     </div>
     <div class="acb">
       <button class="btn be" onclick="active=bk.find(b=>b.id==${oB.id});showDet(active)">↓ Checkout details</button>
@@ -535,7 +544,7 @@ function showDet(b){
   const ciX=b.ciE?'<br><small style="color:#BA7517">⏰ Early check-in</small>':b.ciL?'<br><small style="color:#888">⏰ Late check-in</small>':"";
   const coX=b.coL?'<br><small style="color:#BA7517">⏰ Late check-out</small>':b.coE?'<br><small style="color:#4A8A20">⏰ Early check-out</small>':"";
   const clBox=isTurn
-    ?`<div class="cu">⚡ <div><strong>Urgent — same-day turnaround!</strong><br>Contact cleaner immediately. ${nxIn.name} checks in at <strong>${f12(eCi(nxIn))}</strong>${lw}</div></div>`
+    ?`<div class="cu">⚡ <div><strong>Urgent — same-day turnaround!</strong><br>Contact cleaner immediately. ${esc(nxIn.name)} checks in at <strong>${f12(eCi(nxIn))}</strong>${lw}</div></div>`
     :cd?`<div class="rb">🧹 Cleaner confirmed for <strong>${b.co} at ${f12(cot)}</strong>${lw}</div>`
     :`<div class="cb">🧹 <div><strong>Contact cleaner</strong> for checkout on <strong>${b.co} at ${f12(cot)}</strong>${lw}</div></div>`;
   // Cleaner flow only shown for confirmed bookings (pencil bookings have no cleaner logistics)
@@ -557,16 +566,16 @@ function showDet(b){
   }
   document.getElementById("dpanel").innerHTML=`
     <div class="pt">Booking details</div>
-    <div class="dr"><span class="dl">Guest</span><strong class="dv">${b.name}</strong></div>
+    <div class="dr"><span class="dl">Guest</span><strong class="dv">${esc(b.name)}</strong></div>
     <div class="dr"><span class="dl">Booker</span><span class="bdg ${rep?"rp":"nw"}">${rep?"⭐ Repeat ("+cnt+"x)":"New guest"}</span></div>
-    <div class="dr"><span class="dl">Mobile</span><span class="dv" style="color:#1A56DB">${b.mobile||"—"}</span></div>
-    ${b.email?`<div class="dr"><span class="dl">Email</span><span class="dv" style="color:#1A56DB">${b.email}</span></div>`:""}
-    <div class="dr"><span class="dl">Platform</span><span class="bdg ${pC(b.platform)}">${b.platform}</span></div>
+    <div class="dr"><span class="dl">Mobile</span><span class="dv" style="color:#1A56DB">${esc(b.mobile||"—")}</span></div>
+    ${b.email?`<div class="dr"><span class="dl">Email</span><span class="dv" style="color:#1A56DB">${esc(b.email)}</span></div>`:""}
+    <div class="dr"><span class="dl">Platform</span><span class="bdg ${pC(b.platform)}">${esc(b.platform)}</span></div>
     <div class="dr"><span class="dl">Payment</span><span class="bdg ${pyC(b.pay)}">${pyL(b.pay)}</span></div>
-    ${b.method?`<div class="dr"><span class="dl">Paid via</span><span class="bdg ${mC(b.method)}">${b.method}</span></div>`:""}
-    <div class="dr"><span class="dl">Check-in</span><span class="dv">${b.ci} at <strong>${f12(cit)}</strong>${ciX}</span></div>
-    <div class="dr"><span class="dl">Check-out</span><span class="dv">${b.co} at <strong>${f12(cot)}</strong>${coX}</span></div>
-    ${b.notes?`<div class="dr"><span class="dl">Notes</span><span class="dv">${b.notes}</span></div>`:""}
+    ${b.method?`<div class="dr"><span class="dl">Paid via</span><span class="bdg ${mC(b.method)}">${esc(b.method)}</span></div>`:""}
+    <div class="dr"><span class="dl">Check-in</span><span class="dv">${esc(b.ci)} at <strong>${f12(cit)}</strong>${ciX}</span></div>
+    <div class="dr"><span class="dl">Check-out</span><span class="dv">${esc(b.co)} at <strong>${f12(cot)}</strong>${coX}</span></div>
+    ${b.notes?`<div class="dr"><span class="dl">Notes</span><span class="dv">${esc(b.notes)}</span></div>`:""}
     ${rateRow}
     ${ratingHtml}
     ${showCleaner?`<div class="tt">
@@ -586,10 +595,10 @@ function showBlk(bl2){
   active=null;
   document.getElementById("dpanel").innerHTML=`
     <div class="pt">🔧 Maintenance block</div>
-    <div class="dr"><span class="dl">Reason</span><strong class="dv">${bl2.reason}</strong></div>
+    <div class="dr"><span class="dl">Reason</span><strong class="dv">${esc(bl2.reason)}</strong></div>
     <div class="dr"><span class="dl">From</span><span class="dv">${bl2.from}</span></div>
     <div class="dr"><span class="dl">To</span><span class="dv">${bl2.to}</span></div>
-    ${bl2.notes?`<div class="dr"><span class="dl">Notes</span><span class="dv">${bl2.notes}</span></div>`:""}
+    ${bl2.notes?`<div class="dr"><span class="dl">Notes</span><span class="dv">${esc(bl2.notes)}</span></div>`:""}
     <div class="acb">
       <button class="btn be" onclick="openEditBlk(${bl2.id})">✏️ Edit</button>
       <button class="btn bc" onclick="delBlk(${bl2.id})">✕ Remove</button>
@@ -606,12 +615,12 @@ function buildRatingHtml(b,inProfile){
   const starSvg=(n,filled)=>`<svg onclick="setRatingStar(${rid},${n})" width="28" height="28" viewBox="0 0 24 24" style="cursor:pointer;flex-shrink:0" data-star="${n}"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="${filled?'#F59E0B':'none'}" stroke="${filled?'#F59E0B':'#D1D5DB'}" stroke-width="2"/></svg>`;
   if(b.rating){
     const stars=[1,2,3,4,5].map(n=>`<span style="color:${n<=b.rating?'#F59E0B':'#D1D5DB'};font-size:20px">&#9733;</span>`).join('');
-    const tagChips=(b.tags||[]).map(t=>`<span class="gp-tag-chip act">${t}</span>`).join('');
+    const tagChips=(b.tags||[]).map(t=>`<span class="gp-tag-chip act">${esc(t)}</span>`).join('');
     return`<div style="margin-top:8px;padding-top:8px;border-top:1px solid #f0f0f0">
       <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#999;margin-bottom:5px">Your review</div>
       <div>${stars}</div>
       ${tagChips?`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:5px">${tagChips}</div>`:''}
-      ${b.reviewNotes?`<div style="font-size:11px;color:#555;margin-top:5px;font-style:italic">${b.reviewNotes}</div>`:''}
+      ${b.reviewNotes?`<div style="font-size:11px;color:#555;margin-top:5px;font-style:italic">${esc(b.reviewNotes)}</div>`:''}
       <button class="btn" style="font-size:11px;padding:3px 10px;margin-top:6px" onclick="editRating(${rid},${inProfile})">Edit review</button>
     </div>`;
   }
@@ -624,7 +633,7 @@ function buildRatingHtml(b,inProfile){
     <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#999;margin-bottom:5px">Rate your guest</div>
     <div id="stars-${rid}" style="display:flex;gap:3px;margin-bottom:8px">${starsHtml}</div>
     <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px" id="tags-${rid}">${tagChips}</div>
-    <textarea id="rnotes-${rid}" placeholder="Private notes about this guest" style="width:100%;box-sizing:border-box;border:1px solid #D1D5DB;border-radius:6px;padding:7px;font-size:12px;font-family:inherit;resize:vertical;min-height:50px">${pendingNotes}</textarea>
+    <textarea id="rnotes-${rid}" placeholder="Private notes about this guest" style="width:100%;box-sizing:border-box;border:1px solid #D1D5DB;border-radius:6px;padding:7px;font-size:12px;font-family:inherit;resize:vertical;min-height:50px">${esc(pendingNotes)}</textarea>
     <div id="raterr-${rid}" style="display:none;color:#DC2626;font-size:12px;margin-top:4px">Please select a star rating.</div>
     <button class="btn bsv" style="width:100%;margin-top:6px" onclick="saveRating(${rid},${inProfile})">Save rating</button>
   </div>`;
@@ -787,7 +796,7 @@ function saveAdd(){
       pendOver=conflictBook;pend=b;
       cAll();
       const contact=conflictBook.mobile||conflictBook.email||"—";
-      document.getElementById("ow-msg").innerHTML=`There is currently an unpaid or pending booking for these dates. Booker: <strong>${conflictBook.name}</strong>, ${contact}. Do you want to overwrite this booking?`;
+      document.getElementById("ow-msg").innerHTML=`There is currently an unpaid or pending booking for these dates. Booker: <strong>${esc(conflictBook.name)}</strong>, ${esc(contact)}. Do you want to overwrite this booking?`;
       document.getElementById("ov-ow").classList.add("sh");return;
     }
     if(conflictBook){err.textContent="Conflict on "+conf+" — already booked.";err.style.display="block";return;}
@@ -802,7 +811,7 @@ function saveAdd(){
       ()=>{displaced.forEach(d2=>{archiveBk(d2,"booking_confirmed");bk=bk.filter(x=>x.id!==d2.id);});cOv('ov-displaced');
         const exCoD=gCO(b.ci);
         if(exCoD){
-          document.getElementById("twb").innerHTML=`<div class="wb"><strong>↓ ${exCoD.name}</strong> checks out on <strong>${b.ci} at ${f12(eCo(exCoD))}</strong><br><strong>↑ ${b.name}</strong> would check in at <strong>${f12(eCi(b))}</strong><br><br>Cleaner must prepare unit between these times. Confirm this is enough time.</div>`;
+          document.getElementById("twb").innerHTML=`<div class="wb"><strong>↓ ${esc(exCoD.name)}</strong> checks out on <strong>${esc(b.ci)} at ${f12(eCo(exCoD))}</strong><br><strong>↑ ${esc(b.name)}</strong> would check in at <strong>${f12(eCi(b))}</strong><br><br>Cleaner must prepare unit between these times. Confirm this is enough time.</div>`;
           document.getElementById("twbt").innerHTML=`<button class="bxx" onclick="cOv('ov-tw');pend=null;">Cancel</button><button class="bsv" onclick="commitPend()">Proceed anyway</button>`;
           document.getElementById("ov-tw").classList.add("sh");
         } else {commitBk(b);pend=null;}
@@ -814,7 +823,7 @@ function saveAdd(){
   const exCo=gCO(ci);
   if(exCo){
     pend=b;cAll();
-    document.getElementById("twb").innerHTML=`<div class="wb"><strong>↓ ${exCo.name}</strong> checks out on <strong>${ci} at ${f12(eCo(exCo))}</strong><br><strong>↑ ${name}</strong> would check in at <strong>${f12(eCi(b))}</strong><br><br>Cleaner must prepare unit between these times. Confirm this is enough time.</div>`;
+    document.getElementById("twb").innerHTML=`<div class="wb"><strong>↓ ${esc(exCo.name)}</strong> checks out on <strong>${esc(ci)} at ${f12(eCo(exCo))}</strong><br><strong>↑ ${esc(name)}</strong> would check in at <strong>${f12(eCi(b))}</strong><br><br>Cleaner must prepare unit between these times. Confirm this is enough time.</div>`;
     document.getElementById("twbt").innerHTML=`<button class="bxx" onclick="cOv('ov-tw');pend=null;">Cancel</button><button class="bsv" onclick="commitPend()">Proceed anyway</button>`;
     document.getElementById("ov-tw").classList.add("sh");return;
   }
@@ -849,7 +858,7 @@ function confirmOw(){
   if(exCo&&exCo.id!==ovId){
     // Turnaround warning — removal only happens if user proceeds
     cAll();pend=b;
-    document.getElementById("twb").innerHTML=`<div class="wb"><strong>↓ ${exCo.name}</strong> checks out on <strong>${b.ci} at ${f12(eCo(exCo))}</strong><br><strong>↑ ${b.name}</strong> would check in at <strong>${f12(eCi(b))}</strong><br><br>Cleaner must prepare unit between these times. Confirm this is enough time.</div>`;
+    document.getElementById("twb").innerHTML=`<div class="wb"><strong>↓ ${esc(exCo.name)}</strong> checks out on <strong>${esc(b.ci)} at ${f12(eCo(exCo))}</strong><br><strong>↑ ${esc(b.name)}</strong> would check in at <strong>${f12(eCi(b))}</strong><br><br>Cleaner must prepare unit between these times. Confirm this is enough time.</div>`;
     document.getElementById("twbt").innerHTML=`<button class="bxx" onclick="cOv('ov-tw');pend=null;pendOver=null;">Cancel</button><button class="bsv" onclick="bk=bk.filter(x=>x.id!==${ovId});pendOver=null;commitPend()">Proceed anyway</button>`;
     document.getElementById("ov-tw").classList.add("sh");return;
   }
@@ -867,12 +876,12 @@ function showRepeatGuest(profile,b,onSame,onDiff){
   const avgStars=profile.averageRating;
   const starsHtml=avgStars?`<div style="color:#F59E0B;font-size:16px;margin:4px 0">${"★".repeat(Math.round(avgStars))}${"☆".repeat(5-Math.round(avgStars))} <span style="font-size:12px;color:#555">${avgStars.toFixed(1)}</span></div>`:"";
   const lastStayHtml=lastStay?`<div style="font-size:12px;color:#555;margin-bottom:4px">Last stay: <strong>${lastStay.ci} → ${lastStay.co}</strong> \xb7 <span class="bdg ${pC(lastStay.platform)}">${lastStay.platform}</span>${lastStay.pay?` \xb7 <span class="bdg ${pyC(lastStay.pay)}">${pyL(lastStay.pay)}</span>`:""}</div>`:"";
-  const mobileDiff=b.mobile&&!profile.mobiles.includes(b.mobile)?`<div style="color:#B45309;font-size:12px;background:#FFFBEB;border:1px solid #FDE68A;padding:6px 10px;border-radius:6px;margin-bottom:8px">⚠ Different number from last time. Previous: ${profile.mobiles[0]||"—"}</div>`:"";
-  const notesHtml=profile.notes?`<div style="font-size:12px;color:#555;font-style:italic;margin-bottom:4px">"${profile.notes}"</div>`:"";
+  const mobileDiff=b.mobile&&!profile.mobiles.includes(b.mobile)?`<div style="color:#B45309;font-size:12px;background:#FFFBEB;border:1px solid #FDE68A;padding:6px 10px;border-radius:6px;margin-bottom:8px">⚠ Different number from last time. Previous: ${esc(profile.mobiles[0]||"—")}</div>`:"";
+  const notesHtml=profile.notes?`<div style="font-size:12px;color:#555;font-style:italic;margin-bottom:4px">"${esc(profile.notes)}"</div>`:"";
   document.getElementById("rg-content").innerHTML=`
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-      <div class="gp-avatar" style="width:42px;height:42px;font-size:15px">${initials(profile.name)}</div>
-      <div><div style="font-weight:700;font-size:14px">${profile.name}</div>${starsHtml}</div>
+      <div class="gp-avatar" style="width:42px;height:42px;font-size:15px">${esc(initials(profile.name))}</div>
+      <div><div style="font-weight:700;font-size:14px">${esc(profile.name)}</div>${starsHtml}</div>
     </div>
     ${lastStayHtml}${notesHtml}${mobileDiff}`;
   document.getElementById("rg-same").onclick=()=>{
@@ -1002,7 +1011,7 @@ function openCan(){
   if(!active)return;const b=active;
   const days=dR(b.ci,b.co);
   document.getElementById("cab").innerHTML=`
-    <p style="font-size:13px;margin-bottom:9px;color:#666">Cancelling for <strong>${b.name}</strong> (${b.ci} → ${b.co})</p>
+    <p style="font-size:13px;margin-bottom:9px;color:#666">Cancelling for <strong>${esc(b.name)}</strong> (${esc(b.ci)} → ${esc(b.co)})</p>
     <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:9px">
       <label style="display:flex;gap:7px;font-size:13px;cursor:pointer;padding:8px;border:1px solid #ddd;border-radius:5px">
         <input type="radio" name="ct" value="full" checked onchange="tgP(false)" style="margin-top:2px">
@@ -1031,7 +1040,7 @@ function execFull(){
   const b=pfcl;if(!b)return;
   archiveBk(b,"confirmed_cancelled_full",{cancelledBy:"host"});
   bk=bk.filter(x=>x.id!==b.id);sv();cAll();renderCal();
-  document.getElementById("dpanel").innerHTML=`<div class="ph">Booking for ${b.name} cancelled.</div>`;
+  document.getElementById("dpanel").innerHTML=`<div class="ph">Booking for ${esc(b.name)} cancelled.</div>`;
   active=null;pfcl=null;
   if(document.getElementById('tab-reports')&&document.getElementById('tab-reports').style.display!=='none')buildRep();
   // Re-contact check: find displaced pencil guests whose dates overlap the cancelled booking
@@ -1104,7 +1113,7 @@ function saveMaint(){
     else bl.push({id:nid++,from:fr,to:to,reason:re,notes:no});
     delete document.getElementById("ov-mn").dataset.eid;
     sv();cAll();renderCal();
-    document.getElementById("dpanel").innerHTML=`<div class="ph">Block saved: ${re} · ${fr} to ${to}.</div>`;
+    document.getElementById("dpanel").innerHTML=`<div class="ph">Block saved: ${esc(re)} · ${fr} to ${to}.</div>`;
   };
   const mDisplaced=pclOnRange(fr,to);
   if(mDisplaced.length>0){
@@ -1147,14 +1156,14 @@ function renderList(){
     const rep=cG(b.name)>1,ni=dR(b.ci,b.co).length,isTurn=isPencil(b)?false:!!gCI(b.co);
     return`<div class="bc2" onclick="pickBk(${b.id})">
       <div class="bc2t">
-        <div><div class="bc2n">${rep?"⭐ ":""}${b.name}${isTurn?' <span style="color:#E8A020;font-size:10px">⚡</span>':""}${b.type==="pencil"?'<span class="pcl-bdg">✏️ Pencil</span>':""}</div>
-        <div class="bc2d">${b.ci} → ${b.co} · ${ni} night${ni!==1?"s":""}</div></div>
+        <div><div class="bc2n">${rep?"⭐ ":""}${esc(b.name)}${isTurn?' <span style="color:#E8A020;font-size:10px">⚡</span>':""}${b.type==="pencil"?'<span class="pcl-bdg">✏️ Pencil</span>':""}</div>
+        <div class="bc2d">${esc(b.ci)} → ${esc(b.co)} · ${ni} night${ni!==1?"s":""}</div></div>
         ${b.type==="pencil"?'<span class="bdg" style="background:#FEF9C3;color:#713F12;border:1px solid #FDE047;flex-shrink:0">Pencil hold</span>':`<span class="bdg ${pyC(b.pay)}" style="flex-shrink:0">${pyL(b.pay)}</span>`}
       </div>
       <div class="bc2b">
-        <span class="bdg ${pC(b.platform)}">${b.platform}</span>
-        ${b.method?`<span class="bdg ${mC(b.method)}">${b.method}</span>`:""}
-        ${b.mobile?`<span style="font-size:11px;color:#888">${b.mobile}</span>`:""}
+        <span class="bdg ${pC(b.platform)}">${esc(b.platform)}</span>
+        ${b.method?`<span class="bdg ${mC(b.method)}">${esc(b.method)}</span>`:""}
+        ${b.mobile?`<span style="font-size:11px;color:#888">${esc(b.mobile)}</span>`:""}
       </div>
     </div>`;
   }).join("");
@@ -1246,7 +1255,7 @@ function renderGM(){
   Object.values(nameMap).forEach(arr=>{if(arr.length>1)dupePairs.push([arr[0],arr[1]]);});
   const mergeBanner=dupePairs.length?`<div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:10px 12px;margin-bottom:10px">
     <div style="font-weight:700;font-size:12px;margin-bottom:4px">&#x26A0; Possible duplicate profiles</div>
-    ${dupePairs.map(([a,b2])=>`<div style="font-size:12px;color:#555;margin-bottom:4px"><strong>${a.name}</strong> — ${a.mobiles[0]||'no mobile'} vs ${b2.mobiles[0]||'no mobile'} <button class="btn bsv" style="font-size:11px;padding:2px 8px;margin-left:6px" onclick="mergeProfiles(${a.id},${b2.id})">Merge</button></div>`).join('')}
+    ${dupePairs.map(([a,b2])=>`<div style="font-size:12px;color:#555;margin-bottom:4px"><strong>${esc(a.name)}</strong> — ${esc(a.mobiles[0]||'no mobile')} vs ${esc(b2.mobiles[0]||'no mobile')} <button class="btn bsv" style="font-size:11px;padding:2px 8px;margin-left:6px" onclick="mergeProfiles(${a.id},${b2.id})">Merge</button></div>`).join('')}
   </div>`:'';
   const el=document.getElementById("gm-list");
   if(!guests.length){el.innerHTML=mergeBanner+`<div class="gm-el">No guests found.</div>`;return;}
@@ -1258,10 +1267,10 @@ function renderGM(){
     const plBadges=g.platforms.map(p=>`<span class="bdg ${pC(p)}">${p}</span>`).join("");
     return`<div class="gm-row" onclick="openGMProf(${g.id})">
       <div style="display:flex;align-items:center;gap:9px">
-        <div class="gp-avatar">${initials(g.name)}</div>
+        <div class="gp-avatar">${esc(initials(g.name))}</div>
         <div style="flex:1;min-width:0">
-          <div class="gm-rn">${g.name}${blBadge}${pclBadge}</div>
-          <div class="gm-rs">${g.stays.length} stay${g.stays.length!==1?'s':''}${lastLabel?' \xb7 '+lastLabel:''}${g.mobile?' \xb7 '+g.mobile:''}</div>
+          <div class="gm-rn">${esc(g.name)}${blBadge}${pclBadge}</div>
+          <div class="gm-rs">${g.stays.length} stay${g.stays.length!==1?'s':''}${lastLabel?' \xb7 '+lastLabel:''}${g.mobile?' \xb7 '+esc(g.mobile):''}</div>
           <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-top:2px">${plBadges}${starsHtml?`<span style="margin-left:2px">${starsHtml}</span>`:''}</div>
         </div>
       </div>
@@ -1285,7 +1294,7 @@ function openGMProf(profileId){
   const plBadges=platforms.map(p=>`<span class="bdg ${pC(p)}">${p}</span>`).join(" ");
   const starsHtml=profile.averageRating?`<div style="color:#F59E0B;font-size:16px;margin-bottom:4px">${"★".repeat(Math.round(profile.averageRating))}${"☆".repeat(5-Math.round(profile.averageRating))} <span style="font-size:12px;color:#555">${profile.averageRating.toFixed(1)}</span></div>`:"";
   const blHdrBadge=profile.isBlacklisted?` <span class="bl-bdg">Blacklisted</span>`:"";
-  document.getElementById("gm-pname").innerHTML=(repConf?'⭐ ':'')+profile.name+blHdrBadge+(allStays.length>1?` <span style="font-size:12px;font-weight:400;color:#888">(${allStays.length} stays)</span>`:'');
+  document.getElementById("gm-pname").innerHTML=(repConf?'⭐ ':'')+esc(profile.name)+blHdrBadge+(allStays.length>1?` <span style="font-size:12px;font-weight:400;color:#888">(${allStays.length} stays)</span>`:'');
   const staysHtml=allStays.map(s=>{
     const ni=dR(s.ci,s.co).length;
     const lbl=stayLabel(s);
@@ -1300,7 +1309,7 @@ function openGMProf(profileId){
       <div class="gm-stay-inf">
         <span class="bdg ${pC(s.platform)}">${s.platform}</span>
         ${s.method&&s._src==='bk'?`<span class="bdg ${mC(s.method)}">${s.method}</span>`:''}
-        ${s.notes?`<span style="font-size:11px;color:#888">${s.notes}</span>`:''}
+        ${s.notes?`<span style="font-size:11px;color:#888">${esc(s.notes)}</span>`:''}
       </div>
       ${ratingSection}
     </div>`;
@@ -1309,20 +1318,20 @@ function openGMProf(profileId){
     ?`<div style="background:#FEF2F2;border:1px solid #FCA5A5;border-radius:8px;padding:12px;margin-top:12px">
         <div style="color:#991B1B;font-weight:700;margin-bottom:4px">&#x1F6AB; Blacklisted</div>
         ${profile.blacklistDate?`<div style="font-size:12px;color:#7F1D1D;margin-bottom:4px">Date: ${new Date(profile.blacklistDate).toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric'})}</div>`:''}
-        ${profile.blacklistReason?`<div style="font-size:12px;color:#7F1D1D;margin-bottom:8px">Reason: ${profile.blacklistReason}</div>`:''}
+        ${profile.blacklistReason?`<div style="font-size:12px;color:#7F1D1D;margin-bottom:8px">Reason: ${esc(profile.blacklistReason)}</div>`:''}
         <button class="btn" onclick="removeBlacklist(${profileId})">Remove from blacklist</button>
       </div>`
     :`<div style="margin-top:12px"><button class="btn bc" onclick="showBlacklistPanel(${profileId})">&#x1F6AB; Blacklist guest</button></div>`;
   document.getElementById("gm-pbody").innerHTML=`
     <div class="gm-psec">Contact</div>
-    ${profile.mobiles.length?profile.mobiles.map(m=>`<div class="dr"><span class="dl">Mobile</span><span class="dv" style="color:#1A56DB">${m}<button class="gm-copy" onclick="cpTxt(this,'${m.replace(/'/g,"\\'")}')">Copy</button></span></div>`).join(''):`<div class="dr"><span class="dl">Mobile</span><span class="dv" style="color:#aaa">—</span></div>`}
-    ${profile.email?`<div class="dr"><span class="dl">Email</span><span class="dv" style="color:#1A56DB">${profile.email}<button class="gm-copy" onclick="cpTxt(this,'${profile.email.replace(/'/g,"\\'")}')">Copy</button></span></div>`:''}
+    ${profile.mobiles.length?profile.mobiles.map(m=>`<div class="dr"><span class="dl">Mobile</span><span class="dv" style="color:#1A56DB">${esc(m)}<button class="gm-copy" data-val="${esc(m)}" onclick="cpTxt(this,this.dataset.val)">Copy</button></span></div>`).join(''):`<div class="dr"><span class="dl">Mobile</span><span class="dv" style="color:#aaa">—</span></div>`}
+    ${profile.email?`<div class="dr"><span class="dl">Email</span><span class="dv" style="color:#1A56DB">${esc(profile.email)}<button class="gm-copy" data-val="${esc(profile.email)}" onclick="cpTxt(this,this.dataset.val)">Copy</button></span></div>`:''}
     <div class="gm-psec">Summary</div>
     <div class="dr"><span class="dl">Total stays</span><span class="dv">${allStays.length}</span></div>
     <div class="dr"><span class="dl">Platforms</span><span class="dv">${plBadges}</span></div>
     <div class="dr"><span class="dl">Payment summary</span><span class="dv">${paySum}</span></div>
     ${starsHtml?`<div class="dr"><span class="dl">Avg rating</span><span class="dv">${starsHtml}</span></div>`:''}
-    ${profile.notes?`<div class="dr"><span class="dl">Notes</span><span class="dv">${profile.notes}</span></div>`:''}
+    ${profile.notes?`<div class="dr"><span class="dl">Notes</span><span class="dv">${esc(profile.notes)}</span></div>`:''}
     <div class="gm-psec">Stay history</div>
     ${staysHtml}
     ${blSection}`;
@@ -1340,7 +1349,7 @@ function showBlacklistPanel(profileId){
   const pbody=document.getElementById("gm-pbody");if(!pbody)return;
   pbody.innerHTML=`
     <div style="margin-top:10px">
-      <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#999;margin-bottom:8px">&#x1F6AB; Blacklist ${profile.name}</div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#999;margin-bottom:8px">&#x1F6AB; Blacklist ${esc(profile.name)}</div>
       <div style="font-size:12px;color:#555;margin-bottom:8px">Select reason:</div>
       <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px" id="bl-reasons">
         ${reasons.map(r=>`<span class="gp-tag-chip" data-reason="${r}" onclick="this.parentElement.querySelectorAll('.gp-tag-chip').forEach(c=>c.classList.remove('act'));this.classList.add('act');">${r}</span>`).join('')}
@@ -1367,7 +1376,7 @@ function removeBlacklist(profileId){
   const pbody=document.getElementById("gm-pbody");if(!pbody)return;
   const confirmDiv=document.createElement('div');
   confirmDiv.style.cssText='background:#FEF9C3;border:1px solid #FDE68A;border-radius:8px;padding:12px;margin-top:10px';
-  confirmDiv.innerHTML=`<div style="font-size:13px;margin-bottom:8px">Remove ${profile.name} from blacklist?</div>
+  confirmDiv.innerHTML=`<div style="font-size:13px;margin-bottom:8px">Remove ${esc(profile.name)} from blacklist?</div>
     <div style="display:flex;gap:8px">
       <button class="btn bc" style="flex:1" onclick="execRemoveBlacklist(${profileId})">Yes, remove</button>
       <button class="btn bxx" style="flex:1" onclick="openGMProf(${profileId})">Cancel</button>
@@ -1619,18 +1628,18 @@ function buildTicker(){
   const todayOut=conf.find(b=>b.co===today);
   const todayIn=conf.find(b=>b.ci===today);
   if(todayOut&&todayIn){
-    events.push({label:"TURNAROUND TODAY",text:todayOut.name.split(" ")[0]+" checks out "+(f12(eCo(todayOut))||"")+" \xb7 "+todayIn.name.split(" ")[0]+" checks in "+(f12(eCi(todayIn))||""),date:today,id:todayIn.id});
+    events.push({label:"TURNAROUND TODAY",text:esc(todayOut.name.split(" ")[0])+" checks out "+(f12(eCo(todayOut))||"")+" \xb7 "+esc(todayIn.name.split(" ")[0])+" checks in "+(f12(eCi(todayIn))||""),date:today,id:todayIn.id});
   } else {
     // P2: Check-in today
     const todayIns=conf.filter(b=>b.ci===today);
     todayIns.forEach(b=>{
       const nights=dR(b.ci,b.co).length;
       const payStr=b.pay==="full"?"Paid":b.pay==="partial"?"Partial balance due":b.pay==="none"?"Unpaid":"";
-      events.push({label:"CHECK-IN TODAY",text:b.name+" \xb7 "+b.platform+(f12(eCi(b))?" \xb7 "+f12(eCi(b)):"")+(payStr?" \xb7 "+payStr:"")+" \xb7 "+nights+" night"+(nights!==1?"s":""),date:today,id:b.id});
+      events.push({label:"CHECK-IN TODAY",text:esc(b.name)+" \xb7 "+esc(b.platform)+(f12(eCi(b))?" \xb7 "+f12(eCi(b)):"")+(payStr?" \xb7 "+payStr:"")+" \xb7 "+nights+" night"+(nights!==1?"s":""),date:today,id:b.id});
     });
     // P3: Checkout today, no check-in today
     if(!todayIns.length&&todayOut){
-      events.push({label:"CHECKOUT TODAY",text:todayOut.name+" \xb7 "+todayOut.platform+(f12(eCo(todayOut))?" \xb7 "+f12(eCo(todayOut)):""),date:today,id:todayOut.id});
+      events.push({label:"CHECKOUT TODAY",text:esc(todayOut.name)+" \xb7 "+esc(todayOut.platform)+(f12(eCo(todayOut))?" \xb7 "+f12(eCo(todayOut)):""),date:today,id:todayOut.id});
     }
   }
   // P4: Tomorrow check-in (only if no today events)
@@ -1639,7 +1648,7 @@ function buildTicker(){
     conf.filter(b=>b.ci===tmr).forEach(b=>{
       const nights=dR(b.ci,b.co).length;
       const payStr=b.pay==="full"?"Paid":b.pay==="partial"?"Partial balance due":b.pay==="none"?"Unpaid":"";
-      events.push({label:"TOMORROW",text:b.name+" \xb7 "+b.platform+(f12(eCi(b))?" \xb7 "+f12(eCi(b)):"")+(payStr?" \xb7 "+payStr:"")+" \xb7 "+nights+" night"+(nights!==1?"s":""),date:tmr,id:b.id});
+      events.push({label:"TOMORROW",text:esc(b.name)+" \xb7 "+esc(b.platform)+(f12(eCi(b))?" \xb7 "+f12(eCi(b)):"")+(payStr?" \xb7 "+payStr:"")+" \xb7 "+nights+" night"+(nights!==1?"s":""),date:tmr,id:b.id});
     });
   }
   // P5: Next upcoming check-in
@@ -1651,7 +1660,7 @@ function buildTicker(){
       const dateStr=d.toLocaleDateString("en-US",{month:"short",day:"numeric"});
       const nights=dR(b.ci,b.co).length;
       const payStr=b.pay==="full"?"Paid":b.pay==="partial"?"Partial balance due":b.pay==="none"?"Unpaid":"";
-      events.push({label:"NEXT CHECK-IN",text:dateStr+" \xb7 "+b.name+" \xb7 "+b.platform+(f12(eCi(b))?" \xb7 "+f12(eCi(b)):"")+(payStr?" \xb7 "+payStr:"")+" \xb7 "+nights+" night"+(nights!==1?"s":""),date:b.ci,id:b.id});
+      events.push({label:"NEXT CHECK-IN",text:dateStr+" \xb7 "+esc(b.name)+" \xb7 "+esc(b.platform)+(f12(eCi(b))?" \xb7 "+f12(eCi(b)):"")+(payStr?" \xb7 "+payStr:"")+" \xb7 "+nights+" night"+(nights!==1?"s":""),date:b.ci,id:b.id});
     }
   }
   // P6: No bookings
@@ -1847,10 +1856,10 @@ function openPclPanel(ds){
   document.getElementById("pcl-list").innerHTML=list.map(b=>`
     <div class="pcl-entry">
       <div class="pcl-lbl">PENCIL HOLD</div>
-      <div class="pcl-entry-nm">${b.name}</div>
-      <div class="pcl-entry-dt">${b.ci} → ${b.co}</div>
-      <div class="pcl-entry-inf">${[b.mobile,b.email,b.platform].filter(Boolean).join(' · ')}</div>
-      ${b.notes?`<div style="font-size:11px;color:#555;margin-bottom:6px">${b.notes}</div>`:''}
+      <div class="pcl-entry-nm">${esc(b.name)}</div>
+      <div class="pcl-entry-dt">${esc(b.ci)} → ${esc(b.co)}</div>
+      <div class="pcl-entry-inf">${[b.mobile,b.email,b.platform].filter(Boolean).map(esc).join(' · ')}</div>
+      ${b.notes?`<div style="font-size:11px;color:#555;margin-bottom:6px">${esc(b.notes)}</div>`:''}
       <div class="pcl-entry-act">
         <button class="btn bx" onclick="openPclConf(${b.id})">Confirm booking</button>
         <button class="btn bc" onclick="cancelPcl(${b.id})">Cancel</button>
@@ -1868,14 +1877,14 @@ function showPclDet(b){
       <span class="pcl-lbl" style="font-size:11px">✏️ PENCIL BOOKING</span>
       ${cnt>1?`<span class="bdg rp" style="margin-left:5px">⭐ ${cnt}× guest</span>`:''}
     </div>
-    <div class="dr"><span class="dl">Guest</span><span class="dv">${b.name}</span></div>
-    ${b.mobile?`<div class="dr"><span class="dl">Mobile</span><span class="dv">${b.mobile}</span></div>`:''}
-    ${b.email?`<div class="dr"><span class="dl">Email</span><span class="dv">${b.email}</span></div>`:''}
-    <div class="dr"><span class="dl">Check-in</span><span class="dv">${b.ci}${b.ciS?' at '+f12(b.ciS):''}</span></div>
-    <div class="dr"><span class="dl">Check-out</span><span class="dv">${b.co}${b.coS?' at '+f12(b.coS):''}</span></div>
+    <div class="dr"><span class="dl">Guest</span><span class="dv">${esc(b.name)}</span></div>
+    ${b.mobile?`<div class="dr"><span class="dl">Mobile</span><span class="dv">${esc(b.mobile)}</span></div>`:''}
+    ${b.email?`<div class="dr"><span class="dl">Email</span><span class="dv">${esc(b.email)}</span></div>`:''}
+    <div class="dr"><span class="dl">Check-in</span><span class="dv">${esc(b.ci)}${b.ciS?' at '+f12(b.ciS):''}</span></div>
+    <div class="dr"><span class="dl">Check-out</span><span class="dv">${esc(b.co)}${b.coS?' at '+f12(b.coS):''}</span></div>
     <div class="dr"><span class="dl">Nights</span><span class="dv">${dR(b.ci,b.co).length}</span></div>
-    <div class="dr"><span class="dl">Platform</span><span class="dv"><span class="bdg ${pC(b.platform)}">${b.platform}</span></span></div>
-    ${b.notes?`<div class="dr"><span class="dl">Notes</span><span class="dv">${b.notes}</span></div>`:''}
+    <div class="dr"><span class="dl">Platform</span><span class="dv"><span class="bdg ${pC(b.platform)}">${esc(b.platform)}</span></span></div>
+    ${b.notes?`<div class="dr"><span class="dl">Notes</span><span class="dv">${esc(b.notes)}</span></div>`:''}
     <div class="acb">
       <button class="btn bx" onclick="openPclConf(${b.id})">Confirm this booking</button>
       <button class="btn" onclick="editPcl(${b.id})">Edit</button>
@@ -1920,10 +1929,10 @@ function showPclList(ds){
     list.map(b=>`
       <div class="pcl-entry" style="margin-bottom:7px">
         <div class="pcl-lbl">PENCIL HOLD</div>
-        <div class="pcl-entry-nm">${b.name}</div>
-        <div class="pcl-entry-dt">${b.ci} → ${b.co}</div>
-        <div class="pcl-entry-inf">${[b.mobile,b.email,b.platform].filter(Boolean).join(' · ')}</div>
-        ${b.notes?`<div style="font-size:11px;color:#555;margin-bottom:6px">${b.notes}</div>`:''}
+        <div class="pcl-entry-nm">${esc(b.name)}</div>
+        <div class="pcl-entry-dt">${esc(b.ci)} → ${esc(b.co)}</div>
+        <div class="pcl-entry-inf">${[b.mobile,b.email,b.platform].filter(Boolean).map(esc).join(' · ')}</div>
+        ${b.notes?`<div style="font-size:11px;color:#555;margin-bottom:6px">${esc(b.notes)}</div>`:''}
         <div class="pcl-entry-act">
           <button class="btn bx" onclick="openPclConf(${b.id})">Confirm</button>
           <button class="btn" onclick="editPcl(${b.id})">Edit</button>
@@ -1979,8 +1988,8 @@ function cancelPcl(id){
   document.getElementById("dpanel").innerHTML=`
     <div class="pn">
       <div class="pt">Cancel pencil booking?</div>
-      <div class="dr"><span class="dl">Guest</span><strong>${b.name}</strong></div>
-      <div class="dr"><span class="dl">Dates</span>${b.ci} → ${b.co}</div>
+      <div class="dr"><span class="dl">Guest</span><strong>${esc(b.name)}</strong></div>
+      <div class="dr"><span class="dl">Dates</span>${esc(b.ci)} → ${esc(b.co)}</div>
       <div class="acb">
         <button class="btn" onclick="showPclDet(bk.find(x=>x.id===${id}))">Keep it</button>
         <button class="btn bc" onclick="execCancelPcl(${id})">Yes, cancel</button>
@@ -2000,7 +2009,7 @@ function showDisplaced(list,msg,confirmLabel,cancelLabel,onConfirm,onCancel){
   document.getElementById("disp-msg").textContent=msg;
   document.getElementById("disp-list").innerHTML=list.map(b=>`
     <div style="background:#fafafa;border:1px solid #e8e8e8;border-radius:6px;padding:8px 10px;font-size:12px">
-      <strong>${b.name}</strong>${b.mobile?' · '+b.mobile:''}${b.email?'<br>'+b.email:''}
+      <strong>${esc(b.name)}</strong>${b.mobile?' · '+esc(b.mobile):''}${b.email?'<br>'+esc(b.email):''}
     </div>`).join("");
   document.getElementById("disp-btns").innerHTML=`
     <button class="bxx" onclick="dispOnCancel&&dispOnCancel()">${cancelLabel}</button>
@@ -2039,8 +2048,8 @@ function showExpiryToast(expired){
 function openExpiryDetails(){
   document.getElementById("expiry-list").innerHTML=pclExpired.map(b=>`
     <div style="background:#fafafa;border:1px solid #e8e8e8;border-radius:6px;padding:8px 10px;font-size:12px">
-      <strong>${b.name}</strong> · ${b.ci} → ${b.co}
-      ${b.mobile?'<br>'+b.mobile:''}${b.email?'<br>'+b.email:''}
+      <strong>${esc(b.name)}</strong> · ${b.ci} → ${b.co}
+      ${b.mobile?'<br>'+esc(b.mobile):''}${b.email?'<br>'+esc(b.email):''}
     </div>`).join("");
   document.getElementById("ov-expiry").classList.add("sh");
 }
@@ -2074,7 +2083,7 @@ function openNotices(){
     cleanerHtml=coGuests.map(b=>{
       const rowCls=isToday?"cu":"bel-row";
       const prefix=isToday?"Today — ":"";
-      return`<div class="${rowCls}" onclick="pickBk(${b.id});cOv('ov-notices')">${prefix}<strong>${b.name}</strong> checks out <strong>${b.co}</strong> at ${f12(eCo(b))||"—"}${b.cd?'<span style="color:#4A8A20;margin-left:6px">✓ Contacted</span>':'<span style="color:#E8A020;margin-left:6px">⚠ Not contacted</span>'}</div>`;
+      return`<div class="${rowCls}" onclick="pickBk(${b.id});cOv('ov-notices')">${prefix}<strong>${esc(b.name)}</strong> checks out <strong>${b.co}</strong> at ${f12(eCo(b))||"—"}${b.cd?'<span style="color:#4A8A20;margin-left:6px">✓ Contacted</span>':'<span style="color:#E8A020;margin-left:6px">⚠ Not contacted</span>'}</div>`;
     }).join("");
   } else {
     cleanerHtml=`<div class="bel-none">No upcoming checkouts</div>`;
@@ -2090,19 +2099,19 @@ function openNotices(){
     return expiry-now<=in48ms;
   }).sort((a,b2)=>a.ci.localeCompare(b2.ci));
   const pclHtml=nearPcl.length
-    ?nearPcl.map(b=>`<div class="bel-row" onclick="showPclDet(bk.find(x=>x.id===${b.id}));cOv('ov-notices')"><strong>${b.name}</strong> · ${b.ci} → ${b.co} · ${b.platform}</div>`).join("")
+    ?nearPcl.map(b=>`<div class="bel-row" onclick="showPclDet(bk.find(x=>x.id===${b.id}));cOv('ov-notices')"><strong>${esc(b.name)}</strong> · ${b.ci} → ${b.co} · ${esc(b.platform)}</div>`).join("")
     :`<div class="bel-none">No pencil holds expiring within 48 hours.</div>`;
 
   // Section 3 — Recently Expired Pencil Bookings (uses archivedAt timestamp; old entries without it are excluded)
   const recentExp=bh.filter(b=>b.cancelReason==="expired"&&b.archivedAt&&b.archivedAt>now-weekMs);
   const expHtml=recentExp.length
-    ?recentExp.map(b=>`<div class="bel-row" style="cursor:default"><strong>${b.name}</strong> · ${b.ci} → ${b.co}${b.mobile?'<br><span style="color:#888">'+b.mobile+'</span>':''}${b.email?'<br><span style="color:#888">'+b.email+'</span>':''}</div>`).join("")
+    ?recentExp.map(b=>`<div class="bel-row" style="cursor:default"><strong>${esc(b.name)}</strong> · ${b.ci} → ${b.co}${b.mobile?'<br><span style="color:#888">'+esc(b.mobile)+'</span>':''}${b.email?'<br><span style="color:#888">'+esc(b.email)+'</span>':''}</div>`).join("")
     :`<div class="bel-none">No recent expirations</div>`;
 
   // Section 4 — Upcoming Confirmed Bookings (fully paid)
   const upcoming=bk.filter(b=>isConf(b)&&b.ci>=TD()&&b.pay==="full").sort((a,b2)=>a.ci.localeCompare(b2.ci));
   const upcomingHtml=upcoming.length
-    ?upcoming.map(b=>`<div class="bel-row" onclick="pickBk(${b.id});cOv('ov-notices')"><strong>${b.name}</strong> · ${b.ci} · <span class="bdg ${pC(b.platform)}">${b.platform}</span></div>`).join("")
+    ?upcoming.map(b=>`<div class="bel-row" onclick="pickBk(${b.id});cOv('ov-notices')"><strong>${esc(b.name)}</strong> · ${b.ci} · <span class="bdg ${pC(b.platform)}">${esc(b.platform)}</span></div>`).join("")
     :`<div class="bel-none">No upcoming confirmed bookings</div>`;
 
   // Section 5+ — Payment sections (conditional on prof.fullPay)
@@ -2110,17 +2119,17 @@ function openNotices(){
   if(prof.fullPay===true){
     const awaitingAll=bk.filter(b=>isConf(b)&&b.pay==="none"&&b.co>=TD()).sort((a,b2)=>a.ci.localeCompare(b2.ci));
     const awaitingHtml=awaitingAll.length
-      ?awaitingAll.map(b=>`<div class="bel-row" onclick="pickBk(${b.id});cOv('ov-notices')"><strong>${b.name}</strong> · ${b.ci} → ${b.co} · <span class="bdg ${pC(b.platform)}">${b.platform}</span>${b.mobile?'<span style="color:#888;margin-left:5px">'+b.mobile+'</span>':b.email?'<span style="color:#888;margin-left:5px">'+b.email+'</span>':''}</div>`).join("")
+      ?awaitingAll.map(b=>`<div class="bel-row" onclick="pickBk(${b.id});cOv('ov-notices')"><strong>${esc(b.name)}</strong> · ${b.ci} → ${b.co} · <span class="bdg ${pC(b.platform)}">${esc(b.platform)}</span>${b.mobile?'<span style="color:#888;margin-left:5px">'+esc(b.mobile)+'</span>':b.email?'<span style="color:#888;margin-left:5px">'+esc(b.email)+'</span>':''}</div>`).join("")
       :`<div class="bel-none">No unpaid bookings</div>`;
     paymentSectionsHtml=`<div class="bel-sec"><div class="bel-sec-hd">💸 Awaiting Payment</div>${awaitingHtml}</div>`;
   } else {
     const awaitingFull=bk.filter(b=>isConf(b)&&b.pay==="none"&&b.co>=TD()).sort((a,b2)=>a.ci.localeCompare(b2.ci));
     const awaitingFullHtml=awaitingFull.length
-      ?awaitingFull.map(b=>`<div class="bel-row" onclick="pickBk(${b.id});cOv('ov-notices')"><strong>${b.name}</strong> · ${b.ci} → ${b.co} · <span class="bdg ${pC(b.platform)}">${b.platform}</span>${b.mobile?'<span style="color:#888;margin-left:5px">'+b.mobile+'</span>':b.email?'<span style="color:#888;margin-left:5px">'+b.email+'</span>':''}</div>`).join("")
+      ?awaitingFull.map(b=>`<div class="bel-row" onclick="pickBk(${b.id});cOv('ov-notices')"><strong>${esc(b.name)}</strong> · ${b.ci} → ${b.co} · <span class="bdg ${pC(b.platform)}">${esc(b.platform)}</span>${b.mobile?'<span style="color:#888;margin-left:5px">'+esc(b.mobile)+'</span>':b.email?'<span style="color:#888;margin-left:5px">'+esc(b.email)+'</span>':''}</div>`).join("")
       :`<div class="bel-none">No unpaid bookings</div>`;
     const awaitingPart=bk.filter(b=>isConf(b)&&b.pay==="partial"&&b.co>=TD()).sort((a,b2)=>a.ci.localeCompare(b2.ci));
     const awaitingPartHtml=awaitingPart.length
-      ?awaitingPart.map(b=>`<div class="bel-row" onclick="pickBk(${b.id});cOv('ov-notices')"><strong>${b.name}</strong> · ${b.ci} → ${b.co} · <span class="bdg ${pC(b.platform)}">${b.platform}</span>${b.mobile?'<span style="color:#888;margin-left:5px">'+b.mobile+'</span>':b.email?'<span style="color:#888;margin-left:5px">'+b.email+'</span>':''}</div>`).join("")
+      ?awaitingPart.map(b=>`<div class="bel-row" onclick="pickBk(${b.id});cOv('ov-notices')"><strong>${esc(b.name)}</strong> · ${b.ci} → ${b.co} · <span class="bdg ${pC(b.platform)}">${esc(b.platform)}</span>${b.mobile?'<span style="color:#888;margin-left:5px">'+esc(b.mobile)+'</span>':b.email?'<span style="color:#888;margin-left:5px">'+esc(b.email)+'</span>':''}</div>`).join("")
       :`<div class="bel-none">No partial payments pending</div>`;
     paymentSectionsHtml=`
       <div class="bel-sec"><div class="bel-sec-hd">💸 Awaiting Full Payment</div>${awaitingFullHtml}</div>
@@ -2132,7 +2141,7 @@ function openNotices(){
   const recontactHtml=recontact.length>0
     ?`<div class="bel-sec"><div class="bel-sec-hd">📞 Re-contact Suggestions</div>
       <div class="bel-none" style="color:#555;margin-bottom:6px">You recently had a cancellation. These guests were displaced and may be interested:</div>
-      ${recontact.map(r=>`<div class="bel-row" style="cursor:default"><strong>${r.name}</strong>${r.mobile?' · '+r.mobile:''}${r.email?'<br><span style="color:#888">'+r.email+'</span>':''}</div>`).join("")}
+      ${recontact.map(r=>`<div class="bel-row" style="cursor:default"><strong>${esc(r.name)}</strong>${r.mobile?' · '+esc(r.mobile):''}${r.email?'<br><span style="color:#888">'+esc(r.email)+'</span>':''}</div>`).join("")}
     </div>`
     :'';
 
@@ -2144,7 +2153,7 @@ function openNotices(){
       const d=new Date(b.co+'T00:00:00');
       const coFmt=d.toLocaleDateString('en-PH',{month:'short',day:'numeric'});
       return`<div class="bel-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-        <div><strong>${b.name}</strong> <span style="color:#888;font-size:11px">checked out ${coFmt}</span> <span class="bdg ${pC(b.platform)}">${b.platform}</span></div>
+        <div><strong>${esc(b.name)}</strong> <span style="color:#888;font-size:11px">checked out ${coFmt}</span> <span class="bdg ${pC(b.platform)}">${esc(b.platform)}</span></div>
         <button class="btn bsv" style="font-size:11px;padding:3px 10px;flex-shrink:0" onclick="cOv('ov-notices');pickBk(${b.id})">Rate now</button>
       </div>`;
     }).join('')
@@ -2159,7 +2168,7 @@ function openNotices(){
       const clStatus=b.cd
         ?'<span style="color:#4A8A20;margin-left:6px">✓ Cleaner contacted</span>'
         :'<span style="color:#B45309;margin-left:6px">⚠ Cleaner not yet contacted</span>';
-      return`<div class="bel-row" onclick="cOv('ov-notices');pickBk(${b.id})"><strong>${b.name}</strong> at ${coTime}${clStatus}</div>`;
+      return`<div class="bel-row" onclick="cOv('ov-notices');pickBk(${b.id})"><strong>${esc(b.name)}</strong> at ${coTime}${clStatus}</div>`;
     }).join('')
     :`<div class="bel-none">No checkouts tomorrow.</div>`;
 
@@ -2172,7 +2181,7 @@ function openNotices(){
     ?`<div class="bel-sec" style="border-left:3px solid #FCA5A5;padding-left:8px"><div class="bel-sec-hd">&#x1F6AB; Blacklisted Guest Alert</div>${blAlertBks.map(b=>{
         const p=getGP(b.guestProfileId);
         const ciDate=new Date(b.ci+'T00:00:00').toLocaleDateString('en-PH',{month:'short',day:'numeric'});
-        return`<div class="bel-row" style="background:#FEF2F2;border-color:#FCA5A5" onclick="cOv('ov-notices');pickBk(${b.id})"><span style="background:#FEE2E2;color:#991B1B;font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;margin-right:6px">BLACKLISTED</span><strong>${b.name}</strong> · Check-in ${ciDate}${p&&p.blacklistReason?'<br><span style="font-size:11px;color:#7F1D1D">'+p.blacklistReason+'</span>':''}</div>`;
+        return`<div class="bel-row" style="background:#FEF2F2;border-color:#FCA5A5" onclick="cOv('ov-notices');pickBk(${b.id})"><span style="background:#FEE2E2;color:#991B1B;font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;margin-right:6px">BLACKLISTED</span><strong>${esc(b.name)}</strong> · Check-in ${ciDate}${p&&p.blacklistReason?'<br><span style="font-size:11px;color:#7F1D1D">'+esc(p.blacklistReason)+'</span>':''}</div>`;
       }).join('')}</div>`
     :'';
 
@@ -2182,7 +2191,7 @@ function openNotices(){
   const gpDupePairs=[];
   Object.values(gpNameMap).forEach(arr=>{if(arr.length>1)gpDupePairs.push([arr[0],arr[1]]);});
   const dupesHtml=gpDupePairs.length
-    ?`<div class="bel-sec" style="background:#FFFBEB;border-radius:7px;padding:8px 10px;border:1px solid #FDE68A"><div class="bel-sec-hd">&#x26A0; Possible Duplicate Guests</div>${gpDupePairs.map(([a,b2])=>`<div class="bel-row" style="background:transparent;border-color:#FDE68A;display:flex;justify-content:space-between;align-items:center;gap:8px"><div style="font-size:12px"><strong>${a.name}</strong> — ${a.mobiles[0]||'no mobile'} vs ${b2.mobiles[0]||'no mobile'}</div><button class="btn" style="font-size:11px;padding:3px 9px;flex-shrink:0" onclick="cOv('ov-notices');showTab('guests')">Review</button></div>`).join('')}</div>`
+    ?`<div class="bel-sec" style="background:#FFFBEB;border-radius:7px;padding:8px 10px;border:1px solid #FDE68A"><div class="bel-sec-hd">&#x26A0; Possible Duplicate Guests</div>${gpDupePairs.map(([a,b2])=>`<div class="bel-row" style="background:transparent;border-color:#FDE68A;display:flex;justify-content:space-between;align-items:center;gap:8px"><div style="font-size:12px"><strong>${esc(a.name)}</strong> — ${esc(a.mobiles[0]||'no mobile')} vs ${esc(b2.mobiles[0]||'no mobile')}</div><button class="btn" style="font-size:11px;padding:3px 9px;flex-shrink:0" onclick="cOv('ov-notices');showTab('guests')">Review</button></div>`).join('')}</div>`
     :'';
 
   // Data backup reminder
