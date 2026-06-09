@@ -10,6 +10,9 @@ let gp=[],gpnid=1;
 let tickerTarget=null;
 let selectedGPId=null,pendingBookingForRepeat=null,pendingRating={};
 let repMonth=null,repView="bookings";
+// Dachshund mascot SVGs — injected into #ticker-inner by buildTicker()
+const TICKER_DOG_WALK=`<svg class="ticker-dog ticker-dog-walk" width="72" height="44" viewBox="0 0 72 44" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;margin-right:8px;display:inline-block;vertical-align:middle"><path class="dog-tail" d="M64 24 Q71 14 67 6" stroke="#4A2C0A" stroke-width="4" fill="none" stroke-linecap="round"/><g class="dog-bob"><ellipse cx="42" cy="28" rx="22" ry="10" fill="#8B5A2B"/><ellipse cx="42" cy="22" rx="17" ry="7" fill="#4A2C0A"/><ellipse cx="22" cy="29" rx="5" ry="9" fill="#8B5A2B"/><ellipse cx="19" cy="31" rx="4" ry="8" fill="#4A2C0A" transform="rotate(8,19,31)"/><circle cx="14" cy="20" r="10" fill="#8B5A2B"/><ellipse cx="7" cy="23" rx="5" ry="4" fill="#A07040"/><ellipse cx="3.5" cy="21.5" rx="2" ry="1.5" fill="#1a1a1a"/><circle cx="11" cy="17" r="2.5" fill="#1a1a1a"/><circle cx="11.8" cy="16.2" r="0.7" fill="#fff"/><rect x="20" y="26" width="10" height="4" rx="2" fill="#F59E0B"/><rect class="dog-leg-fl" x="28" y="36" width="5" height="8" rx="2.5" fill="#8B5A2B"/><rect class="dog-leg-fr" x="34" y="36" width="5" height="8" rx="2.5" fill="#6B4020"/><rect class="dog-leg-bl" x="50" y="36" width="5" height="8" rx="2.5" fill="#8B5A2B"/><rect class="dog-leg-br" x="56" y="36" width="5" height="8" rx="2.5" fill="#6B4020"/></g></svg>`;
+const TICKER_DOG_SIT=`<svg class="ticker-dog ticker-dog-sit" width="36" height="44" viewBox="0 0 36 44" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;margin-right:8px;display:inline-block;vertical-align:middle"><path class="dog-sit-tail" d="M28 38 Q35 29 31 22" stroke="#4A2C0A" stroke-width="3.5" fill="none" stroke-linecap="round"/><rect x="6" y="27" width="24" height="16" rx="10" fill="#8B5A2B"/><circle cx="11" cy="41" r="5" fill="#8B5A2B"/><circle cx="25" cy="41" r="5" fill="#8B5A2B"/><circle cx="18" cy="15" r="12" fill="#8B5A2B"/><ellipse cx="18" cy="8" rx="9" ry="6" fill="#4A2C0A"/><ellipse cx="7" cy="22" rx="5" ry="9" fill="#4A2C0A" transform="rotate(10,7,22)"/><ellipse cx="29" cy="22" rx="5" ry="9" fill="#4A2C0A" transform="rotate(-10,29,22)"/><circle cx="13" cy="12" r="2.5" fill="#1a1a1a"/><circle cx="13.8" cy="11.2" r="0.7" fill="#fff"/><circle cx="23" cy="12" r="2.5" fill="#1a1a1a"/><circle cx="23.8" cy="11.2" r="0.7" fill="#fff"/><rect class="dog-blink-l" x="10.5" y="9.5" width="5" height="5" rx="2.5" fill="#8B5A2B"/><rect class="dog-blink-r" x="20.5" y="9.5" width="5" height="5" rx="2.5" fill="#8B5A2B"/><ellipse cx="18" cy="20" rx="6" ry="4.5" fill="#A07040"/><ellipse cx="18" cy="17.5" rx="2.5" ry="1.5" fill="#1a1a1a"/><ellipse cx="18" cy="24" rx="3.5" ry="3.5" fill="#FF8FA3"/><line x1="18" y1="22" x2="18" y2="27" stroke="#E060A0" stroke-width="1.2" stroke-linecap="round"/></svg>`;
 async function h256(s){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,"0")).join("");}
 async function doLogin(){
   const u=document.getElementById("lu").value.trim(),p=document.getElementById("lp").value;
@@ -1656,7 +1659,8 @@ function buildTicker(){
   if(!events.length){events.push({label:"",text:"No upcoming check-ins  \xb7  Calendar is clear",date:null,id:null});}
   tickerTarget=events[0].date?{date:events[0].date,id:events[0].id}:null;
   const sep="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\xb7\xb7\xb7\xb7\xb7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-  const content=events.map(e=>(e.label?`<span style="color:#F59E0B">${e.label}</span> \xb7 `:"")+e.text).join(sep);
+  const textContent=events.map(e=>(e.label?`<span style="color:#F59E0B">${e.label}</span> \xb7 `:"")+e.text).join(sep);
+  const content=TICKER_DOG_WALK+textContent;
   const inner=document.getElementById("ticker-inner");
   if(inner){inner.innerHTML=content+sep+content;inner.classList.remove("paused");}
   const pauseBtn=document.getElementById("ticker-pause-btn");
@@ -1671,6 +1675,10 @@ function toggleTickerPause(){
   inner.classList.toggle("paused",!isPaused);
   btn.textContent=isPaused?"⏸":"▶";
   btn.setAttribute("aria-label",isPaused?"Pause ticker":"Resume ticker");
+  // Snapshot all dogs into a static array before any DOM mutation
+  const dogs=[...inner.querySelectorAll('.ticker-dog')];
+  const dogSvg=isPaused?TICKER_DOG_WALK:TICKER_DOG_SIT;
+  dogs.forEach(el=>{el.outerHTML=dogSvg;});
 }
 function toggleLegend(){
   const lw=document.getElementById("legend-wrap");
