@@ -2,7 +2,7 @@
 
 > This file is read automatically by Claude Code every session.
 > It contains the full context needed to work on this project.
-> Last updated: 2026-06-07 | Version: v1.6.0
+> Last updated: 2026-06-10 | Version: v1.6.0
 
 ---
 
@@ -27,6 +27,7 @@
 - **Preserve all existing class names and IDs** unless explicitly refactoring. JavaScript references HTML by ID and class. Silent renames break functionality.
 - **localStorage keys are fixed.** The two keys are bt_b (bookings array) and bt_bl (blocks array). Do not rename them. Doing so silently wipes all user data on next load.
 - **Always recalculate nid on load.** After loading from localStorage, nid must be set to Math.max(...all existing ids) + 1 to prevent ID collisions.
+- **Always escape user data before innerHTML.** All user-supplied fields must be wrapped in `esc()` before insertion via `innerHTML`. The `esc()` helper is defined in the helpers section of app.js. Never use bare `${field}` inside an innerHTML template string where the field comes from user input (names, notes, mobile, email, platform, method, tags, block reason/notes, review notes). For copy buttons or any onclick that embeds a user value, use `data-val="${esc(value)}"` and read it via `this.dataset.val` — never interpolate user data into an inline event handler string.
 
 ### 1.3 Communication Rules
 
